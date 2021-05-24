@@ -1,14 +1,18 @@
 import diameter
-import meb_solver
+# import meb_solver # comment out if not connected to the VPN 
+import check_subset
+import numpy as np
+import matplotlib.pyplot as plt
 
 class Ball:
     """
     A class representing a ball with center and radius used to calculate minimum enclosing balls.
     """
-    def __init__(self, center=None, radius=None, approx_diameter=None) -> None:
+    def __init__(self, center=None, radius=None, approx_diameter=None, core_set=None) -> None:
         self.center = center
         self.radius = radius
         self.approx_diameter = approx_diameter
+        self.core_set = core_set
 
     def __str__(self) -> str:
         return (
@@ -43,11 +47,23 @@ class Ball:
 
     def fit(self, data, eps) -> None:
         """
-        
+        does the thing
         """
         p = data[0]
-        X = list(diameter.diameter_approx(p, data))
+        X = np.array(diameter.diameter_approx(p, data))
         delta = eps/163
 
-        #TODO: algorithm 1
-        pass
+        while True:
+            c, r = meb_solver.MEB_solver(X) # compute MEB for X
+            if check_subset.check_subset(data, c, r): # check if all the data is contained in this ball
+                self.center = c
+                self.radius = r
+                self.core_set = X
+                break
+            else:
+                p = diameter.find_furthest(c, data) # p = argmax_(x\in S) [||c'-x||]
+            
+            X = np.append(X,p)
+        return None
+
+print("finished")
