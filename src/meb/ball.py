@@ -1,5 +1,5 @@
-from meb import diameter, check_subset
-from meb import meb_solver # comment out if not connected to the VPN 
+import diameter, check_subset
+import meb_solver # comment out if not connected to the VPN 
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -65,5 +65,3 @@ class Ball:
             
             X = np.append(X,p)
         return None
-
-print("finished")

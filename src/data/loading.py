@@ -13,7 +13,7 @@ def to_csv(data, filename) -> None:
         None
     """
     df = pd.DataFrame(data)
-    df.to_csv(r"{}".format(filename))
+    df.to_csv(r"{}".format(filename), header=False, index=False)
     return None
 
 def from_csv(filename) -> np.array:
