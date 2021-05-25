@@ -1,0 +1,130 @@
+\documentclass[11pt,twoside]{article}
+\usepackage{geometry}
+\usepackage{enumerate}
+\usepackage{latexsym,booktabs}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage[singlespacing]{setspace}
+
+\geometry{a4paper,left=2cm,right=2.0cm, top=2cm, bottom=2.0cm}
+
+\newtheorem{Definition}{Definition}
+\newtheorem{Theorem}{Theorem}
+\newtheorem{Lemma}{Lemma}
+\newtheorem{Corollary}{Corollary}
+\newtheorem{Proposition}{Proposition}
+\newtheorem{Algorithm}{Algorithm}
+\numberwithin{Theorem}{section}
+\numberwithin{Definition}{section}
+\numberwithin{Lemma}{section}
+\numberwithin{Algorithm}{section}
+\numberwithin{equation}{section}
+
+
+\begin{document}
+
+\pagestyle{empty}
+
+% =============================================================================
+% Title page
+% =============================================================================
+\begin{titlepage}
+\vspace*{.5em}
+\center
+\textbf{\large{The School of Mathematics}} \\
+\vspace*{1em}
+\begin{figure}[!h]
+\centering
+\includegraphics[width=180pt]{CentredLogoCMYK.jpg}
+\end{figure}
+\vspace{2em}
+\textbf{\Huge{Minimum Enclosing Balls with Outliers}}\\[2em]
+\textbf{\LARGE{by}}\\
+\vspace{2em}
+\textbf{\LARGE{Thomas Holmes}}\\
+\vspace{6.5em}
+\Large{Dissertation Presented for the Degree of\\
+MSc in Operational Research with Computational Optimization}\\
+\vspace{6.5em}
+\Large{August 2021}\\
+\vspace{3em}
+\Large{Supervised by\\Dr E. Alper Yıldırım}
+\vfill
+\end{titlepage}
+
+\cleardoublepage
+
+% =============================================================================
+% Abstract, acknowledgments, and own work declaration
+% =============================================================================
+\begin{center}
+\Large{Abstract}
+\end{center}
+
+Here comes your abstract ...
+
+\clearpage
+
+\begin{center}
+\Large{Acknowledgments}
+\end{center}
+
+Here come your acknowledgments ...
+
+\clearpage
+
+\begin{center}
+\Large{Own Work Declaration}
+\end{center}
+
+Here comes your own work declaration
+
+\cleardoublepage
+
+
+
+% =============================================================================
+% Table of contents, tables, and pictures (if applicable)
+% =============================================================================
+\pagestyle{plain}
+\setcounter{page}{1}
+\pagenumbering{Roman}
+
+\tableofcontents
+\clearpage
+\listoftables
+\listoffigures
+\cleardoublepage
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\nocite{*}
+\bibliographystyle{abbrv}
+\clearpage
+% =============================================================================
+% Main body
+% =============================================================================
+
+
+
+%the entries have to be in the file literature.bib
+\bibliography{literature}
+\clearpage
+
+\appendix
+\section*{Appendices}
+\addcontentsline{toc}{section}{Appendices}
+
+\section{An Appendix}
+\label{app:one}
+
+Some stuff.
+\clearpage
+
+\section{Another Appendix}
+\label{app:two}
+
+Some other stuff.
+
+\end{document}
