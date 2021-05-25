@@ -1,6 +1,6 @@
-import diameter
-# import meb_solver # comment out if not connected to the VPN 
-import check_subset
+from meb import diameter, check_subset
+from meb import meb_solver # comment out if not connected to the VPN 
+
 import numpy as np
 import matplotlib.pyplot as plt
 
