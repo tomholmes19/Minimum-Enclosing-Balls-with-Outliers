@@ -1,6 +1,8 @@
 import numpy as np
 import xpress as xp
 
+xp.controls.outputlog = 0
+
 def MEB_solver(data):
     """
     Solves the MEB problem using Xpress
@@ -13,7 +15,7 @@ def MEB_solver(data):
         r_soln (float): radius of the MEB
     """
     n = len(data) # number of points
-    d = len(data[0]) # dimension
+    d = len(data[0]) # dimension TODO: make this better
 
     m = xp.problem(name="MEB") # problem object
 
