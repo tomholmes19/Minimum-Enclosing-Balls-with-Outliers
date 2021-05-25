@@ -1,6 +1,8 @@
 import numpy as np
 import xpress as xp
 
+xp.controls.outputlog = 0
+
 d = 3 # dimension
 n = 1000 # number of data points
 
