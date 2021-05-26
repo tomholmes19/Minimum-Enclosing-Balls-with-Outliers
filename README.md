@@ -2,4 +2,4 @@
 
 TODO: make a readme
 
-![meb](meb.png)
+![](sample_meb.png)
