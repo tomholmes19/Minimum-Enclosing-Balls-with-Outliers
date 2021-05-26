@@ -51,22 +51,23 @@ class Ball:
             if dimension == 1:
                 print("Why do you want to plot for dimension 1?")
             elif dimension == 2:
+                fig,ax = plt.subplots(figsize=(figsize,figsize))
+                ax.set_aspect("equal")
+                
                 n = len(data) # number of data points not in the core set
-                m = len(self.core_set) # number of data points in the core set
-
                 x = [data[i][0] for i in range(n)]
                 y = [data[i][1] for i in range(n)]
 
-                x_core = [self.core_set[i][0] for i in range(m)]
-                y_core = [self.core_set[i][1] for i in range(m)]
+                plt.scatter(x, y, color="blue", alpha=alpha, label="data")    
+                
+                if self.core_set is not None:
+                    m = len(self.core_set) # number of data points in the core set
+                    x_core = [self.core_set[i][0] for i in range(m)]
+                    y_core = [self.core_set[i][1] for i in range(m)]
+                    
+                    plt.scatter(x_core, y_core, color="orange", label="core set")
 
-                fig,ax = plt.subplots(figsize=(figsize,figsize))
-                ax.set_aspect("equal")
-
-                plt.scatter(x, y, color="blue", alpha=alpha, label="data")
-                plt.scatter(x_core, y_core, color="orange", label="core set")
                 plt.scatter(self.center[0], self.center[1], color="red", marker="x", label="center")
-
                 ax.add_patch(
                     plt.Circle(self.center, self.radius, color="red", fill=False, label="ball")
                 )
@@ -110,33 +111,42 @@ class Ball:
 
         return out
 
-    def fit(self, data, eps):
+    def fit(self, data, method="heuristic", eps=1e-4):
         """
-        Fits a MEB to the given data using Algorithm 1
+        Fits a MEB to the given data using the specified method
 
         Input:
             data (array like): data to fit the MEB to
-            eps (float): error tolerance
+            method (str): which method to use to find MEB ("heuristic" or "exact")
+            eps (float): error tolerance if using heuristic
         
         Return:
             self (Ball): the MEB for the data
         """
-        p = data[0]
-        X = np.array(diameter.diameter_approx(p, data))
-        delta = eps/163
+        if method == "heuristic": # Algorithm 1
+            p = data[0]
+            X = np.array(diameter.diameter_approx(p, data))
+            delta = eps/163
 
-        while True: # might want to set a max number of iterations
-            c, r = meb_solver.MEB_solver(X) # compute MEB(X)
-            r_dash = r*(1+delta) # get radius for (1+delta) approximation to MEB(X)
-            temp_ball = Ball(c,r_dash*(1+eps/2)) # set temp ball
+            while True: # might want to set a max number of iterations
+                c, r = meb_solver.MEB_solver(X) # compute MEB(X)
+                r_dash = r*(1+delta) # get radius for (1+delta) approximation to MEB(X)
+                temp_ball = Ball(c,r_dash*(1+eps/2)) # set temp ball
 
-            if temp_ball.check_subset(data): # check if all the data is contained in temp ball
-                self.center = c
-                self.radius = temp_ball.radius
-                self.core_set = X
-                break
-            else:
-                p = diameter.find_furthest(c, data) # p = argmax_(x\in S) [||c'-x||]
-            
-            X = np.vstack((X,p)) # X := X U {p}
+                if temp_ball.check_subset(data): # check if all the data is contained in temp ball
+                    self.center = c
+                    self.radius = temp_ball.radius
+                    self.core_set = X
+                    break
+                else:
+                    p = diameter.find_furthest(c, data) # p = argmax_(x\in S) [||c'-x||]
+                
+                X = np.vstack((X,p)) # X := X U {p}
+        
+        elif method == "exact":
+            c, r = meb_solver.MEB_solver(data)
+            self.center = c
+            self.radius = r
+        else:
+            raise ValueError("Invalid/unknown method passed to Ball.fit()")
         return self
