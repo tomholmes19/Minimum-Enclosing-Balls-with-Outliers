@@ -1,8 +1,8 @@
-import data.loading
+import data.loading, data.generation
 from meb.ball import Ball
-
-test_data = data.loading.from_csv(r"src\test\normal_test.csv")
-
+print("generating data")
+test_data = data.generation.normal(0,1,n=10000,dimension=2)
+print("finished data")
 ball = Ball().fit(test_data, eps=1e-2)
 
-print(ball)
+ball.plot(test_data)

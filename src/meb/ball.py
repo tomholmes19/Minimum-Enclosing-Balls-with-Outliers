@@ -21,23 +21,53 @@ class Ball:
             "Approximate diameter:\t {}".format(self.approx_diameter)
         )
 
-    def plot(self, data) -> None:
+    def plot(self, data, alpha=1, figsize=8) -> None:
         """
         Plots the given data with the minimum enclosing ball if dimension is 1,2, or 3
 
         Input:
             data (array like): data to be plotted
+            alpha (float): opacity from 0 to 1 for data points
+            figsize (float): size of the figure (1:1 aspect ratio)
         
         Return:
             None
         """
-        if self.center == None:
+        if self.center is None:
             print("MEB has not been computed")
-        elif len(self.center) in [1,2,3]: 
-            #TODO: plot for dimensions 1, 2, or 3
-            pass
         else:
-            print("Can not plot MEB for dimension")
+            dimension = len(self.center)
+            if dimension == 1:
+                print("Why do you want to plot for dimension 1?")
+            elif dimension == 2:
+                n = len(data) # number of data points not in the core set
+                m = len(self.core_set) # number of data points in the core set
+
+                x = [data[i][0] for i in range(n)]
+                y = [data[i][1] for i in range(n)]
+
+                x_core = [self.core_set[i][0] for i in range(m)]
+                y_core = [self.core_set[i][1] for i in range(m)]
+
+                fig,ax = plt.subplots(figsize=(figsize,figsize))
+                ax.set_aspect("equal")
+
+                plt.scatter(x, y, color="blue", alpha=alpha, label="data")
+                plt.scatter(x_core, y_core, color="orange", label="core set")
+                plt.scatter(self.center[0], self.center[1], color="red", marker="x", label="center")
+
+                ax.add_patch(
+                    plt.Circle(self.center, self.radius, color="red", fill=False, label="ball")
+                )
+                
+                plt.legend()
+
+                plt.show()
+            elif dimension == 3:
+                #TODO: plot for 3d
+                pass
+            else:
+                print("Can not plot MEB for dimension {}".format(dimension))
 
         return None
 
