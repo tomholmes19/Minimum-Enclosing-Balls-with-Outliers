@@ -7,6 +7,17 @@ import matplotlib.pyplot as plt
 class Ball:
     """
     A class representing a ball with center and radius used to calculate minimum enclosing balls.
+
+    Attributes:
+        center (array like): center of the ball
+        radius (float): radius of the ball
+        approx_diameter (float): approximate diameter of the ball (estimated)
+        core_set (array like): the core set used to find the MEB of the data the ball is fit to
+    
+    Methods:
+        plot (None): plots the fit ball if it is dimension 2 or 3
+        check_subset (bool): checks if a given data set is a subset of the ball
+        fit (Ball): fits the MEB to the given data
     """
     def __init__(self, center=None, radius=None, approx_diameter=None, core_set=None) -> None:
         self.center = center
@@ -87,17 +98,28 @@ class Ball:
             out (bool): true if data is contained in the ball, false otherwise
         """
         out = True
-        # if any point is not in the ball, switch out to false and break loop
-        for x in data:
-            if np.linalg.norm(x-self.center) > self.radius:
-                out = False
-                break
+        if self.center is None:
+            print("MEB has not been computed")
+            out = False
+        else:
+            # if any point is not in the ball, switch out to false and break loop
+            for x in data:
+                if np.linalg.norm(x-self.center) > self.radius:
+                    out = False
+                    break
 
         return out
 
     def fit(self, data, eps):
         """
-        does the thing
+        Fits a MEB to the given data using Algorithm 1
+
+        Input:
+            data (array like): data to fit the MEB to
+            eps (float): error tolerance
+        
+        Return:
+            self (Ball): the MEB for the data
         """
         p = data[0]
         X = np.array(diameter.diameter_approx(p, data))
