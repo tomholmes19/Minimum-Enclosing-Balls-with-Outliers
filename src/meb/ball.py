@@ -1,5 +1,4 @@
-# import diameter, check_subset
-from . import diameter, meb_solver
+from . import geometry, meb_solver
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -52,7 +51,7 @@ class Ball:
                 print("Why do you want to plot for dimension 1?")
             elif dimension == 2:
                 fig,ax = plt.subplots(figsize=(figsize,figsize))
-                ax.set_aspect("equal")
+                
                 
                 n = len(data) # number of data points not in the core set
                 x = [data[i][0] for i in range(n)]
@@ -125,7 +124,7 @@ class Ball:
         """
         if method == "heuristic": # Algorithm 1
             p = data[0]
-            X = np.array(diameter.diameter_approx(p, data))
+            X = np.array(geometry.diameter_approx(p, data))
             delta = eps/163
 
             while True: # might want to set a max number of iterations
@@ -139,7 +138,7 @@ class Ball:
                     self.core_set = X
                     break
                 else:
-                    p = diameter.find_furthest(c, data) # p = argmax_(x\in S) [||c'-x||]
+                    p = geometry.find_furthest(c, data) # p = argmax_(x\in S) [||c'-x||]
                 
                 X = np.vstack((X,p)) # X := X U {p}
         
@@ -150,3 +149,27 @@ class Ball:
         else:
             raise ValueError("Invalid/unknown method passed to Ball.fit()")
         return self
+
+    def distance_graph(self, data):
+        #TODO: document this method if its useful
+        n = len(data)
+        mean = geometry.mean_vector(data)
+
+        distances = {i: np.linalg.norm(data[i]-mean) for i in range(n)}
+        sorted_distances = {index: dist for index, dist in sorted(distances.items(), key=lambda item: item[1])}
+
+        #TODO: refactor this as a function
+        dist = list(sorted_distances.values())
+        gradients_list = [dist[i+1]-dist[i] for i in range(len(dist)-1)]
+        gradients = {index: gradient for index, gradient in zip(sorted_distances.keys(), gradients_list)}
+    
+        dist2 = list(gradients.values())
+        gradients_list2 = [dist2[i+1]-dist2[i] for i in range(len(dist2)-1)]
+        gradients2 = {index: gradient for index, gradient in zip(gradients.keys(), gradients_list2)}
+
+        fig, ax = plt.subplots(1,3, figsize=(12,4))
+        ax[0].plot(range(n), sorted_distances.values())
+        ax[1].plot(range(n-1), gradients.values())
+        ax[2].plot(range(n-2), gradients2.values())
+        plt.show()
+        return None

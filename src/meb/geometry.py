@@ -43,3 +43,28 @@ def diameter_approx(p, data, return_diameter=False):
         out = out + (diameter,)
     
     return out
+
+def mean_vector(data) -> np.array:
+    """
+    Calculates the mean vector from a set of d-dimensional vectors
+
+    Input:
+        data (array like): set of vectors to calculate the mean for
+
+    Return:
+        mean (np.array): mean vector
+    """
+    d = len(data[0])
+    
+    # calculate mean for each column in data
+    # e.g.
+    #   a = [
+    #       [1,2],
+    #       [3,4],
+    #       [5,6]    
+    #   ]
+    #   calculate mean of [1,3,5], [2,4,6], return results as elements of array
+    mean = np.array([
+        np.mean([x[i] for x in data]) for i in range(d)
+    ])
+    return mean
