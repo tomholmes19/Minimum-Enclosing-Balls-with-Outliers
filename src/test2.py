@@ -1,11 +1,15 @@
 import data.loading, data.generation
 from meb.ball import Ball
 
+import timeit
+
 print("generating data")
-test_data = data.generation.normal(0,1,10000,2)
+test_data = data.generation.normal(0,1,10000,200)
 print("finished data")
-ball = Ball().fit(test_data, eps=1e-4)
 
-ball.plot(test_data, figsize=8)
+start_time = timeit.default_timer()
+ball = Ball().fit(test_data, eps=1e-4, method="heuristic")
+elapsed = timeit.default_timer() - start_time
+print("Elapsed: {}".format(elapsed))
 
-Ball().distance_graph(test_data)
+print(len(ball.core_set))
