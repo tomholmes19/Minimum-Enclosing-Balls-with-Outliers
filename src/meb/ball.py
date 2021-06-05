@@ -30,60 +30,33 @@ class Ball:
             "Approximate diameter:\t {}".format(self.approx_diameter)
         )
 
-    def plot(self, data, alpha=1, figsize=8) -> None:
+    def check_params(self) -> True:
         """
-        Plots the given data with the minimum enclosing ball if dimension is 1,2, or 3
+        Checks if the center and radius of the ball have been set, if not raise ValueError()
 
         Input:
-            data (array like): data to be plotted
-            alpha (float): opacity from 0 to 1 for data points
-            figsize (float): size of the figure (1:1 aspect ratio)
+            None
+        Return:
+            bool: True if center and radius are set
+        """
+        if self.center is None or self.radius is None:
+            raise ValueError("Center/radius not set")
+        
+        yield True # if center and radius have been set, assume they will not be un-set
+    
+    def contains(self, x) -> bool:
+        """
+        Checks if x is inside the ball
+
+        Input:
+            x (array like): data point to check if it is inside the ball
         
         Return:
-            None
+            out (bool): True if x is inside the ball, False otherwise
         """
-        if self.center is None:
-            print("MEB has not been computed")
-        else:
-            dimension = len(self.center)
-            if dimension == 1:
-                print("Why do you want to plot for dimension 1?")
-            elif dimension == 2:
-                fig,ax = plt.subplots(figsize=(figsize,figsize))
-                
-                
-                n = len(data) # number of data points not in the core set
-                x = [data[i][0] for i in range(n)]
-                y = [data[i][1] for i in range(n)]
-
-                plt.scatter(x, y, color="blue", alpha=alpha, label="data")    
-                
-                if self.core_set is not None:
-                    m = len(self.core_set) # number of data points in the core set
-                    x_core = [self.core_set[i][0] for i in range(m)]
-                    y_core = [self.core_set[i][1] for i in range(m)]
-                    
-                    plt.scatter(x_core, y_core, color="orange", label="core set")
-
-                plt.scatter(self.center[0], self.center[1], color="red", marker="x", label="center")
-                ax.add_patch(
-                    plt.Circle(self.center, self.radius, color="red", fill=False, label="ball")
-                )
-                
-                plt.legend()
-
-                plt.show()
-            elif dimension == 3:
-                #TODO: plot for 3d
-                pass
-            else:
-                print("Can not plot MEB for dimension {}".format(dimension))
-
-        return None
-
-    def set_approx_diameter(self, data) -> None:
-        # is this even needed?
-        pass
+        self.check_params
+        out = np.linalg.norm(x-self.center) < self.radius
+        return out
 
     def check_subset(self, data) -> bool:
         #TODO: check if theres a better way of doing this
@@ -102,11 +75,65 @@ class Ball:
         # if any point is not in the ball, switch out to false and break loop
         out = True
         for x in data:
-            if np.linalg.norm(x-self.center) > self.radius:
+            if not self.contains(x):
                 out = False
                 break
 
         return out
+
+    def plot(self, data, alpha=1, figsize=8) -> None:
+        """
+        Plots the given data with the minimum enclosing ball if dimension is 1,2, or 3
+
+        Input:
+            data (array like): data to be plotted
+            alpha (float): opacity from 0 to 1 for data points
+            figsize (float): size of the figure (1:1 aspect ratio)
+        
+        Return:
+            None
+        """
+        self.check_params
+        
+        dimension = len(self.center)
+        if dimension == 1:
+            print("Why do you want to plot for dimension 1?")
+        elif dimension == 2:
+            fig,ax = plt.subplots(figsize=(figsize,figsize))
+            
+            
+            n = len(data) # number of data points not in the core set
+            x = [data[i][0] for i in range(n)]
+            y = [data[i][1] for i in range(n)]
+
+            plt.scatter(x, y, color="blue", alpha=alpha, label="data")    
+            
+            if self.core_set is not None:
+                m = len(self.core_set) # number of data points in the core set
+                x_core = [self.core_set[i][0] for i in range(m)]
+                y_core = [self.core_set[i][1] for i in range(m)]
+                
+                plt.scatter(x_core, y_core, color="orange", label="core set")
+
+            plt.scatter(self.center[0], self.center[1], color="red", marker="x", label="center")
+            ax.add_patch(
+                plt.Circle(self.center, self.radius, color="red", fill=False, label="ball")
+            )
+            
+            plt.legend()
+
+            plt.show()
+        elif dimension == 3:
+            #TODO: plot for 3d
+            pass
+        else:
+            print("Can not plot MEB for dimension {}".format(dimension))
+
+        return None
+    
+    def set_approx_diameter(self, data) -> None:
+        # is this even needed?
+        pass
 
     def distance_graph(self, data):
         #TODO: document this method if its useful
