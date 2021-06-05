@@ -1,25 +1,34 @@
 import numpy as np
 
-def find_furthest(p,data):
+def find_furthest(p,data, return_index=False) -> np.array:
     """
     Finds the furthest point in data from p (l2 norm)
 
     Input:
         p (array like): initial point
         data (array like): list of points to find furthest point from p
+        return_index (bool): if True return the index of the furthest point, if False return the furthest point
 
     Return:
         furthest_point (array like): point in data which is furthest from p
     """
+    # initial values set to return point p if data is empty or only contains p
     furthest_dist = 0
     furthest_point = p
-    for x in data:
+    furthest_index = 0
+    n = len(data)
+    for i in range(n):
+        x = data[i]
         dist = np.linalg.norm(p-x)
         if dist > furthest_dist:
             furthest_dist = dist
             furthest_point = x
-        
-    return furthest_point
+            furthest_index = i
+    
+    if return_index:
+        return furthest_index
+    else:
+        return furthest_point
 
 def diameter_approx(p, data, return_diameter=False):
     """
