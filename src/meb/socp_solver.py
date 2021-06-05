@@ -3,7 +3,7 @@ import xpress as xp
 
 xp.controls.outputlog = 0
 
-def MEB_solver(data):
+def socp_solver(data):
     """
     Solves the MEB problem using Xpress
 

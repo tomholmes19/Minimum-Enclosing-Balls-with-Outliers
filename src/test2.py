@@ -1,15 +1,16 @@
 import data.loading, data.generation
-from meb.ball import Ball
+from meb.ball import Ball, MEB
 
 import timeit
 
 print("generating data")
-test_data = data.generation.normal(0,1,10000,200)
+test_data = data.generation.normal(0,1,1000,2)
 print("finished data")
 
 start_time = timeit.default_timer()
-ball = Ball().fit(test_data, eps=1e-4, method="heuristic")
+ball = MEB(radius=5).fit(test_data, eps=1e-4, method="exact")
 elapsed = timeit.default_timer() - start_time
 print("Elapsed: {}".format(elapsed))
 
-print(len(ball.core_set))
+print(ball)
+ball.plot(test_data)

@@ -1,11 +1,11 @@
-from . import geometry, meb_solver
+from . import geometry, socp_solver
 
 import numpy as np
 import matplotlib.pyplot as plt
 
 class Ball:
     """
-    A class representing a ball with center and radius used to calculate minimum enclosing balls.
+    A class representing a ball with center and radius
 
     Attributes:
         center (array like): center of the ball
@@ -16,7 +16,6 @@ class Ball:
     Methods:
         plot (None): plots the fit ball if it is dimension 2 or 3
         check_subset (bool): checks if a given data set is a subset of the ball
-        fit (Ball): fits the MEB to the given data
     """
     def __init__(self, center=None, radius=None, approx_diameter=None, core_set=None) -> None:
         self.center = center
@@ -110,46 +109,6 @@ class Ball:
 
         return out
 
-    def fit(self, data, method="heuristic", eps=1e-4):
-        """
-        Fits a MEB to the given data using the specified method
-
-        Input:
-            data (array like): data to fit the MEB to
-            method (str): which method to use to find MEB ("heuristic" or "exact")
-            eps (float): error tolerance if using heuristic
-        
-        Return:
-            self (Ball): the MEB for the data
-        """
-        if method == "heuristic": # Algorithm 1
-            p = data[0]
-            X = np.array(geometry.diameter_approx(p, data))
-            delta = eps/163
-
-            while True: # might want to set a max number of iterations
-                c, r = meb_solver.MEB_solver(X) # compute MEB(X)
-                r_dash = r*(1+delta) # get radius for (1+delta) approximation to MEB(X)
-                temp_ball = Ball(c,r_dash*(1+eps/2)) # set temp ball
-
-                if temp_ball.check_subset(data): # check if all the data is contained in temp ball
-                    self.center = c
-                    self.radius = temp_ball.radius
-                    self.core_set = X
-                    break
-                else:
-                    p = geometry.find_furthest(c, data) # p = argmax_(x\in S) [||c'-x||]
-                
-                X = np.vstack((X,p)) # X := X U {p}
-        
-        elif method == "exact":
-            c, r = meb_solver.MEB_solver(data)
-            self.center = c
-            self.radius = r
-        else:
-            raise ValueError("Invalid/unknown method passed to Ball.fit()")
-        return self
-
     def distance_graph(self, data):
         #TODO: document this method if its useful
         n = len(data)
@@ -173,3 +132,63 @@ class Ball:
         ax[2].plot(range(n-2), gradients2.values())
         plt.show()
         return None
+
+class MEB(Ball):
+    """
+    Extends meb.Ball
+    A Ball object used to calculate minimum enclosing balls.
+
+    Methods:
+        fit (Ball): fits the MEB to the given data
+    """
+    def __init__(self, center=None, radius=None, approx_diameter=None, core_set=None) -> None:
+        super().__init__(center=center, radius=radius, approx_diameter=approx_diameter, core_set=core_set)
+    
+    def fit(self, data, method="heuristic", eps=1e-4):
+        """
+        Fits a MEB to the given data using the specified method
+
+        Input:
+            data (array like): data to fit the MEB to
+            method (str): which method to use to find MEB ("heuristic" or "exact")
+            eps (float): error tolerance if using heuristic
+        
+        Return:
+            self (Ball): the MEB for the data
+        """
+        if method == "exact": # solves the exact optimisation problem for MEB
+            c, r = socp_solver.socp_solver(data)
+            self.center = c
+            self.radius = r
+        
+        elif method == "socp_heuristic": # algorithm 1 https://dl.acm.org/doi/10.1145/996546.996548
+            p = data[0]
+            X = np.array(geometry.diameter_approx(p, data))
+            delta = eps/163
+
+            while True: # might want to set a max number of iterations
+                c, r = socp_solver.socp_solver(X) # compute MEB(X)
+                r_dash = r*(1+delta) # get radius for (1+delta) approximation to MEB(X)
+                temp_ball = Ball(c,r_dash*(1+eps/2)) # set temp ball
+
+                if temp_ball.check_subset(data): # check if all the data is contained in temp ball
+                    self.center = c
+                    self.radius = temp_ball.radius
+                    self.core_set = X
+                    break
+                else:
+                    p = geometry.find_furthest(c, data) # p = argmax_(x\in S) [||c'-x||]
+                
+                X = np.vstack((X,p)) # X := X U {p}
+        
+        else:
+            raise ValueError("Invalid/unknown method passed to MEB.fit()")
+        
+        return self
+
+class MEBwo(Ball):
+    """
+    A ball object used to calculate minimum enclosing balls with outliers
+    """
+    def __init__(self, center=None, radius=None, approx_diameter=None, core_set=None) -> None:
+            super().__init__(center=center, radius=radius, approx_diameter=approx_diameter, core_set=core_set)
