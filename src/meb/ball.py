@@ -91,7 +91,7 @@ class Ball:
         Return:
             None
         """
-        self.check_params
+        self.check_params()
         
         dimension = len(self.center)
         if dimension == 1:
