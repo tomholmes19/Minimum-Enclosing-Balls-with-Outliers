@@ -54,7 +54,7 @@ class Ball:
         Return:
             out (bool): True if x is inside the ball, False otherwise
         """
-        self.check_params
+        # don't check_params here since this is called repeatedly by check_subset()
         out = np.linalg.norm(x-self.center) < self.radius
         return out
 
@@ -69,9 +69,7 @@ class Ball:
         Return:
             out (bool): true if data is contained in the ball, false otherwise
         """
-        if self.center is None or self.radius is None:
-            raise ValueError("Center/radius not set")
-
+        self.check_params()
         # if any point is not in the ball, switch out to false and break loop
         out = True
         for x in data:
