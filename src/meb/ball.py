@@ -1,7 +1,7 @@
-from . import geometry, socp_solver
-
 import numpy as np
 import matplotlib.pyplot as plt
+
+from . import algorithms, geometry
 
 class Ball:
     """
@@ -96,16 +96,15 @@ class Ball:
         Return:
             out (bool): true if data is contained in the ball, false otherwise
         """
+        if self.center is None or self.radius is None:
+            raise ValueError("Center/radius not set")
+
+        # if any point is not in the ball, switch out to false and break loop
         out = True
-        if self.center is None:
-            print("MEB has not been computed")
-            out = False
-        else:
-            # if any point is not in the ball, switch out to false and break loop
-            for x in data:
-                if np.linalg.norm(x-self.center) > self.radius:
-                    out = False
-                    break
+        for x in data:
+            if np.linalg.norm(x-self.center) > self.radius:
+                out = False
+                break
 
         return out
 
@@ -150,44 +149,27 @@ class MEB(Ball):
 
         Input:
             data (array like): data to fit the MEB to
-            method (str): which method to use to find MEB ("heuristic" or "exact")
+            method (str): which method to use to find MEB
             eps (float): error tolerance if using heuristic
         
         Return:
             self (Ball): the MEB for the data
         """
-        if method == "exact": # solves the exact optimisation problem for MEB
-            c, r = socp_solver.socp_solver(data)
-            self.center = c
-            self.radius = r
+        # get the function corresponding to method
+        algorithm = algorithms.algorithms.get("alg_{}".format(method)) # returns none if 'alg_method' not in algorithms dict
+        if algorithm is None:
+            raise NotImplementedError("Method '{}' not implemented".format(method))
         
-        elif method == "socp_heuristic": # algorithm 1 https://dl.acm.org/doi/10.1145/996546.996548
-            p = data[0]
-            X = np.array(geometry.diameter_approx(p, data))
-            delta = eps/163
-
-            while True: # might want to set a max number of iterations
-                c, r = socp_solver.socp_solver(X) # compute MEB(X)
-                r_dash = r*(1+delta) # get radius for (1+delta) approximation to MEB(X)
-                temp_ball = Ball(c,r_dash*(1+eps/2)) # set temp ball
-
-                if temp_ball.check_subset(data): # check if all the data is contained in temp ball
-                    self.center = c
-                    self.radius = temp_ball.radius
-                    self.core_set = X
-                    break
-                else:
-                    p = geometry.find_furthest(c, data) # p = argmax_(x\in S) [||c'-x||]
-                
-                X = np.vstack((X,p)) # X := X U {p}
-        
-        else:
-            raise ValueError("Invalid/unknown method passed to MEB.fit()")
+        c, r, X = algorithm(data, eps)
+        self.center = c
+        self.radius = r
+        self.core_set = X
         
         return self
 
-class MEBwo(Ball):
+class MEBwO(MEB):
     """
+    Extends MEB
     A ball object used to calculate minimum enclosing balls with outliers
     """
     def __init__(self, center=None, radius=None, approx_diameter=None, core_set=None) -> None:
