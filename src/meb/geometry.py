@@ -1,17 +1,23 @@
 import numpy as np
 
-def find_furthest(p,data, return_index=False) -> np.array:
+def find_furthest(p,data, core_set=None, return_index=False) -> np.array:
     """
-    Finds the furthest point in data from p (l2 norm)
+    Finds the furthest point in data from p (l2 norm) that isn't in the core set if specified
 
     Input:
         p (array like): initial point
         data (array like): list of points to find furthest point from p
+        core_set (array like): list of points in the core set not to consider
         return_index (bool): if True return the index of the furthest point, if False return the furthest point
 
     Return:
         furthest_point (array like): point in data which is furthest from p
     """
+    if core_set is None:
+        core = []
+    else:
+        core = core_set.copy()
+
     # initial values set to return point p if data is empty or only contains p
     furthest_dist = 0
     furthest_point = p
@@ -19,11 +25,12 @@ def find_furthest(p,data, return_index=False) -> np.array:
     n = len(data)
     for i in range(n):
         x = data[i]
-        dist = np.linalg.norm(p-x)
-        if dist > furthest_dist:
-            furthest_dist = dist
-            furthest_point = x
-            furthest_index = i
+        if x not in core: # if no core set specified, always evaluates to True
+            dist = np.linalg.norm(p-x)
+            if dist > furthest_dist:
+                furthest_dist = dist
+                furthest_point = x
+                furthest_index = i
     
     if return_index:
         return furthest_index
