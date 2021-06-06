@@ -7,6 +7,24 @@ Algorithms used to compute MEB
 All functions should start with 'alg_' to be captured in algorithms dictionary (see bottom of algorithms.py)
 """
 
+def point_union(X,p) -> np.array:
+    """
+    Returns the set union of the set X and the set {p}, i.e. if p in X then returns X, otherwise returns X U {p}
+
+    Input:
+        X (array like): set of points
+        p (np.array): candidate point
+    
+    Return
+        out (np.array): union of X and {p}
+    """
+    if p not in X:
+        out = np.vstack((X,p))
+    else:
+        out = X
+    
+    return out
+
 def alg_socp_exact(data, eps): # solves the exact optimisation problem for MEB
         c, r = socp_solver.socp_solver(data)
         return c, r, None
@@ -25,16 +43,30 @@ def alg_socp_heuristic(data, eps): # algorithm 1 https://dl.acm.org/doi/10.1145/
         if temp_ball.check_subset(data): # check if all the data is contained in temp ball
             break
         else:
-            p = geometry.find_furthest(c, data) # p = argmax_(x\in S) [||c'-x||]
+            p = geometry.find_furthest(c, data, core_set=X) # p = argmax_(x\in S) [||c'-x||]
         
-        X = np.vstack((X,p)) # X := X U {p}
+        X = point_union(X,p)
 
     return c, r, X
 
+def psi(u, data):
+    n = len(data) # number of points
+
+    x = sum([
+        u[i] * np.dot(data[i],data[i]) for i in range(n)
+    ])
+    y = np.array(
+        sum([u[i] * data[i] for i in range(n)])
+    )
+
+    z = np.dot(y,y)
+
+    out = x - z
+    return out
+
 def alg_heuristic_1(data, eps): # algorithm 3.1 https://www.researchgate.net/publication/220133011_Two_Algorithms_for_the_Minimum_Enclosing_Ball_Problem
-    #TODO: finish this
-    alpha = geometry.find_furthest(data[0], data)
-    beta = geometry.find_furthest(data[alpha], data)
+    alpha = geometry.find_furthest(data[0], data, return_index=True)
+    beta = geometry.find_furthest(data[alpha], data, return_index=True)
 
     n = len(data)
     u = np.zeros(n)
@@ -42,8 +74,24 @@ def alg_heuristic_1(data, eps): # algorithm 3.1 https://www.researchgate.net/pub
     u[beta] = 1/2
 
     X = np.array([data[alpha], data[beta]])
+    c = sum([u[i]*data[i] for i in range(n)])
+    gamma = psi(u, data)
+    kappa = geometry.find_furthest(c, data, return_index=True)
+    delta = ((np.linalg.norm(data[kappa]-c)**2)/gamma) - 1
 
-    return None
+    tol = (1+eps)**2 - 1
+    k = 0
+    while delta > tol:
+        lam = delta/(2*(1+delta))
+        e = np.zeros(n); e[kappa] = 1 # create unit vector
+        u = (1-lam)*u + lam*e
+        c = (1-lam)*c + lam*data[kappa]
+        X = point_union(X,data[kappa]) # X := X U {a^k}
+        gamma = psi(u,data)
+        kappa = geometry.find_furthest(c, data, return_index=True)
+        delta = ((np.linalg.norm(data[kappa]-c)**2)/gamma) - 1
+
+    return c, np.sqrt((1+delta)*gamma), X
 
 # dictionary of functions whose name starts with "alg_" (i.e. the ones in this file)
 algorithms = {name: func for name, func in locals().copy().items() if name.startswith("alg_")}
