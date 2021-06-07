@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.linalg.linalg import norm
 from . import geometry, socp_solver, ball
 
 """
@@ -64,6 +65,21 @@ def psi(u, data):
     out = x - z
     return out
 
+def e(n, k) -> np.array:
+    """
+    Returns the standard basis vector e_k in R^n i.e. 0 n-vector with k-th element 1
+
+    Input:
+        n (int): dimension of vector
+        k (int): element of vector to be 1
+    
+    Return:
+        e (np.array): canonical basis vector
+    """
+    e = np.zeros(n)
+    e[k] = 1
+    return e
+
 def alg_heuristic_1(data, eps): # algorithm 3.1 https://www.researchgate.net/publication/220133011_Two_Algorithms_for_the_Minimum_Enclosing_Ball_Problem
     alpha = geometry.find_furthest(data[0], data, return_index=True)
     beta = geometry.find_furthest(data[alpha], data, return_index=True)
@@ -80,16 +96,60 @@ def alg_heuristic_1(data, eps): # algorithm 3.1 https://www.researchgate.net/pub
     delta = ((np.linalg.norm(data[kappa]-c)**2)/gamma) - 1
 
     tol = (1+eps)**2 - 1
-    k = 0
+
     while delta > tol:
         lam = delta/(2*(1+delta))
-        e = np.zeros(n); e[kappa] = 1 # create unit vector
-        u = (1-lam)*u + lam*e
+        u = (1-lam)*u + lam*e(n, kappa)
         c = (1-lam)*c + lam*data[kappa]
         X = point_union(X,data[kappa]) # X := X U {a^k}
         gamma = psi(u,data)
         kappa = geometry.find_furthest(c, data, return_index=True)
         delta = ((np.linalg.norm(data[kappa]-c)**2)/gamma) - 1
+
+    return c, np.sqrt((1+delta)*gamma), X
+
+def alg_heuristic_2(data, eps): # algorithm 4.1 https://www.researchgate.net/publication/220133011_Two_Algorithms_for_the_Minimum_Enclosing_Ball_Problem
+    alpha = geometry.find_furthest(data[0], data, return_index=True)
+    beta = geometry.find_furthest(data[alpha], data, return_index=True)
+
+    n = len(data)
+    u = np.zeros(n)
+    u[alpha] = 1/2
+    u[beta] = 1/2
+
+    X = np.array([data[alpha], data[beta]])
+    c = sum([u[i]*data[i] for i in range(n)])
+    gamma = psi(u, data)
+    kappa = geometry.find_furthest(c, data, return_index=True)
+    xi = geometry.find_furthest(c, data, return_index=True, find_closest=True)
+    delta_plus = ((np.linalg.norm(data[kappa]-c)**2)/gamma) - 1
+    delta_minus = 1 - ((np.linalg.norm(data[xi]-c)**2)/gamma)
+    delta = max(delta_plus, delta_minus)
+
+    tol = (1+eps)**2 - 1
+
+    while delta > tol:
+        if delta > delta_minus:
+            lam = delta/(2*(1+delta))
+            u = (1-lam)*u + lam*e(n, kappa)
+            c = (1-lam)*c + lam*data[kappa]
+            X = point_union(X, data[kappa])
+        else:
+            temp = u[xi]/(1-u[xi])
+            lam = min(delta_minus/(2*(1-delta_minus)), temp)
+            if lam == temp:
+                X = np.array([x for x in X if (x!=data[xi]).all()])
+            else:
+                pass
+            u = (1+lam)*u - lam*e(n, xi)
+            c = (1+lam)*c - lam*data[xi]
+        
+        gamma = psi(u, data)
+        kappa = geometry.find_furthest(c, data, return_index=True)
+        xi = geometry.find_furthest(c, data, return_index=True)
+        delta_plus = ((np.linalg.norm(data[kappa]-c)**2)/gamma) - 1
+        delta_minus = 1 - ((np.linalg.norm(data[xi] - c)**2)/gamma)
+        delta = max(delta_plus, delta_minus)
 
     return c, np.sqrt((1+delta)*gamma), X
 
