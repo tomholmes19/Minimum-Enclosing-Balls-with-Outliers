@@ -1,41 +1,42 @@
 import numpy as np
 
-def find_furthest(p,data, core_set=None, return_index=False) -> np.array:
+def find_furthest(p,data, core_set=None, return_index=False, find_closest=False) -> np.array:
     """
-    Finds the furthest point in data from p (l2 norm) that isn't in the core set if specified
+    Finds the furthest or closest point in data from p (l2 norm) that isn't in the core set if specified
 
     Input:
         p (array like): initial point
         data (array like): list of points to find furthest point from p
         core_set (array like): list of points in the core set not to consider
         return_index (bool): if True return the index of the furthest point, if False return the furthest point
+        find_closest (bool): if True return closest point instead of furthest
 
     Return:
-        furthest_point (array like): point in data which is furthest from p
+        point (array like): point in data which is furthest or closest to p
     """
     if core_set is None:
         core = []
     else:
-        core = core_set.copy()
+        core = core_set
 
     # initial values set to return point p if data is empty or only contains p
-    furthest_dist = 0
-    furthest_point = p
-    furthest_index = 0
+    dist = 0 # highest/lowest distance found so far
+    point = p # furthest/closest point found so far
+    index = 0 # index of point in data
     n = len(data)
     for i in range(n):
         x = data[i]
         if x not in core: # if no core set specified, always evaluates to True
-            dist = np.linalg.norm(p-x)
-            if dist > furthest_dist:
-                furthest_dist = dist
-                furthest_point = x
-                furthest_index = i
+            x_dist = np.linalg.norm(p-x)
+            if (find_closest and x_dist < dist) or (not find_closest and x_dist > dist):
+                dist = x_dist
+                point = x
+                index = i
     
     if return_index:
-        return furthest_index
+        return index
     else:
-        return furthest_point
+        return point
 
 def diameter_approx(p, data, return_diameter=False):
     """
