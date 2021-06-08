@@ -3,8 +3,8 @@ import numpy as np
 import gurobipy as gp
 from gurobipy import GRB
 
-d = 4 # dimension
-n = 1000 # number of data points
+d = 2 # dimension
+n = 10 # number of data points
 
 def gen_data(n,d):
     data = [0]*n
@@ -16,18 +16,26 @@ data = gen_data(n,d)
 
 m = gp.Model("MEB")
 
-r = m.addVar(name="radius")
 c = m.addMVar(shape=d, lb=-GRB.INFINITY, name="center")
+r = m.addVar(name="radius")
 
 m.setObjective(r, GRB.MINIMIZE)
 
-#TODO: figure out norm constraint
-m.addConstrs(
-    (sum((c[j] - data[i][j]) for j in range(d)) + r <= 0 for i in range(n))
-)
+for i in range(n):
+    m.addMQConstr(
+        Q=np.identity(d),
+        c=np.append(-2*data[i],-1),
+        sense=GRB.LESS_EQUAL,
+        rhs=-1*(data[i]@data[i]),
+        xQ_L=c,
+        xQ_R=c,
+        xc=c.tolist().append(r)
+    )
 
+#m.addConstrs(
+#    ( (data[i] @ data[i]) - 2*(data[i] @ c) + (c @ c)  <= r for i in range(n) )
+#)
 
 m.optimize()
 
-for v in m.getVars():
-    print(v.varName, v.x)
+print([v.x for v in c.tolist()])
