@@ -44,7 +44,7 @@ def alg_socp_heuristic(data, eps): # algorithm 1 https://dl.acm.org/doi/10.1145/
         if temp_ball.check_subset(data): # check if all the data is contained in temp ball
             break
         else:
-            p = geometry.find_furthest(c, data, core_set=X) # p = argmax_(x\in S) [||c'-x||]
+            p = geometry.find_furthest(c, data) # p = argmax_(x\in S) [||c'-x||]
         
         X = point_union(X,p)
 
