@@ -1,6 +1,6 @@
 import numpy as np
 from numpy.linalg.linalg import norm
-from . import geometry, gurobi_solver, ball
+from . import geometry, gurobi_solvers, ball
 
 """
 Algorithms used to compute MEB
@@ -26,8 +26,8 @@ def point_union(X,p) -> np.array:
     
     return out
 
-def alg_socp_exact(data, eps): # solves the exact optimisation problem for MEB
-        c, r = gurobi_solver.socp_solver(data)
+def alg_socp_exact(data): # solves the exact optimisation problem for MEB
+        c, r = gurobi_solvers.meb_exact(data)
         return c, r, None
 
 def alg_socp_heuristic(data, eps): # algorithm 1 https://dl.acm.org/doi/10.1145/996546.996548
@@ -37,7 +37,7 @@ def alg_socp_heuristic(data, eps): # algorithm 1 https://dl.acm.org/doi/10.1145/
     delta = eps/163
 
     while True: # might want to set a max number of iterations
-        c, r = gurobi_solver.socp_solver(X) # compute MEB(X)
+        c, r = gurobi_solvers.socp_solver(X) # compute MEB(X)
         r_dash = r*(1+delta) # get radius for (1+delta) approximation to MEB(X)
         temp_ball = ball.Ball(c,r_dash*(1+eps/2)) # set temp ball
 

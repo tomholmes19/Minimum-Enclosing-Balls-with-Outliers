@@ -3,7 +3,7 @@ import numpy as np
 import gurobipy as gp
 from gurobipy import GRB
 
-def socp_solver(data):
+def meb_exact(data):
     """
     Solves the MEB problem using Gurobi
 
