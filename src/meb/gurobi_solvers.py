@@ -41,5 +41,50 @@ def meb_exact(data):
     c_soln = [v.x for v in c.tolist()]
     r_soln = np.sqrt(m.getVarByName(name="radius").x)
 
-    return c_soln, r_soln
+    return c_soln, r_soln, None
+
+def mebwo_exact(data, eta, M, LP_relax=False):
+    """
+    Solves the MEBwO problem for eta% of the points covered using Gurobi
+
+    Input:
+        data (array like): list of data points to compute the MEB for
+        eta (float): percentage of points to be covered, i.e. eta=0.9 means 90% of points in data are inside the ball
+        M (float): value of M for big M constraint
+        LP_relax (bool): if True then relax binary variables to 0 <= xi[i] <= 1 for all i
+
+    Return:
+        c_soln (NumPy array): center of the MEB
+        r_soln (float): radius of the MEB
+        xi_soln (int): binary variables for outlier or not outlier
+    """
+    n = len(data) # number of points
+    d = len(data[0]) # dimension TODO: make this better
+    k = np.ceil(n*(1-eta)) # number of points that are outliers
     
+    m = gp.Model("MEBwO")
+
+    c = m.addVars(d, lb=-GRB.INFINITY, name="center")
+    r = m.addVar(name="radius")
+
+    if LP_relax:
+        xi = m.addVars(n, lb=0, ub=1, vtype=GRB.CONTINUOUS)
+    else:
+        xi = m.addVars(n, vtype=GRB.BINARY)
+
+    m.setObjective(r, GRB.MINIMIZE)
+
+    # containment big M constraint
+    m.addConstrs(
+        (gp.quicksum([c[j]*c[j] - 2*c[j]*data[i][j] + (data[i][j]**2) for j in range(d)]) - r - M*xi[i] <= 0 for i in range(n))
+    )
+    
+    m.addConstr(gp.quicksum(xi[i] for i in range(n)) <= k)
+
+    m.optimize()
+
+    c_soln = [c[i].x for i in range(d)]
+    r_soln = np.sqrt(r.x)
+    xi_soln = [xi[i].x for i in range(n)]
+
+    return c_soln, r_soln, xi_soln
