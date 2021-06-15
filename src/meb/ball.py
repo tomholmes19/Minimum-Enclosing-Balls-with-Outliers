@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from . import meb_algorithms, geometry
+from . import meb_algorithms, mebwo_algorithms, geometry
 
 class Ball:
     """
@@ -175,7 +175,6 @@ class MEB(Ball):
         Input:
             data (array like): data to fit the MEB to
             method (str): which method to use to find MEB
-            eps (float): error tolerance if using heuristic
         
         Return:
             self (Ball): the MEB for the data
@@ -201,6 +200,16 @@ class MEBwO(MEB):
     def __init__(self, center=None, radius=None, approx_diameter=None, core_set=None) -> None:
             super().__init__(center=center, radius=radius, approx_diameter=approx_diameter, core_set=core_set)
     
-    def fit(self, data, **kwargs):
-        #TODO: write this, refactor input sanitation
-        pass
+    def fit(self, data, method, **kwargs):
+        #TODO: refactor input sanitation
+        # get the function corresponding to method
+        algorithm = mebwo_algorithms.algorithms.get("alg_{}".format(method)) # returns none if 'alg_method' not in algorithms dict
+        if algorithm is None:
+            raise NotImplementedError("Method '{}' not implemented".format(method))
+
+        c, r, xi = algorithm(data, **kwargs)
+
+        self.center = c
+        self.radius = r
+
+        return self
