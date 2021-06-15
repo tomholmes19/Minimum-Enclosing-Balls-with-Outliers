@@ -55,7 +55,7 @@ class Ball:
             out (bool): True if x is inside the ball, False otherwise
         """
         # don't check_params here since this is called repeatedly by check_subset()
-        out = np.linalg.norm(x-self.center) < self.radius
+        out = np.linalg.norm(x-self.center) <= self.radius
         return out
 
     def check_subset(self, data) -> bool:
@@ -98,8 +98,7 @@ class Ball:
             print("Why do you want to plot for dimension 1?")
         elif dimension == 2:
             fig,ax = plt.subplots(figsize=(figsize,figsize))
-            
-            
+
             n = len(data) # number of data points not in the core set
             x = [data[i][0] for i in range(n)]
             y = [data[i][1] for i in range(n)]
@@ -201,7 +200,7 @@ class MEBwO(MEB):
             super().__init__(center=center, radius=radius, approx_diameter=approx_diameter, core_set=core_set)
     
     def fit(self, data, method, **kwargs):
-        #TODO: refactor input sanitation
+        #TODO: refactor input sanitation and algorithm retrieval
         # get the function corresponding to method
         algorithm = mebwo_algorithms.algorithms.get("alg_{}".format(method)) # returns none if 'alg_method' not in algorithms dict
         if algorithm is None:
@@ -213,3 +212,23 @@ class MEBwO(MEB):
         self.radius = r
 
         return self
+
+    def pct_containment(self, data) -> float:
+        """
+        Finds what % of points in data are inside the ball
+
+        Input:
+            data (array like): data to check
+        
+        Return:
+            pct (float): percentage of points contained in the ball
+        """
+        n = len(data) # total number of points
+        inside = 0 # number of points inside the ball
+
+        for x in data:
+            if self.contains(x):
+                inside += 1
+
+        pct = inside/n
+        return pct
