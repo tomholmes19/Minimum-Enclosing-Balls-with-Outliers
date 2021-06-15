@@ -24,24 +24,24 @@ m = gp.Model("MEB")
 # m.Params.NonConvex = 2
 
 c = m.addVars(d, lb=-GRB.INFINITY, name="center")
-xi = m.addVars(n, vtype=GRB.BINARY)
+xi = m.addVars(n, lb=0, ub=1, vtype=GRB.CONTINUOUS)
 r = m.addVar(name="radius")
 
 y = m.addVars(d)
 
 m.setObjective(r, GRB.MINIMIZE)
 
-for i in range(n):
-    m.addConstr(
-        sum([c[j]*c[j] - 2*c[j]*data[i][j] + (data[i][j]**2) for j in range(d)]) - r - M*xi[i] <= 0
-    )
 
-m.addConstr(sum(xi[i] for i in range(n)) <= k)
+m.addConstrs(
+    (gp.quicksum([c[j]*c[j] - 2*c[j]*data[i][j] + (data[i][j]**2) for j in range(d)]) - r - M*xi[i] <= 0 for i in range(n))
+)
+
+m.addConstr(gp.quicksum(xi[i] for i in range(n)) <= k)
 
 m.optimize()
 
 center = [c[i].x for i in range(d)]
-radius = np.sqrt(m.getVarByName(name="radius").x)
+radius = np.sqrt(r.x)
 
 print("center:\t", center)
 print("radius:\t", radius)
