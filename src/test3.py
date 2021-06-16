@@ -1,16 +1,26 @@
 import timeit
-import numpy as np
 
-M = 10
-size = 1000000000
+n = 100000000
+my_list = range(n)
 
 full_start = timeit.default_timer()
-a = np.full(size,M)
+
+a = [x for x in my_list if x % 2 == 0]
+b = [x for x in my_list if x % 2 == 1]
+
 full_elapsed = timeit.default_timer() - full_start
 
 zeros_start = timeit.default_timer()
-b = np.zeros(size)
-b = M*b
+
+a = []
+b = []
+
+for x in my_list:
+    if x % 2 == 0:
+        a.append(x)
+    else:
+        b.append(x)
+
 zeros_elapsed = timeit.default_timer() - zeros_start
 
 print(full_elapsed, zeros_elapsed)

@@ -79,7 +79,7 @@ class Ball:
 
         return out
 
-    def plot(self, data, alpha=1, figsize=8) -> None:
+    def plot(self, data, alpha=1, figsize=8, show=True) -> None:
         """
         Plots the given data with the minimum enclosing ball if dimension is 1,2, or 3
 
@@ -87,6 +87,7 @@ class Ball:
             data (array like): data to be plotted
             alpha (float): opacity from 0 to 1 for data points
             figsize (float): size of the figure (1:1 aspect ratio)
+            show (bool): whether to call plt.show() or not
         
         Return:
             None
@@ -117,9 +118,10 @@ class Ball:
                 plt.Circle(self.center, self.radius, color="red", fill=False, label="ball")
             )
             
-            plt.legend()
+            if show:
+                plt.legend()
+                plt.show()
 
-            plt.show()
         elif dimension == 3:
             #TODO: plot for 3d
             pass
@@ -232,3 +234,36 @@ class MEBwO(MEB):
 
         pct = inside/n
         return pct
+
+    def plot(self, data, alpha=1, figsize=8, show=True) -> None:
+        """
+        Plots the MEBwO
+
+        Input:
+            data (array like): data to be plotted
+            alpha (float): opacity from 0 to 1 for data points
+            figsize (float): size of the figure (1:1 aspect ratio)
+            show (bool): whether to call plt.show() or not
+        
+        Return:
+            None
+        """
+
+        self.check_params()
+
+        inliers = [x for x in data if self.contains(x)]
+        outliers = [x for x in data if not self.contains(x)]
+
+        super().plot(data=inliers, alpha=alpha, figsize=figsize, show=False)
+
+        k = len(outliers)
+        #TODO: refactor this as a function
+        x_outliers = [outliers[i][0] for i in range(k)]
+        y_outliers = [outliers[i][1] for i in range(k)]
+        plt.scatter(x_outliers, y_outliers, color="g", alpha=alpha, label="outliers")   
+
+        if show:
+            plt.legend()
+            plt.show()
+        
+        return None

@@ -4,7 +4,7 @@ import numpy as np
 
 import timeit
 
-test_data = data.generation.normal(0,1,1000,10)
+test_data = data.generation.normal(0,1,1000,2)
 start = timeit.default_timer()
 ball = MEBwO().fit(data=test_data, method="exact", eta=0.9)
 elapsed = timeit.default_timer() - start
