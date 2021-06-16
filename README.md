@@ -4,4 +4,4 @@ The repository for my masters dissertation to be submitted for the MSc Operation
 
 TODO: make a readme
 
-![](sample_meb.png)
+![](sample_mebwo.png)
