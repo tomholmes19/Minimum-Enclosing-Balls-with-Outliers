@@ -95,9 +95,8 @@ class Ball:
         self.check_params()
         
         dimension = len(self.center)
-        if dimension == 1:
-            print("Why do you want to plot for dimension 1?")
-        elif dimension == 2:
+
+        if dimension == 2:
             fig,ax = plt.subplots(figsize=(figsize,figsize))
 
             n = len(data) # number of data points not in the core set
@@ -250,20 +249,22 @@ class MEBwO(MEB):
         """
 
         self.check_params()
+        dimension = len(self.center)
 
-        inliers = [x for x in data if self.contains(x)]
-        outliers = [x for x in data if not self.contains(x)]
+        if dimension == 2:
+            inliers = [x for x in data if self.contains(x)]
+            outliers = [x for x in data if not self.contains(x)]
 
-        super().plot(data=inliers, alpha=alpha, figsize=figsize, show=False)
+            super().plot(data=inliers, alpha=alpha, figsize=figsize, show=False)
 
-        k = len(outliers)
-        #TODO: refactor this as a function
-        x_outliers = [outliers[i][0] for i in range(k)]
-        y_outliers = [outliers[i][1] for i in range(k)]
-        plt.scatter(x_outliers, y_outliers, color="g", alpha=alpha, label="outliers")   
+            k = len(outliers)
+            #TODO: refactor this as a function
+            x_outliers = [outliers[i][0] for i in range(k)]
+            y_outliers = [outliers[i][1] for i in range(k)]
+            plt.scatter(x_outliers, y_outliers, color="g", alpha=alpha, label="outliers")   
 
-        if show:
-            plt.legend()
-            plt.show()
+            if show:
+                plt.legend()
+                plt.show()
         
         return None

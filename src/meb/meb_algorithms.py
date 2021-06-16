@@ -37,7 +37,7 @@ def alg_socp_heuristic(data, eps): # algorithm 1 https://dl.acm.org/doi/10.1145/
     delta = eps/163
 
     while True: # might want to set a max number of iterations
-        c, r = gurobi_solvers.socp_solver(X) # compute MEB(X)
+        c, r, _ = gurobi_solvers.meb_exact(X) # compute MEB(X)
         r_dash = r*(1+delta) # get radius for (1+delta) approximation to MEB(X)
         temp_ball = ball.Ball(c,r_dash*(1+eps/2)) # set temp ball
 
