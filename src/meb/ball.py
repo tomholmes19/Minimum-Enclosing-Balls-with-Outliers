@@ -98,6 +98,7 @@ class Ball:
 
         if dimension == 2:
             fig,ax = plt.subplots(figsize=(figsize,figsize))
+            plt.gca().set_aspect('equal')
 
             n = len(data) # number of data points not in the core set
             x = [data[i][0] for i in range(n)]

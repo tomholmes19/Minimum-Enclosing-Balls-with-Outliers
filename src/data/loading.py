@@ -29,5 +29,3 @@ def from_csv(filename) -> np.array:
     df = pd.read_csv(r"{}".format(filename), header=None)
     out = df.to_numpy()
     return out
-
-print(len(from_csv(r"src\test\normal_test.csv")))
