@@ -26,6 +26,8 @@ def from_csv(filename) -> np.array:
     Return:
         out (np.array): data in np.array format
     """
-    df = pd.read_csv(r"{}".format(filename))
+    df = pd.read_csv(r"{}".format(filename), header=None)
     out = df.to_numpy()
     return out
+
+print(len(from_csv(r"src\test\normal_test.csv")))
