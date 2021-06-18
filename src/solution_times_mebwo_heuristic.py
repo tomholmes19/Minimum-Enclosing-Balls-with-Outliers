@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 from data.loading import from_csv
 from meb.ball import MEBwO
 
-n_list = [50, 100, 150, 200, 250, 300]
-d_list = [3, 7, 11, 15]
+n_list = [100, 500, 1000, 5000, 10000]
+d_list = [5, 10, 15, 20, 50, 100]
 
 def load_normal(n,d):
     filename = r"src\datasets\normal\normal_n{}_d{}".format(n,d)
@@ -15,56 +15,57 @@ def load_normal(n,d):
 if False:
     times = []
     eta = 0.9
-    d = 3
+    d = 10
 
     for n in n_list:
         data = load_normal(n,d)
+
         start = timeit.default_timer()
-        ball = MEBwO().fit(data=data, method="exact", eta=eta)
+        ball = MEBwO().fit(data=data, method="heuristic", eta=eta)
         elapsed = timeit.default_timer() - start
 
         times.append(elapsed)
-    
+
     plt.plot(n_list, times, marker="o", linestyle=":", mec="r", mfc="r")
     plt.xlabel("n")
     plt.ylabel("Time")
-    plt.title("Running time for MEBwO as a function of n, d={}, eta={}".format(d, eta))
-    plt.savefig("images\mebwo_runtimes_d{}.png".format(d))
+    plt.title("Running time for MEBwO heuristic as a function of n, d={}, eta={}".format(d, eta))
+    plt.savefig("images\mebwo_heuristic_runtimes_d{}.png".format(d))
     plt.show()
+    
 
 if False:
     times = []
     eta = 0.9
-    n = 200
-
+    n = 1000
     for d in d_list:
         data = load_normal(n,d)
 
         start = timeit.default_timer()
-        ball = MEBwO().fit(data=data, method="exact", eta=eta)
-        elapsed = timeit.default_timer()
+        ball = MEBwO().fit(data=data, method="heuristic", eta=0.9)
+        elapsed = timeit.default_timer() - start
 
         times.append(elapsed)
     
     plt.plot(d_list, times, marker="o", linestyle=":", mec="r", mfc="r")
     plt.xlabel("d")
     plt.ylabel("Time")
-    plt.title("Running time for MEBwO as a function of d, n={}, eta={}".format(n, eta))
-    plt.savefig("images\mebwo_runtimes_n{}.png".format(n))
+    plt.title("Running time for MEBwO heuristic as a function of d, n={}, eta={}".format(n, eta))
+    plt.savefig("images\mebwo_heuristic_runtimes_n{}.png".format(n))
     plt.show()
 
 if False:
     times = []
 
-    n = 300
-    d = 3
+    n = 5000
+    d = 10
     data = load_normal(n,d)
 
-    eta_list = [0.5, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1]
+    eta_list = [0.75, 0.8, 0.85, 0.9, 0.95, 1]
 
     for eta in eta_list:
         start = timeit.default_timer()
-        ball = MEBwO().fit(data=data, method="exact", eta=eta)
+        ball = MEBwO().fit(data=data, method="heuristic", eta=eta)
         elapsed = timeit.default_timer() - start
 
         times.append(elapsed)
@@ -72,24 +73,24 @@ if False:
     plt.plot(eta_list, times, marker="o", linestyle=":", mec="r", mfc="r")
     plt.xlabel("eta")
     plt.ylabel("Time")
-    plt.title("Running time for MEBwO as a function of eta, n={}, d={}".format(n, d))
-    plt.savefig("images\mebwo_runtimes_eta.png")
+    plt.title("Running time for MEBwO heuristic as a function of eta, n={}, d={}".format(n, d))
+    plt.savefig("images\mebwo_heuristic_runtimes_eta.png")
     plt.show()
 
-if False:
+if True:
     times = []
 
-    n = 300
-    d = 3
+    n = 5000
+    d = 10
     eta = 0.9
 
     data = load_normal(n,d)
 
-    M_list = [10, 20, 30, 40, 50]
+    M_list = [5, 7.5, 10, 15, 20, 30, 40, 60, 80, 100]
 
     for M in M_list:
         start = timeit.default_timer()
-        ball = MEBwO().fit(data=data, method="exact", eta=eta, M=M)
+        ball = MEBwO().fit(data=data, method="heuristic", eta=eta, M=M)
         elapsed = timeit.default_timer() - start
 
         times.append(elapsed)
@@ -97,6 +98,6 @@ if False:
     plt.plot(M_list, times, marker="o", linestyle=":", mec="r", mfc="r")
     plt.xlabel("M")
     plt.ylabel("Time")
-    plt.title("Running time for MEBwO as a function of M, n={}, d={}, eta=eta".format(n, d, eta))
-    plt.savefig("images\mebwo_runtimes_M.png")
+    plt.title("Running time for MEBwO heuristic as a function of M, n={}, d={}, eta=eta".format(n, d, eta))
+    plt.savefig("images\mebwo_heuristic_runtimes_M.png")
     plt.show()

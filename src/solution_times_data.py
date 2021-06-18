@@ -3,8 +3,8 @@ import numpy as np
 from data.loading import to_csv
 from data.generation import normal
 
-n_list = [100, 500, 1000, 5000, 10000]
-d_list = [5, 10, 15, 20, 50, 100]
+n_list = [50, 100, 150, 200, 250, 300]
+d_list = [3, 7, 11, 15]
 
 for n in n_list:
     for d in d_list:
