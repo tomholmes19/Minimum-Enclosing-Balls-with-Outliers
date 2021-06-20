@@ -1,26 +1,25 @@
 import timeit
 
-n = 100000000
-my_list = range(n)
+from data.generation import normal
+from meb.geometry import M_estimate
+from meb.ball import Ball
+from meb.mebwo_algorithms import M_approx
 
-full_start = timeit.default_timer()
+data = normal(0, 1, 1000, 2)
+print("Calculating M1")
+M1_start = timeit.default_timer()
+M1 = M_estimate(data)
+M1_elapsed = timeit.default_timer() - M1_start
 
-a = [x for x in my_list if x % 2 == 0]
-b = [x for x in my_list if x % 2 == 1]
+print("Calculating M2")
+M2_start = timeit.default_timer()
+M2 = M_approx(data)
+M2_elapsed = timeit.default_timer() - M2_start
 
-full_elapsed = timeit.default_timer() - full_start
+print("M1:\t\t{}".format(M1))
+print("Elapsed:\t{}s".format(M1_elapsed))
 
-zeros_start = timeit.default_timer()
+print("M2:\t\t{}".format(M2))
+print("Elapsed:\t{}s".format(M2_elapsed))
 
-a = []
-b = []
-
-for x in my_list:
-    if x % 2 == 0:
-        a.append(x)
-    else:
-        b.append(x)
-
-zeros_elapsed = timeit.default_timer() - zeros_start
-
-print(full_elapsed, zeros_elapsed)
+Ball(radius=1, center=[0,0]).plot(data)

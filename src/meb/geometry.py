@@ -13,6 +13,8 @@ def find_furthest(p,data, core_set=None, return_index=False, find_closest=False)
 
     Return:
         point (array like): point in data which is furthest or closest to p
+        OR
+        index (int): index of points in data which is furthest or closest to p
     """
     if core_set is None:
         core = []
@@ -85,3 +87,21 @@ def mean_vector(data) -> np.array:
         np.mean([x[i] for x in data]) for i in range(d)
     ])
     return mean
+
+def M_estimate(data):
+    """
+    Calculates all pairwise distances between points in the data and returns the largest distance
+    WARNING: O(n^2)
+
+    Input:
+        data (array like): data
+    Return:
+        distance (float): largest pointwise distance between all points in the data
+    """
+    n = len(data)
+
+    distance = max([
+        max([np.linalg.norm(data[i] - x) for x in data]) for i in range(n)
+    ])
+
+    return distance
