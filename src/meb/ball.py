@@ -10,24 +10,21 @@ class Ball:
     Attributes:
         center (array like): center of the ball
         radius (float): radius of the ball
-        approx_diameter (float): approximate diameter of the ball (estimated)
         core_set (array like): the core set used to find the MEB of the data the ball is fit to
     
     Methods:
         plot (None): plots the fit ball if it is dimension 2 or 3
         check_subset (bool): checks if a given data set is a subset of the ball
     """
-    def __init__(self, center=None, radius=None, approx_diameter=None, core_set=None) -> None:
+    def __init__(self, center=None, radius=None, core_set=None) -> None:
         self.center = center
         self.radius = radius
-        self.approx_diameter = approx_diameter
         self.core_set = core_set
 
     def __str__(self) -> str:
         return (
-            "Center:\t {}\n".format(self.center) +
-            "Radius:\t {}\n".format(self.radius) +
-            "Approximate diameter:\t {}".format(self.approx_diameter)
+            "Center:\t{}\n".format(self.center) +
+            "Radius:\t{}".format(self.radius)
         )
 
     def check_params(self) -> True:
@@ -129,10 +126,6 @@ class Ball:
             print("Can not plot MEB for dimension {}".format(dimension))
 
         return None
-    
-    def set_approx_diameter(self, data) -> None:
-        # is this even needed?
-        pass
 
     def distance_graph(self, data):
         #TODO: document this method if its useful
@@ -166,8 +159,8 @@ class MEB(Ball):
     Methods:
         fit (Ball): fits the MEB to the given data
     """
-    def __init__(self, center=None, radius=None, approx_diameter=None, core_set=None) -> None:
-        super().__init__(center=center, radius=radius, approx_diameter=approx_diameter, core_set=core_set)
+    def __init__(self, center=None, radius=None, core_set=None) -> None:
+        super().__init__(center=center, radius=radius, core_set=core_set)
     
     def fit(self, data, method="heuristic", **kwargs):
         """
@@ -198,10 +191,17 @@ class MEBwO(MEB):
     Extends MEB
     A ball object used to calculate minimum enclosing balls with outliers
     """
-    def __init__(self, center=None, radius=None, approx_diameter=None, core_set=None) -> None:
-            super().__init__(center=center, radius=radius, approx_diameter=approx_diameter, core_set=core_set)
+    def __init__(self, center=None, radius=None, core_set=None, pct_containment=None) -> None:
+            super().__init__(center=center, radius=radius, core_set=core_set)
+            self.pct_containment = pct_containment
+        
+    def __str__(self) -> str:
+        return (
+            super().__str__() + "\n" +
+            "Cont:\t{}".format(self.pct_containment)
+        )
     
-    def fit(self, data, method, **kwargs):
+    def fit(self, data, method, calc_pct=False, **kwargs):
         #TODO: refactor input sanitation and algorithm retrieval
         # get the function corresponding to method
         algorithm = mebwo_algorithms.algorithms.get("alg_{}".format(method)) # returns none if 'alg_method' not in algorithms dict
@@ -213,9 +213,12 @@ class MEBwO(MEB):
         self.center = c
         self.radius = r
 
+        if calc_pct:
+            self.calc_pct(data)
+
         return self
 
-    def pct_containment(self, data) -> float:
+    def calc_pct(self, data) -> float:
         """
         Finds what % of points in data are inside the ball
 
@@ -233,6 +236,7 @@ class MEBwO(MEB):
                 inside += 1
 
         pct = inside/n
+        self.pct_containment = pct
         return pct
 
     def plot(self, data, alpha=1, figsize=8, show=True) -> None:
