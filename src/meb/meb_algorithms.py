@@ -46,7 +46,7 @@ def alg_socp_heuristic(data, eps): # algorithm 1 https://dl.acm.org/doi/10.1145/
         else:
             p = geometry.find_furthest(c, data) # p = argmax_(x\in S) [||c'-x||]
         
-        X = point_union(X,p)
+        X = np.vstack((X, p))
 
     return c, r, X
 
