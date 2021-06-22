@@ -42,5 +42,23 @@ def alg_heuristic(data, eta, eps=1e-4, M=None):
     c, r, _ = meb_algorithms.alg_socp_heuristic(data=data_dash, eps=eps)
     return c, r, None
 
+def alg_heuristic_2(data, eta, eps):
+    """
+    Fits a MEB to the data, then deletes the core set, repeats until have MEB containing eta*n many points
+    """
+    n = len(data)
+    k = int(eta*n)
+
+    num_contained = n
+    A = data
+    X = []
+
+    while num_contained > k:
+        A = [a for a in A if a not in X]
+        num_contained -= len(X)
+        c, r, X = meb_algorithms.alg_socp_heuristic(A, eps)
+        
+        
+    return c, r, None
 # dictionary of functions whose name starts with "alg_" (i.e. the ones in this file)
 algorithms = {name: func for name, func in locals().copy().items() if name.startswith("alg_")}
