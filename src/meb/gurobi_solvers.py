@@ -64,7 +64,7 @@ def mebwo_exact(data, eta, M, LP_relax=False):
 
     m = gp.Model("MEBwO")
 
-    c = m.addVars(d, lb=-GRB.INFINITY, name="center")
+    c = m.addMVar(shape=d, lb=-GRB.INFINITY, name="center")
     r = m.addVar(name="radius")
 
     if LP_relax:
@@ -74,10 +74,16 @@ def mebwo_exact(data, eta, M, LP_relax=False):
 
     m.setObjective(r, GRB.MINIMIZE)
 
-    # containment big M constraint
-    m.addConstrs(
-        (gp.quicksum([c[j]*c[j] - 2*c[j]*data[i][j] + (data[i][j]**2) for j in range(d)]) - r - M*xi[i] <= 0 for i in range(n))
-    )
+    for i in range(n):
+        m.addMQConstr(
+            Q=np.identity(d),
+            c=-1*np.concatenate((2*data[i], [M,1])),
+            sense=GRB.LESS_EQUAL,
+            rhs=-1*(data[i]@data[i]),
+            xQ_L=c,
+            xQ_R=c,
+            xc=c.tolist() + [xi[i], r]
+        )
     
     m.addConstr(gp.quicksum(xi[i] for i in range(n)) <= k)
 

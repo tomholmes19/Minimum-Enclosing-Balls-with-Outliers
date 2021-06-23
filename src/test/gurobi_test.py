@@ -2,11 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import gurobipy as gp
 from gurobipy import GRB
+from numpy.core.defchararray import less_equal
 
 d = 2 # dimension
-n = 1000 # number of data points
+n = 100 # number of data points
 eta = 0.9
-k = n*(1-eta)
+k = int(n*(1-eta))
 M = 10
 
 def gen_data(n,d):
@@ -23,18 +24,22 @@ m = gp.Model("MEB")
 
 # m.Params.NonConvex = 2
 
-c = m.addVars(d, lb=-GRB.INFINITY, name="center")
-xi = m.addVars(n, lb=0, ub=1, vtype=GRB.CONTINUOUS)
+c = m.addMVar(shape=d, lb=-GRB.INFINITY, name="center")
+xi = m.addVars(n, lb=0, ub=1, vtype=GRB.BINARY)
 r = m.addVar(name="radius")
-
-y = m.addVars(d)
 
 m.setObjective(r, GRB.MINIMIZE)
 
-
-m.addConstrs(
-    (gp.quicksum([c[j]*c[j] - 2*c[j]*data[i][j] + (data[i][j]**2) for j in range(d)]) - r - M*xi[i] <= 0 for i in range(n))
-)
+for i in range(n):
+    m.addMQConstr(
+        Q=np.identity(d),
+        c=-1*np.concatenate((2*data[i], [M,1])),
+        sense=GRB.LESS_EQUAL,
+        rhs=-1*(data[i]@data[i]),
+        xQ_L=c,
+        xQ_R=c,
+        xc=c.tolist() + [xi[i], r]
+    )
 
 m.addConstr(gp.quicksum(xi[i] for i in range(n)) <= k)
 
