@@ -6,11 +6,11 @@ from meb.ball import MEBwO
 
 #TODO: turn these into functions
 
-n_list = [50, 100, 150, 200, 250, 300]
+n_list = [100, 200, 300, 400]
 d_list = [3, 7, 11, 15]
 
 def load_normal(n,d):
-    filename = r"src\datasets\normal\normal_n{}_d{}".format(n,d)
+    filename = r"src\datasets\normal\normal_n{}_d{}.csv".format(n,d)
     data = from_csv(filename=filename)
     return data
 
@@ -19,7 +19,7 @@ if False:
     eta = 0.9
     d = 3
 
-    for n in n_list:
+    for n in n_list[:-1]:
         data = load_normal(n,d)
         start = timeit.default_timer()
         ball = MEBwO().fit(data=data, method="exact", eta=eta)
@@ -32,12 +32,12 @@ if False:
     plt.ylabel("Time")
     plt.title("Running time for MEBwO as a function of n, d={}, eta={}".format(d, eta))
     plt.savefig("images\mebwo_runtimes_d{}.png".format(d))
-    plt.show()
+    #plt.show()
 
 if True:
     times = []
     eta = 0.9
-    n = 200
+    n = 300
 
     for d in d_list:
         data = load_normal(n,d)
@@ -53,7 +53,7 @@ if True:
     plt.ylabel("Time")
     plt.title("Running time for MEBwO as a function of d, n={}, eta={}".format(n, eta))
     plt.savefig("images\mebwo_runtimes_n{}.png".format(n))
-    plt.show()
+    #plt.show()
 
 if False:
     times = []
@@ -62,7 +62,7 @@ if False:
     d = 3
     data = load_normal(n,d)
 
-    eta_list = [0.5, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1]
+    eta_list = [0.75, 0.8, 0.85, 0.9, 0.95, 1]
 
     for eta in eta_list:
         start = timeit.default_timer()
@@ -76,7 +76,7 @@ if False:
     plt.ylabel("Time")
     plt.title("Running time for MEBwO as a function of eta, n={}, d={}".format(n, d))
     plt.savefig("images\mebwo_runtimes_eta.png")
-    plt.show()
+    #plt.show()
 
 if False:
     times = []
@@ -101,4 +101,4 @@ if False:
     plt.ylabel("Time")
     plt.title("Running time for MEBwO as a function of M, n={}, d={}, eta=eta".format(n, d, eta))
     plt.savefig("images\mebwo_runtimes_M.png")
-    plt.show()
+    #plt.show()
