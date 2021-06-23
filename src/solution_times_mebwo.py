@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from data.loading import from_csv
 from meb.ball import MEBwO
 
+#TODO: turn these into functions
+
 n_list = [50, 100, 150, 200, 250, 300]
 d_list = [3, 7, 11, 15]
 
@@ -32,7 +34,7 @@ if False:
     plt.savefig("images\mebwo_runtimes_d{}.png".format(d))
     plt.show()
 
-if False:
+if True:
     times = []
     eta = 0.9
     n = 200
