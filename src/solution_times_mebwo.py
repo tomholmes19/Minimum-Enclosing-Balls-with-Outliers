@@ -34,7 +34,7 @@ if False:
     plt.savefig("images\mebwo_runtimes_d{}.png".format(d))
     #plt.show()
 
-if True:
+if False:
     times = []
     eta = 0.9
     n = 300
@@ -62,7 +62,7 @@ if False:
     d = 3
     data = load_normal(n,d)
 
-    eta_list = [0.75, 0.8, 0.85, 0.9, 0.95, 1]
+    eta_list = [0.8, 0.85, 0.9, 0.95, 1]
 
     for eta in eta_list:
         start = timeit.default_timer()
@@ -78,7 +78,7 @@ if False:
     plt.savefig("images\mebwo_runtimes_eta.png")
     #plt.show()
 
-if False:
+if True:
     times = []
 
     n = 300
