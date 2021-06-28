@@ -174,7 +174,7 @@ class MEB(Ball):
             self (Ball): the MEB for the data
         """
         # get the function corresponding to method
-        algorithm = meb_algorithms.algorithms.get("alg_{}".format(method)) # returns none if 'alg_method' not in algorithms dict
+        algorithm = meb_algorithms.algorithms.get("alg__{}".format(method)) # returns none if 'alg_method' not in algorithms dict
         if algorithm is None:
             raise NotImplementedError("Method '{}' not implemented".format(method))
         
@@ -204,7 +204,7 @@ class MEBwO(MEB):
     def fit(self, data, method, calc_pct=False, **kwargs):
         #TODO: refactor input sanitation and algorithm retrieval
         # get the function corresponding to method
-        algorithm = mebwo_algorithms.algorithms.get("alg_{}".format(method)) # returns none if 'alg_method' not in algorithms dict
+        algorithm = mebwo_algorithms.algorithms.get("alg__{}".format(method)) # returns none if 'alg_method' not in algorithms dict
         if algorithm is None:
             raise NotImplementedError("Method '{}' not implemented".format(method))
 
@@ -235,9 +235,8 @@ class MEBwO(MEB):
             if self.contains(x):
                 inside += 1
 
-        pct = inside/n
-        self.pct_containment = pct
-        return pct
+        self.pct_containment = inside/n
+        return self.pct_containment
 
     def plot(self, data, alpha=1, figsize=8, show=True) -> None:
         """

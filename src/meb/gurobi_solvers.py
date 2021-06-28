@@ -43,7 +43,7 @@ def meb_exact(data):
 
     return c_soln, r_soln, None
 
-def mebwo_exact(data, eta, M, LP_relax=False):
+def mebwo_exact(data, eta, M, relax=False):
     """
     Solves the MEBwO problem for eta% of the points covered using Gurobi
 
@@ -67,7 +67,7 @@ def mebwo_exact(data, eta, M, LP_relax=False):
     c = m.addMVar(shape=d, lb=-GRB.INFINITY, name="center")
     r = m.addVar(name="radius")
 
-    if LP_relax:
+    if relax:
         xi = m.addVars(n, lb=0, ub=1, vtype=GRB.CONTINUOUS)
     else:
         xi = m.addVars(n, vtype=GRB.BINARY)
@@ -89,7 +89,7 @@ def mebwo_exact(data, eta, M, LP_relax=False):
 
     m.optimize()
 
-    c_soln = [c[i].x for i in range(d)]
+    c_soln = [v.x for v in c.tolist()]
     r_soln = np.sqrt(r.x)
     xi_soln = [xi[i].x for i in range(n)]
 
