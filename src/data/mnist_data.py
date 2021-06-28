@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow_datasets as tfds
 
-from data.loading import to_csv
+from loading import to_csv
 
 ds = tfds.load("mnist", split="train", as_supervised=True)
 
