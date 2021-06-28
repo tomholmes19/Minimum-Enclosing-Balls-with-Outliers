@@ -5,7 +5,7 @@ from . import gurobi_solvers, geometry, meb_algorithms
 """
 Algorithms used to compute MEBwO
 
-All functions should start with 'alg_' to be captured in algorithms dictionary (see bottom of algorithms.py)
+All functions should start with 'alg__' to be captured in algorithms dictionary (see bottom of algorithms.py)
 """
 
 sq_3 = np.sqrt(3)
@@ -14,7 +14,7 @@ def M_approx(data):
     M = sq_3*diam
     return M
 
-def alg_exact(data, eta, M=None, LP_relax=False):
+def alg__exact(data, eta, M=None, LP_relax=False):
     if M is None:
         M_ = M_approx(data)
     else:
@@ -23,7 +23,7 @@ def alg_exact(data, eta, M=None, LP_relax=False):
     c, r, xi  = gurobi_solvers.mebwo_exact(data, eta, M_, LP_relax)
     return c, r, xi
 
-def alg_heuristic(data, eta, eps=1e-4, M=None):
+def alg__heuristic(data, eta, eps=1e-4, M=None):
     if M is None:
         M_ = M_approx(data)
     else:
@@ -42,7 +42,7 @@ def alg_heuristic(data, eta, eps=1e-4, M=None):
     c, r, _ = meb_algorithms.alg_socp_heuristic(data=data_dash, eps=eps)
     return c, r, None
 
-def alg_heuristic_2(data, eta, eps):
+def alg__heuristic_2(data, eta, eps):
     """
     Fits a MEB to the data, then deletes the core set, repeats until have MEB containing eta*n many points
     """
@@ -60,5 +60,10 @@ def alg_heuristic_2(data, eta, eps):
         
         
     return c, r, None
+
+def alg__shrink(data, eta):
+    pass
+
+
 # dictionary of functions whose name starts with "alg_" (i.e. the ones in this file)
-algorithms = {name: func for name, func in locals().copy().items() if name.startswith("alg_")}
+algorithms = {name: func for name, func in locals().copy().items() if name.startswith("alg__")}

@@ -5,7 +5,7 @@ from . import geometry, gurobi_solvers, ball
 """
 Algorithms used to compute MEB
 
-All functions should start with 'alg_' to be captured in algorithms dictionary (see bottom of algorithms.py)
+All functions should start with 'alg__' to be captured in algorithms dictionary (see bottom of algorithms.py)
 """
 
 def point_union(X,p) -> np.array:
@@ -26,11 +26,11 @@ def point_union(X,p) -> np.array:
     
     return out
 
-def alg_socp_exact(data): # solves the exact optimisation problem for MEB
+def alg__socp_exact(data): # solves the exact optimisation problem for MEB
         c, r = gurobi_solvers.meb_exact(data)
         return c, r, None
 
-def alg_socp_heuristic(data, eps): # algorithm 1 https://dl.acm.org/doi/10.1145/996546.996548
+def alg__socp_heuristic(data, eps): # algorithm 1 https://dl.acm.org/doi/10.1145/996546.996548
     p = data[0]
     q, qdash = geometry.diameter_approx(p, data)
     X = np.array([q,qdash])
@@ -80,7 +80,7 @@ def e(n, k) -> np.array:
     e[k] = 1
     return e
 
-def alg_heuristic_1(data, eps): # algorithm 3.1 https://www.researchgate.net/publication/220133011_Two_Algorithms_for_the_Minimum_Enclosing_Ball_Problem
+def alg__heuristic_1(data, eps): # algorithm 3.1 https://www.researchgate.net/publication/220133011_Two_Algorithms_for_the_Minimum_Enclosing_Ball_Problem
     alpha = geometry.find_furthest(data[0], data, return_index=True)
     beta = geometry.find_furthest(data[alpha], data, return_index=True)
 
@@ -108,7 +108,7 @@ def alg_heuristic_1(data, eps): # algorithm 3.1 https://www.researchgate.net/pub
 
     return c, np.sqrt((1+delta)*gamma), X
 
-def alg_heuristic_2(data, eps): # algorithm 4.1 https://www.researchgate.net/publication/220133011_Two_Algorithms_for_the_Minimum_Enclosing_Ball_Problem
+def alg__heuristic_2(data, eps): # algorithm 4.1 https://www.researchgate.net/publication/220133011_Two_Algorithms_for_the_Minimum_Enclosing_Ball_Problem
     alpha = geometry.find_furthest(data[0], data, return_index=True)
     beta = geometry.find_furthest(data[alpha], data, return_index=True)
 
