@@ -32,14 +32,14 @@ def alg__heuristic(data, eta, eps=1e-4, M=None):
     n = len(data)
     k = int(eta*n)
 
-    _, _, xi = gurobi_solvers.mebwo_exact(data=data, eta=eta, M=M_, LP_relax=True)
+    _, _, xi = gurobi_solvers.mebwo_exact(data=data, eta=eta, M=M_, relax=True)
     
     indices = np.argsort(xi) # the indices of the sorted list
     indices_dash = indices[:k]
 
     data_dash = [data[i] for i in range(n) if i in indices_dash]
 
-    c, r, _ = meb_algorithms.alg_socp_heuristic(data=data_dash, eps=eps)
+    c, r, _ = meb_algorithms.alg__socp_heuristic(data=data_dash, eps=eps)
     return c, r, None
 
 def alg__heuristic_2(data, eta, eps):
@@ -74,5 +74,5 @@ def alg__shrink(data, eps, eta):
     return c, r, None
 
 
-# dictionary of functions whose name starts with "alg_" (i.e. the ones in this file)
+# dictionary of functions whose name starts with "alg__" (i.e. the ones in this file)
 algorithms = {name: func for name, func in locals().copy().items() if name.startswith("alg__")}
