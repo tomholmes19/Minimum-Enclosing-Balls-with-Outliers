@@ -61,8 +61,17 @@ def alg__heuristic_2(data, eta, eps):
         
     return c, r, None
 
-def alg__shrink(data, eta):
-    pass
+def alg__shrink(data, eps, eta):
+    """
+    Fits a MEB to the data, then finds the k closest points such that eta% of the data is contained
+    """
+    c, _, _ = meb_algorithms.alg__socp_heuristic(data, eps)
+
+    n = len(data)
+    k = int(np.floor(eta*n))
+    _, r = geometry.k_closest(data, c, k)
+
+    return c, r, None
 
 
 # dictionary of functions whose name starts with "alg_" (i.e. the ones in this file)

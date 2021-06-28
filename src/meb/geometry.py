@@ -112,20 +112,22 @@ def k_closest(data, x, k) -> np.array:
 
     Input:
         data (array like): data
-        x (array like): point to find k closest points in data to
+        x (np.array): point to find k closest points in data to
         k (int): number of points closest to x to find
     
     Return:
-        out (np.array): points in data that are closest to x (size k)
+        k_data (np.array): k points in data that are closest to x
+        key_dist (float): maximum distance from x to points in k_data
     """
+    n = len(data)
     # distance from x to every point
-    distances = {point: np.linalg.norm(x-point) for point in data}
+    distances = [np.linalg.norm(x-point) for point in data]
 
-    sorted_distances = sorted(distances.values)
+    sorted_distances = sorted(distances)
 
     # the distance where points with distances lower than this are the k closest
-    key_dist = sorted_distances[k]
+    key_dist = sorted_distances[k-1]
 
-    out = np.array([point for point in data if distances[point] <= key_dist])
+    k_data = np.array([data[i] for i in range(n) if distances[i] <= key_dist])
 
-    return out
+    return k_data, key_dist
