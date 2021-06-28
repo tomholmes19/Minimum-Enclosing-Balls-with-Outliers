@@ -105,3 +105,27 @@ def M_estimate(data):
     ])
 
     return distance
+
+def k_closest(data, x, k) -> np.array:
+    """
+    Finds the k closest points to x in data
+
+    Input:
+        data (array like): data
+        x (array like): point to find k closest points in data to
+        k (int): number of points closest to x to find
+    
+    Return:
+        out (np.array): points in data that are closest to x (size k)
+    """
+    # distance from x to every point
+    distances = {point: np.linalg.norm(x-point) for point in data}
+
+    sorted_distances = sorted(distances.values)
+
+    # the distance where points with distances lower than this are the k closest
+    key_dist = sorted_distances[k]
+
+    out = np.array([point for point in data if distances[point] <= key_dist])
+
+    return out
