@@ -5,10 +5,10 @@ import numpy as np
 import timeit
 eta = 0.9
 
-test_data = data.generation.normal(0,1,10000,2)
+test_data = data.generation.uniform_ball_with_ouliters(2000,2,eta,[0,0],1,3,1)
 
 start = timeit.default_timer()
-ball = MEBwO().fit(data=test_data, method="heuristic", eta=eta, eps=1e-4, calc_pct=True)
+ball = MEBwO().fit(data=test_data, method="shenmaier", eta=eta, calc_pct=True)
 elapsed = timeit.default_timer() - start
 
 print("Total time:\t", elapsed)

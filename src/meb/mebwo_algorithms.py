@@ -47,7 +47,7 @@ def alg__heuristic_2(data, eta, eps):
     Fits a MEB to the data, then deletes the core set, repeats until have MEB containing eta*n many points
     """
     n = len(data)
-    k = int(eta*n)
+    k = int(np.floor(eta*n))
 
     num_contained = n
     A = data
@@ -73,6 +73,23 @@ def alg__shrink(data, eps, eta):
 
     return c, r, None
 
+def alg__shenmaier(data, eta):
+    """
+    Algorithm 1 of Shenmaier 2015 TODO: put the link here
+
+    For every point in data, find MEB of closest k=eta*n points to this point,
+    return MEB with smallest radius
+    """
+    n = len(data)
+    k = int(np.floor(eta*n))
+    radii = [None]*n
+
+    for i in range(n):
+        _, radii[i] = geometry.k_closest(data, data[i], k)
+    
+    min_r_index = np.argmin(radii)
+    
+    return data[min_r_index], radii[min_r_index], None
 
 # dictionary of functions whose name starts with "alg__" (i.e. the ones in this file)
 algorithms = {name: func for name, func in locals().copy().items() if name.startswith("alg__")}
