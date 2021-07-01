@@ -11,7 +11,7 @@ def meb_exact(data):
         data (array like): list of data points to compute the MEB for
 
     Return:
-        c_soln (NumPy array): center of the MEB
+        c_soln (np.array): center of the MEB
         r_soln (float): radius of the MEB
     """
     n = len(data) # number of points
@@ -54,9 +54,9 @@ def mebwo_exact(data, eta, M, relax=False):
         LP_relax (bool): if True then relax binary variables to 0 <= xi[i] <= 1 for all i
 
     Return:
-        c_soln (NumPy array): center of the MEB
+        c_soln (np.array): center of the MEB
         r_soln (float): radius of the MEB
-        xi_soln (int): binary variables for outlier or not outlier
+        xi_soln (list): binary variables for outlier or not outlier
     """
     n = len(data) # number of points
     d = len(data[0]) # dimension TODO: make this better
