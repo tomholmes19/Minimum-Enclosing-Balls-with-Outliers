@@ -34,6 +34,8 @@ def subset_data(data, rows, columns) -> np.array:
     """
     Takes a subset of the given data
 
+    If rows/columns are None, return all rows/columns
+
     Input:
         in_data (array like) or (pd.DataFrame): input data to take subset from
         rows (list of ints): index(es) of rows to subset from data
@@ -42,12 +44,20 @@ def subset_data(data, rows, columns) -> np.array:
     Output:
         out (np.array): data as an array of arrays
     """
+    # convert to dataframe
     if type(data) == pd.DataFrame:
         df = data
     else:
         df = pd.DataFrame(data)
     
+    # check if selecting all rows/columns
+    if rows is None:
+        rows = df.shape[0]
+    if columns is None:
+        columns = df.shape[1]
+    
+    # get subset and convert to np.array
     out = df.iloc[rows, columns]
     out = out.to_numpy()
-    
+
     return out
