@@ -29,3 +29,25 @@ def from_csv(filename) -> np.array:
     df = pd.read_csv(r"{}".format(filename), header=None)
     out = df.to_numpy()
     return out
+
+def subset_data(data, rows, columns) -> np.array:
+    """
+    Takes a subset of the given data
+
+    Input:
+        in_data (array like) or (pd.DataFrame): input data to take subset from
+        rows (list of ints): index(es) of rows to subset from data
+        columns (list of ints): index(es) of columns to subset from data
+    
+    Output:
+        out (np.array): data as an array of arrays
+    """
+    if type(data) == pd.DataFrame:
+        df = data
+    else:
+        df = pd.DataFrame(data)
+    
+    out = df.iloc[rows, columns]
+    out = out.to_numpy()
+    
+    return out
