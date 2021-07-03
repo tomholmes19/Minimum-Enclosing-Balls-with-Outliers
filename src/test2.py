@@ -6,7 +6,7 @@ import timeit
 eta = 0.9
 
 test_data = data.generation.uniform_ball_with_ouliters(2000,2,eta,[0,0],1,3,1)
-test_data = data.loading.subset_data(test_data, range(100), [0,1])
+test_data = data.loading.subset_data(test_data, range(100), None)
 
 start = timeit.default_timer()
 ball = MEBwO().fit(data=test_data, method="shenmaier", eta=eta, calc_pct=True)

@@ -52,9 +52,9 @@ def subset_data(data, rows, columns) -> np.array:
     
     # check if selecting all rows/columns
     if rows is None:
-        rows = df.shape[0]
+        rows = range(df.shape[0])
     if columns is None:
-        columns = df.shape[1]
+        columns = range(df.shape[1])
     
     # get subset and convert to np.array
     out = df.iloc[rows, columns]
