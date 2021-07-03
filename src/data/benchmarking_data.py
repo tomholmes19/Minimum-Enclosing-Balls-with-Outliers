@@ -1,11 +1,12 @@
+import numpy as np
+
 from loading import to_csv
-from generation import normal
+import generation
 
-n_list = [100 + 50*i for i in range(10)]
-d_list = [2 + 2*i for i in range(10)]
+n = 100000
+d = 1000
 
-for n in n_list:
-    for d in d_list:
-        data = normal(mean=0, variance=1, n=n, dimension=d)
-        filename = r"src\data\datasets\normal\normal_n{}_d{}.csv".format(n,d)
-        to_csv(data=data, filename=filename)
+np.random.seed(seed=10)
+
+normal_data = generation.normal(mean=0, variance=1, n=n, dimension=d)
+to_csv(data=normal_data, filename=r"src\data\datasets\normal.csv")

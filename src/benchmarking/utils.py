@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import timeit
 
 from data.loading import from_csv
 
@@ -7,6 +8,22 @@ def load_normal(n,d):
     filename = r"src\data\datasets\normal\normal_n{}_d{}.csv".format(n,d)
     data = from_csv(filename=filename)
     return data
+
+def calc_avg_times(avg_times) -> list:
+    """
+    Takes a list of list in the form [ [*], [*], ...] and returns a list with the average of each sublist
+
+    Input:
+        avg_times (list of list of floats): list of lists of times to find average times for
+
+    Return:
+        times (list of floats): list of average times
+    """
+    times = []
+    for lst in avg_times:
+        times.append(np.mean(lst))
+    
+    return times
 
 def plot_times(x_axis, times, xlabel, ylabel, title, plot, filepath=None):
     """

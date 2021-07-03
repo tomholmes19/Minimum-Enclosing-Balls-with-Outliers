@@ -12,10 +12,6 @@ if True:
     d = 8
     
     for n in n_list:
-        print("\n======\n")
-        print(n)
-        print("\n=====\n")
-
         data = load_normal(n,d)
         M = M_estimate(data)
         times.append(mebwo_exact(data, eta, M))

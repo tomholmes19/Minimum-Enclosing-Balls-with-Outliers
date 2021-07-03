@@ -1,1 +1,3 @@
 src/data/datasets/mnist/mnist_train.csv
+src/data/datasets/mnist_train.csv
+src/data/datasets/normal.csv
