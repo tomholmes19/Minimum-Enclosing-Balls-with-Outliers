@@ -75,7 +75,7 @@ def alg__shrink(data, eps, eta):
 
 def alg__shenmaier(data, eta):
     """
-    Algorithm 1 of Shenmaier 2015 TODO: put the link here
+    Algorithm 1 of Shenmaier 2015 https://link.springer.com/chapter/10.1007/978-88-7642-475-5_92
 
     For every point in data, find MEB of closest k=eta*n points to this point,
     return MEB with smallest radius
@@ -90,6 +90,36 @@ def alg__shenmaier(data, eta):
     min_r_index = np.argmin(radii)
     
     return data[min_r_index], radii[min_r_index], None
+
+def alg__maximin(data, eta, eps):
+    """
+    
+    """
+    num_outliers = int(np.ceil((1-eta)*len(data)))
+
+    c_dash, _, _ = meb_algorithms.alg__socp_heuristic(data, eps)
+
+    outliers = [geometry.find_furthest(c_dash, data)]
+    inliers = [x for x in data if not np.array_equal(x, outliers[0])]
+
+    for _ in range(num_outliers-1):
+        distances = []
+        for x in inliers:
+            distances.append(
+                min([np.linalg.norm(x-y) for y in outliers])
+            )
+        
+        max_dist_index = np.argmax(distances)
+        new_outlier = inliers[max_dist_index]
+        outliers.append(new_outlier)
+        inliers = [x for x in inliers if not np.array_equal(x, new_outlier)]
+    
+    c, r, _ = meb_algorithms.alg__socp_heuristic(inliers, eps)
+
+    print(inliers)
+    print("\n")
+    print(outliers)
+    return c, r, None
 
 # dictionary of functions whose name starts with "alg__" (i.e. the ones in this file)
 algorithms = {name: func for name, func in locals().copy().items() if name.startswith("alg__")}
