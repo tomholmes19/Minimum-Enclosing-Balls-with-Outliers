@@ -5,10 +5,11 @@ import numpy as np
 import timeit
 eta = 0.9
 
-test_data = data.generation.uniform_ball_with_ouliters(100,2,eta,[0,0],1,3,1)
+normal = data.loading.from_csv(r"src\data\datasets\normal.csv")
+test_data = data.loading.subset_data(normal, rows=range(500), columns=range(4))
 
 start = timeit.default_timer()
-ball = MEBwO().fit(data=test_data, method="maximin", eta=eta, eps=1e-2, calc_pct=True)
+ball = MEBwO().fit(data=test_data, method="exact", eta=eta, calc_pct=True)
 elapsed = timeit.default_timer() - start
 
 print("Total time:\t", elapsed)
