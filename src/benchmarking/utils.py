@@ -4,11 +4,6 @@ import timeit
 
 from data.loading import from_csv
 
-def load_normal(n,d):
-    filename = r"src\data\datasets\normal\normal_n{}_d{}.csv".format(n,d)
-    data = from_csv(filename=filename)
-    return data
-
 def calc_avg_times(avg_times) -> list:
     """
     Takes a list of list in the form [ [*], [*], ...] and returns a list with the average of each sublist
