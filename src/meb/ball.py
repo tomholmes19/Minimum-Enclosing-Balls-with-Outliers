@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from . import meb_algorithms, mebwo_algorithms, geometry
+from . import meb_algorithms, mebwo_algorithms, geometry, utils
 
 class Ball:
     """
@@ -56,7 +56,6 @@ class Ball:
         return out
 
     def check_subset(self, data) -> bool:
-        #TODO: check if theres a better way of doing this
         """
         Checks if the given data is a subset of the ball
         
@@ -97,18 +96,10 @@ class Ball:
             fig,ax = plt.subplots(figsize=(figsize,figsize))
             plt.gca().set_aspect('equal')
 
-            n = len(data) # number of data points not in the core set
-            x = [data[i][0] for i in range(n)]
-            y = [data[i][1] for i in range(n)]
-
-            plt.scatter(x, y, color="blue", alpha=alpha, label="data")    
+            utils.scatter_2d(data, color="blue", alpha=alpha, label="data")
             
             if self.core_set is not None:
-                m = len(self.core_set) # number of data points in the core set
-                x_core = [self.core_set[i][0] for i in range(m)]
-                y_core = [self.core_set[i][1] for i in range(m)]
-                
-                plt.scatter(x_core, y_core, color="orange", label="core set")
+                utils.scatter_2d(self.core_set, color="orange", alpha=alpha, label="core set")
 
             plt.scatter(self.center[0], self.center[1], color="red", marker="x", label="center")
             ax.add_patch(
@@ -261,11 +252,7 @@ class MEBwO(MEB):
 
             super().plot(data=inliers, alpha=alpha, figsize=figsize, show=False)
 
-            k = len(outliers)
-            #TODO: refactor this as a function
-            x_outliers = [outliers[i][0] for i in range(k)]
-            y_outliers = [outliers[i][1] for i in range(k)]
-            plt.scatter(x_outliers, y_outliers, color="g", alpha=alpha, label="outliers")   
+            utils.scatter_2d(outliers, color="g", alpha=alpha, label="outliers")
 
             if show:
                 plt.legend()
