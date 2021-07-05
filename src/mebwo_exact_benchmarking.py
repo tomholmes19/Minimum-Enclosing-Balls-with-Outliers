@@ -1,10 +1,13 @@
 from meb.geometry import M_estimate
-
-from benchmarking.utils import load_normal, plot_times
+from benchmarking import utils
 from benchmarking.exact_solver import mebwo_exact
+from data.loading import from_csv, subset_data
 
 n_list = [100 + 50*i for i in range(10)]
 d_list = [2 + 2*i for i in range(10)]
+num_trials = 5
+
+normal = from_csv(r"src\data\datasets\normal.csv")
 
 if True:
     times = []
@@ -12,18 +15,29 @@ if True:
     d = 8
     
     for n in n_list:
-        data = load_normal(n,d)
-        M = M_estimate(data)
-        times.append(mebwo_exact(data, eta, M))
+        trials = [0]*num_trials
+
+        for i in range(num_trials):
+            print("PROGRESS:")
+            print("\tn:\t{}".format(n))
+            print("\tTrial:\t{}".format(i))
+
+            data = subset_data(normal, range(n), range(d))
+            M = M_estimate(data)
+            trials[i] = mebwo_exact(data, eta, M)
+        
+        times.append(trials)
     
-    plot_times(
+    times = utils.calc_avg_times(times)
+
+    utils.plot_times(
         x_axis=n_list,
         times=times,
         xlabel="n",
         ylabel="Time",
         title="Running time for MEBwO as a function of n, d={}, eta={}".format(d, eta),
         plot=True,
-        filepath=r"images\benchmarks\mebwo_runtimes_d{}.png".format(d)
+        #filepath=r"images\benchmarks\mebwo_runtimes_d{}.png".format(d)
     )
 
 
@@ -33,11 +47,11 @@ if False:
     n = 300
 
     for d in d_list:
-        data = load_normal(n,d)
+        data = utils.load_normal(n,d)
         M = M_estimate(data)
         times.append(mebwo_exact(data, eta, M))
     
-    plot_times(
+    utils.plot_times(
         x_axis=d_list,
         times=times,
         xlabel="d",
@@ -52,7 +66,7 @@ if False:
 
     n = 500
     d = 12
-    data = load_normal(n,d)
+    data = utils.load_normal(n,d)
     M = M_estimate(data)
 
     eta_list = [0.75, 0.8, 0.85, 0.9, 0.95, 1]
@@ -60,7 +74,7 @@ if False:
     for eta in eta_list:
         times.append(mebwo_exact(data, eta, M))
     
-    plot_times(
+    utils.plot_times(
         x_axis=eta_list,
         times=times,
         xlabel="eta",
@@ -77,7 +91,7 @@ if False:
     d = 7
     eta = 0.9
 
-    data = load_normal(n,d)
+    data = utils.load_normal(n,d)
 
     M_UB = M_estimate(data)
     M_list = [M_UB*m for m in range(1,11)]
@@ -85,7 +99,7 @@ if False:
     for M in M_list:
         times.append(mebwo_exact(data, eta, M))
     
-    plot_times(
+    utils.plot_times(
         x_axis=M_list,
         times=times,
         xlabel="M",
