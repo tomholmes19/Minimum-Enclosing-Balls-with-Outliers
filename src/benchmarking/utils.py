@@ -2,8 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import timeit
 
-from data.loading import from_csv
-
 def calc_avg_times(avg_times) -> list:
     """
     Takes a list of list in the form [ [*], [*], ...] and returns a list with the average of each sublist
@@ -20,7 +18,7 @@ def calc_avg_times(avg_times) -> list:
     
     return times
 
-def plot_times(x_axis, times, xlabel, ylabel, title, plot, filepath=None):
+def plot_times(x_axis, times, xlabel, ylabel, title, plot, filepath=None) -> None:
     """
     Creates a plot for benchmarking
 
@@ -48,4 +46,24 @@ def plot_times(x_axis, times, xlabel, ylabel, title, plot, filepath=None):
     if plot:
         plt.show()
     
+    return None
+
+def progress_report(x, i) -> None:
+    """
+    Prints the current step in the benchmarking process
+
+    Input:
+        x (float): the parameter being benchmarked (i.e. number of points/dimension)
+        i (int): current trial of x
+    
+    Return:
+        None
+    """
+    bar = "===================="
+    print(bar)
+    print("PROGRESS:")
+    print("\tParam:\t{}".format(x))
+    print("\tTrial:\t{}".format(i))
+    print(bar)
+
     return None

@@ -1,34 +1,21 @@
 from meb.geometry import M_estimate
-from benchmarking import utils
+from benchmarking import utils, trials
 from benchmarking.exact_solver import mebwo_exact
-from data.loading import from_csv, subset_data
+from data.loading import from_csv
 
-n_list = [100 + 50*i for i in range(10)]
+n_list = [100 + 50*i for i in range(3)]
 d_list = [2 + 2*i for i in range(10)]
 num_trials = 5
 
 normal = from_csv(r"src\data\datasets\normal.csv")
+print("Finished loading data")
 
 if True:
-    times = []
+    n = [100 + 50*i for i in range(3)]
     eta = 0.9
     d = 8
-    
-    for n in n_list:
-        trials = [0]*num_trials
 
-        for i in range(num_trials):
-            print("PROGRESS:")
-            print("\tn:\t{}".format(n))
-            print("\tTrial:\t{}".format(i))
-
-            data = subset_data(normal, range(n), range(d))
-            M = M_estimate(data)
-            trials[i] = mebwo_exact(data, eta, M)
-        
-        times.append(trials)
-    
-    times = utils.calc_avg_times(times)
+    times = trials.run_trials_exact(n, d, eta, num_trials, normal)
 
     utils.plot_times(
         x_axis=n_list,
