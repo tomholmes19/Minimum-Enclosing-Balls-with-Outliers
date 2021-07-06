@@ -20,7 +20,7 @@ def alg__exact(data, eta, M=None, LP_relax=False):
     else:
         M_ = M
 
-    c, r, xi  = gurobi_solvers.mebwo_exact(data, eta, M_, LP_relax)
+    c, r, xi, _  = gurobi_solvers.mebwo_exact(data, eta, M_, LP_relax)
     return c, r, xi
 
 def alg__heuristic(data, eta, eps=1e-4, M=None):
@@ -32,7 +32,7 @@ def alg__heuristic(data, eta, eps=1e-4, M=None):
     n = len(data)
     k = int(eta*n)
 
-    _, _, xi = gurobi_solvers.mebwo_exact(data=data, eta=eta, M=M_, relax=True)
+    _, _, xi, _ = gurobi_solvers.mebwo_exact(data=data, eta=eta, M=M_, relax=True)
     
     indices = np.argsort(xi) # the indices of the sorted list
     indices_dash = indices[:k]

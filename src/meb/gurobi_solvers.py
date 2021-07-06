@@ -57,6 +57,7 @@ def mebwo_exact(data, eta, M, relax=False):
         c_soln (np.array): center of the MEB
         r_soln (float): radius of the MEB
         xi_soln (list): binary variables for outlier or not outlier
+        m.Runtime (float): time taken to solve model
     """
     n = len(data) # number of points
     d = len(data[0]) # dimension TODO: make this better
@@ -93,4 +94,4 @@ def mebwo_exact(data, eta, M, relax=False):
     r_soln = np.sqrt(r.x)
     xi_soln = [xi[i].x for i in range(n)]
 
-    return c_soln, r_soln, xi_soln
+    return c_soln, r_soln, xi_soln, m.Runtime
