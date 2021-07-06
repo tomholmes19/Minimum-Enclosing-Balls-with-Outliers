@@ -1,6 +1,6 @@
+import logging
 import numpy as np
 import matplotlib.pyplot as plt
-import timeit
 
 def calc_avg_times(avg_times) -> list:
     """
@@ -66,4 +66,40 @@ def progress_report(x, i) -> None:
     print("\tTrial:\t{}".format(i))
     print(bar)
 
+    return None
+
+def benchmark_logger(filepath, elapsed, n, d, eta, M, r, c, xi, trial_number, num_trials, data_filepath, rows, columns):
+    """
+    After a trial has been completed, logs details to the specified file
+
+    Input:
+        filepath (str): filepath of the log file to be written to
+        elapsed (float): elapsed runtime of trial
+        n (int): number of rows used in data
+        d (int): dimension of data
+        eta (float): proportion of points covered by the MEBwO
+        M (float): big M parameter for solving exact model
+        r (float): solution for radius
+        c (list): solution for center
+        xi (list): solutions for binary variables
+        trial_number (int): current trial in experiment
+        num_trials (int): total number of trials in experiment
+        data_filepath (str): filepath of data used
+        rows (list): rows in data that have been used
+        columns (list): columns in data that have been used
+    
+    Return:
+        None
+    """
+    logging.basicConfig(filename=filepath, encoding='utf-8', format='%(asctime)s %(message)s', level=logging.INFO)
+    
+    msg = (
+        "Finished trial {0}/{1}, ".format(trial_number, num_trials) +
+        "elapsed={}, ".format(elapsed) +
+        "n={0}, d={1}, eta={2}, M={3}, ".format(n,d,eta,M) +
+        "r={0}, c={1}, ".format(r,c) +
+        "data={0}, rows={1}, columns={2} ".format(data_filepath, rows, columns)
+    )
+    logging.info(msg)
+    print("Recorded log to {}".format(filepath))
     return None

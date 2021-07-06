@@ -1,13 +1,12 @@
-from meb.geometry import M_estimate
-from benchmarking import utils, trials
-from benchmarking.exact_solver import mebwo_exact
-from data.loading import from_csv
+import benchmarking.trials, benchmarking.utils
+import data.loading
 
 n_list = [100 + 50*i for i in range(3)]
 d_list = [2 + 2*i for i in range(10)]
 num_trials = 5
 
-normal = from_csv(r"src\data\datasets\normal.csv")
+normal_filepath = r"datasets\normal.csv"
+normal_data = data.loading.from_csv(normal_filepath)
 print("Finished loading data")
 
 if True:
@@ -15,9 +14,9 @@ if True:
     eta = 0.9
     d = 8
 
-    times = trials.run_trials_exact(n, d, eta, num_trials, normal)
+    times = benchmarking.trials.run_trials_exact(n, d, eta, num_trials, normal_data, log_file=r"src\test\test_log.log", data_file=normal_filepath)
 
-    utils.plot_times(
+    benchmarking.utils.plot_times(
         x_axis=n_list,
         times=times,
         xlabel="n",
