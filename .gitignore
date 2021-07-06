@@ -1,2 +1,4 @@
 src/data/datasets/mnist_train.csv
 src/data/datasets/normal.csv
+datasets/mnist_train.csv
+datasets/normal.csv
