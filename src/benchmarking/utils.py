@@ -63,7 +63,7 @@ def progress_report(x, i) -> None:
     print(bar)
     print("PROGRESS:")
     print("\tParam:\t{}".format(x))
-    print("\tTrial:\t{}".format(i))
+    print("\tTrial:\t{}".format(i+1))
     print(bar)
 
     return None
@@ -94,7 +94,7 @@ def benchmark_logger(filepath, elapsed, n, d, eta, M, r, c, xi, trial_number, nu
     logging.basicConfig(filename=filepath, encoding='utf-8', format='%(asctime)s %(message)s', level=logging.INFO)
     
     msg = (
-        "Finished trial {0}/{1}, ".format(trial_number, num_trials) +
+        "Finished trial {0}/{1}, ".format(trial_number+1, num_trials) +
         "elapsed={}, ".format(elapsed) +
         "n={0}, d={1}, eta={2}, M={3}, ".format(n,d,eta,M) +
         "r={0}, c={1}, ".format(r,c) +
