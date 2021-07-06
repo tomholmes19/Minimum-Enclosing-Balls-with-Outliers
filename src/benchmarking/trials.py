@@ -1,3 +1,5 @@
+import numpy as np
+
 from . import utils
 import meb.geometry, meb.gurobi_solvers
 import data
@@ -12,6 +14,7 @@ def run_trials_exact(n, d, eta, num_trials, data_, log_file=None, data_file=None
         d (int): dimension of data (columns)
         eta (float): proportion of data covered by MEBwO
         num_trials (int): number of trials to run for each experiment (for averaging)
+        data_ (np.array): data set
         log_file (str) (default None): file path for log file (if None, no logging)
         data_file (str): file path for original data (for logging)
     
@@ -31,6 +34,10 @@ def run_trials_exact(n, d, eta, num_trials, data_, log_file=None, data_file=None
     if trial_param is None:
         raise TypeError("No list of parameters was found")
 
+    data_shape = data_.shape
+    num_rows = data_shape[0]
+    num_columns = data_shape[1]
+
     times = []
 
     for x in trial_param_vals:
@@ -48,9 +55,9 @@ def run_trials_exact(n, d, eta, num_trials, data_, log_file=None, data_file=None
         for i in range(num_trials):
             utils.progress_report(n_,i)
 
-            #TODO: make these random
-            rows = range(n_)
-            columns = range(d_)
+            # get combination of rows/columns
+            rows = np.random.choice(num_rows, size=n_, replace=False)
+            columns = np.random.choice(num_columns, size=d_, replace=False)
 
             # load subset of data and calculate M
             trial_data = data.loading.subset_data(data_, rows, columns)

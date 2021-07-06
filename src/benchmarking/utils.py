@@ -98,7 +98,7 @@ def benchmark_logger(filepath, elapsed, n, d, eta, M, r, c, xi, trial_number, nu
         "elapsed={}, ".format(elapsed) +
         "n={0}, d={1}, eta={2}, M={3}, ".format(n,d,eta,M) +
         "r={0}, c={1}, ".format(r,c) +
-        "data={0}, rows={1}, columns={2} ".format(data_filepath, rows, columns)
+        "data={0}, rows={1}, columns={2}".format(data_filepath, rows, columns)
     )
     logging.info(msg)
     print("Recorded log to {}".format(filepath))
