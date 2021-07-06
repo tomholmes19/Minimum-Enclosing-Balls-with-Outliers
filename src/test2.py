@@ -6,7 +6,7 @@ import timeit
 eta = 0.9
 
 normal = data.loading.from_csv(r"src\data\datasets\normal.csv")
-test_data = data.loading.subset_data(normal, rows=range(500), columns=range(4))
+test_data = data.loading.subset_data(normal, rows=range(100), columns=range(4))
 
 start = timeit.default_timer()
 ball = MEBwO().fit(data=test_data, method="exact", eta=eta, calc_pct=True)
