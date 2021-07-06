@@ -4,7 +4,19 @@ import data
 
 def run_trials_exact(n, d, eta, num_trials, data_, log_file=None, data_file=None):
     """
+    Runs trials for the exact solver for MEBwO and returns averaged runtimes
+    One of n, d, eta should be a list for benchmarking on that parameter
+
+    Input:
+        n (int): number of data points (rows)
+        d (int): dimension of data (columns)
+        eta (float): proportion of data covered by MEBwO
+        num_trials (int): number of trials to run for each experiment (for averaging)
+        log_file (str) (default None): file path for log file (if None, no logging)
+        data_file (str): file path for original data (for logging)
     
+    Return:
+        avg_times (list of floats): average runtime for each experiment
     """
     # store variables by references in params dictionary
     params = {"n": n, "d": d, "eta": eta}
