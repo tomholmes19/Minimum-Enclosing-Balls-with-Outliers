@@ -43,7 +43,7 @@ def meb_exact(data):
 
     return c_soln, r_soln, None
 
-def mebwo_exact(data, eta, M, relax=False):
+def mebwo_exact(data, eta, M, relax=False, time_limit=None, log_file=""):
     """
     Solves the MEBwO problem for eta% of the points covered using Gurobi
 
@@ -51,7 +51,9 @@ def mebwo_exact(data, eta, M, relax=False):
         data (array like): list of data points to compute the MEB for
         eta (float): percentage of points to be covered, i.e. eta=0.9 means 90% of points in data are inside the ball
         M (float): value of M for big M constraint
-        LP_relax (bool): if True then relax binary variables to 0 <= xi[i] <= 1 for all i
+        relax (bool): if True then relax binary variables to 0 <= xi[i] <= 1 for all i
+        time_limit (float): time limit for solver (if not set then no limit)
+        log_file (str): file location for logging (if not set then do not log)
 
     Return:
         c_soln (np.array): center of the MEB
@@ -64,6 +66,12 @@ def mebwo_exact(data, eta, M, relax=False):
     k = int(np.ceil(n*(1-eta))) # number of points that are outliers
 
     m = gp.Model("MEBwO")
+
+    if log_file != "":
+        m.setParam(GRB.Param.LogFile, log_file)
+
+    if time_limit is not None:
+        m.setParam(GRB.Param.TimeLimit, time_limit)
 
     c = m.addMVar(shape=d, lb=-GRB.INFINITY, name="center")
     r = m.addVar(name="radius")

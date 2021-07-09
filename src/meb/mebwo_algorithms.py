@@ -14,13 +14,13 @@ def M_approx(data):
     M = sq_3*diam
     return M
 
-def alg__exact(data, eta, M=None, relax=False):
+def alg__exact(data, eta, M=None, relax=False, time_limit=None, log_file=""):
     if M is None:
         M_ = M_approx(data)
     else:
         M_ = M
 
-    c, r, xi, _  = gurobi_solvers.mebwo_exact(data, eta, M_, relax)
+    c, r, xi, _  = gurobi_solvers.mebwo_exact(data, eta, M_, relax, time_limit, log_file)
     return c, r, xi
 
 def alg__heuristic(data, eta, eps=1e-4, M=None):

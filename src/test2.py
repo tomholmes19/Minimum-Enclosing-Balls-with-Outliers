@@ -4,7 +4,7 @@ import numpy as np
 
 import timeit
 
-eta = 0.9
+eta = 0.99
 
 test_data = data.generation.two_clusters(
     n=100,
@@ -17,7 +17,7 @@ test_data = data.generation.two_clusters(
 )
 
 start = timeit.default_timer()
-ball = MEBwO().fit(calc_pct=True, data=test_data, method="exact", eta=eta, relax=False)
+ball = MEBwO().fit(calc_pct=True, data=test_data, method="exact", eta=eta, log_file=r"src/test/test_log.log")
 elapsed = timeit.default_timer() - start
 
 print("Total time:\t", elapsed)
