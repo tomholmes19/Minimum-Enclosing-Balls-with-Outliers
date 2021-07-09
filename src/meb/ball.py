@@ -41,26 +41,28 @@ class Ball:
         
         yield True # if center and radius have been set, assume they will not be un-set
     
-    def contains(self, x) -> bool:
+    def contains(self, x, tol=1e-4) -> bool:
         """
         Checks if x is inside the ball
 
         Input:
             x (array like): data point to check if it is inside the ball
+            tol (float): tolerance to account for floating point error
         
         Return:
             out (bool): True if x is inside the ball, False otherwise
         """
         # don't check_params here since this is called repeatedly by check_subset()
-        out = np.linalg.norm(x-self.center) <= self.radius
+        out = np.linalg.norm(x-self.center) <= self.radius*(1+tol)
         return out
 
-    def check_subset(self, data) -> bool:
+    def check_subset(self, data, tol=1e-4) -> bool:
         """
         Checks if the given data is a subset of the ball
         
         Input:
             data (array like): data to check if its a subset of the ball
+            tol (float): tolerance to account for floating point error
 
         Return:
             out (bool): true if data is contained in the ball, false otherwise
@@ -69,7 +71,7 @@ class Ball:
         # if any point is not in the ball, switch out to false and break loop
         out = True
         for x in data:
-            if not self.contains(x):
+            if not self.contains(x, tol):
                 out = False
                 break
 

@@ -3,13 +3,21 @@ from meb.ball import Ball, MEB, MEBwO
 import numpy as np
 
 import timeit
+
 eta = 0.9
 
-normal = data.loading.from_csv(r"datasets/normal.csv")
-test_data = data.loading.subset_data(normal, rows=range(100), columns=range(2))
+test_data = data.generation.two_clusters(
+    n=100,
+    d=2,
+    eta=eta,
+    m1=0,
+    v1=1,
+    m2=10,
+    v2=1
+)
 
 start = timeit.default_timer()
-ball = MEBwO().fit(data=test_data, method="exact", eta=eta, calc_pct=True)
+ball = MEBwO().fit(calc_pct=True, data=test_data, method="exact", eta=eta, relax=False)
 elapsed = timeit.default_timer() - start
 
 print("Total time:\t", elapsed)
