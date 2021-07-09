@@ -14,13 +14,13 @@ def M_approx(data):
     M = sq_3*diam
     return M
 
-def alg__exact(data, eta, M=None, LP_relax=False):
+def alg__exact(data, eta, M=None, relax=False):
     if M is None:
         M_ = M_approx(data)
     else:
         M_ = M
 
-    c, r, xi, _  = gurobi_solvers.mebwo_exact(data, eta, M_, LP_relax)
+    c, r, xi, _  = gurobi_solvers.mebwo_exact(data, eta, M_, relax)
     return c, r, xi
 
 def alg__heuristic(data, eta, eps=1e-4, M=None):
@@ -56,7 +56,7 @@ def alg__heuristic_2(data, eta, eps):
     while num_contained > k:
         A = [a for a in A if a not in X]
         num_contained -= len(X)
-        c, r, X = meb_algorithms.alg_socp_heuristic(A, eps)
+        c, r, X = meb_algorithms.alg__socp_heuristic(A, eps)
         
         
     return c, r, None

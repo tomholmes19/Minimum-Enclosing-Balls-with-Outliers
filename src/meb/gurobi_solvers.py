@@ -61,7 +61,7 @@ def mebwo_exact(data, eta, M, relax=False):
     """
     n = len(data) # number of points
     d = len(data[0]) # dimension TODO: make this better
-    k = np.ceil(n*(1-eta)) # number of points that are outliers
+    k = int(np.ceil(n*(1-eta))) # number of points that are outliers
 
     m = gp.Model("MEBwO")
 
