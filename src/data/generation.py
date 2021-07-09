@@ -97,3 +97,30 @@ def uniform_ball_with_ouliters(n, d, eta, c, r1, r2, sep=0) -> np.array:
     data = data_inner + data_outer
     np.random.shuffle(data)
     return np.array(data)
+
+def two_clusters(n, d, eta, m1, v1, m2, v2) -> np.array:
+    """
+    Generates two clusters of normally distributed data with means and variances m1,m2, and v1,v2 respectively
+
+    Input:
+        n (int): total number of points to generate
+        d (int): dimension of data
+        eta (float): proportion of points to be in cluster 1 (with (1-eta)% in cluster 2)
+        m1 (float): mean of normal distribution for cluster 1
+        v1 (float): variance of normal distribution for cluster 1
+        m1 (float): mean of normal distribution for cluster 2
+        v1 (float): variance of normal distribution for cluster 2
+    
+    Return:
+        data (np.array): generated data
+    """
+    k = int(np.floor(n*eta)) # number of points in cluster 1
+
+    print(n, k, n-k)
+
+    cluster1 = normal(m1, v1, k, d)
+    cluster2 = normal(m2, v2, n-k, d)
+
+    data = np.concatenate((cluster1, cluster2))
+
+    return data
