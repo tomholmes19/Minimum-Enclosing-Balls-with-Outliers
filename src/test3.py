@@ -12,5 +12,5 @@ benchmarking.utils.plot_times(
         ylabel="Time",
         title="Running time for MEBwO as a function of n, d={}, eta={}".format(d, eta),
         plot=True,
-        filepath=r"images/benchmarks/mebwo_runtimes_d{}.png".format(d)
+        #filepath=r"images/benchmarks/mebwo_runtimes_d{}.png".format(d)
     )

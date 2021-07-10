@@ -1,4 +1,12 @@
-import data.generation, data.loading
+from threading import Timer, Event
+import time
+import sys
+timeout = 5
+try:
+    print("Start timer")
+    time.sleep(timeout)
+except KeyboardInterrupt:
+    print("Caught exit")
+    sys.exit()
 
-test_data = data.generation.normal(0,1,1000,5)
-data.loading.to_csv(test_data, "src/test/normal_test.csv")
+print("aaah")
