@@ -1,6 +1,9 @@
 import logging
+import time
 import numpy as np
 import matplotlib.pyplot as plt
+
+from pathlib import Path
 
 def calc_avg_times(avg_times) -> list:
     """
@@ -138,3 +141,30 @@ def get_times_from_log(filepath, calc_avg=True) -> list:
         times = calc_avg_times(times)
     
     return times
+
+def timeout(log_Path, time_limit=20):
+    print("Received no input within {} seconds. Continuing.".format(time_limit))
+    log_Path.unlink()
+    return None
+
+def check_log(log_file, time_limit=20) -> None:
+    """
+    Checks if the given log_file already exists, and if so asks the user if it should continue.
+
+    Input:
+        log_file (str): file path for log file
+        time_limit (float): time limit for user prompt
+    
+    Return:
+        None
+    """
+    if log_file is not None:
+        log_Path = Path(log_file)
+        if log_Path.exists():
+            try:
+                print("Log file {0} already exists. Overwriting in {1}s. Press Ctrl+C to abort.".format(log_file, time_limit))
+                time.sleep(time_limit)
+            except KeyboardInterrupt:
+                exit("Aborting.")
+    
+    return None

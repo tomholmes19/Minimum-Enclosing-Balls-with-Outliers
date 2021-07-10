@@ -34,6 +34,8 @@ def run_trials_exact(n, d, eta, num_trials, data_, log_file=None, data_file=None
     if trial_param is None:
         raise TypeError("No list of parameters was found")
 
+    utils.check_log(log_file)
+
     data_shape = data_.shape
     num_rows = data_shape[0]
     num_columns = data_shape[1]
