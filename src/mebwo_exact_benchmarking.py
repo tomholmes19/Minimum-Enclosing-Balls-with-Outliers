@@ -1,29 +1,31 @@
 import benchmarking.trials, benchmarking.utils
 import data.loading
 
-n_list = [100 + 50*i for i in range(3)]
-d_list = [2 + 2*i for i in range(10)]
 num_trials = 5
 
+data_type = "normal"
 normal_filepath = r"datasets/normal.csv"
 normal_data = data.loading.from_csv(normal_filepath)
 print("Finished loading data")
 
 if True:
-    n = [100 + 50*i for i in range(3)]
+    n = [50+ 50*i for i in range(3)]
     eta = 0.9
     d = 8
 
-    times = benchmarking.trials.run_trials_exact(n, d, eta, num_trials, normal_data, log_file=r"src/test/test_log.log", data_file=normal_filepath)
+    file_name = r"{0}/func_n_d{1}_eta{2}_{3}".format(data_type, d, str(eta).replace(".","p"), data_type)
+    log_file = r"benchmarks/exact/{0}.log".format(file_name)
+
+    times = benchmarking.trials.run_trials_exact(n, d, eta, num_trials, normal_data, log_file=log_file, data_file=normal_filepath)
 
     benchmarking.utils.plot_times(
-        x_axis=n_list,
+        x_axis=n,
         times=times,
         xlabel="n",
         ylabel="Time",
-        title="Running time for MEBwO as a function of n, d={}, eta={}".format(d, eta),
+        title="Running time for MEBwO as a function of n, d={0}, eta={1}".format(d, eta),
         plot=True,
-        #filepath=r"images\benchmarks\mebwo_runtimes_d{}.png".format(d)
+        filepath=r"benchmarks/exact/{0}.png".format(file_name)
     )
 
 
