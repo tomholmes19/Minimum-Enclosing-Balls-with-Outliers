@@ -12,8 +12,8 @@ def wrapper(data_type, func, **kwargs) -> None:
     run = True
 
     if Path(filename).exists():
-        response = input("File {} already exists. Continue? (y/n)\n".format(filename))
-        if response == "n":
+        msg = input("File {} already exists. Continue? (y/n)\n".format(filename))
+        if msg == "n":
             run = False
 
     if run:
