@@ -2,4 +2,4 @@
 datasets/*
 
 # so git will commit datasets folder
-!datasets/.gitkeep
+!datasets/README.md
