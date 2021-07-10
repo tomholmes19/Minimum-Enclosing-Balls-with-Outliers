@@ -103,3 +103,38 @@ def benchmark_logger(filepath, elapsed, n, d, eta, M, r, c, xi, trial_number, nu
     logging.info(msg)
     print("Recorded log to {}".format(filepath))
     return None
+
+def get_times_from_log(filepath, calc_avg=True) -> list:
+    """
+    Scans the given log file and returns a list of the runtimes
+
+    Input:
+        filepath (str): filepath of the log file to be scanned
+        calc_avg (bool): if False then returns list containing lists for each trial, if True then returns list of average times
+    
+    Output:
+        times (list): list of runtimes
+    """
+    times = []
+    trial_times = []
+
+    with open(filepath, "r") as f:
+        num_trials = f.readline().split(sep=", ")[0].split("/")[1]
+
+        for line in f: # iterate over each line
+            line_split = line.split(sep=", ") # split into elements of a list
+            first_part = line_split[0]
+
+            if "Finished trial" in first_part: # indicator that this is a log written by benchmark_logger
+                time = float(line_split[1].split("=")[1]) # line_split[1] will be "elapsed=<time>"
+                trial_times.append(time)
+
+                trial_num = first_part.split()[-1].split("/")[0] # which trial number we are on
+                if trial_num == num_trials: # i.e. if we are on trial 5/5
+                    times.append(trial_times)
+                    trial_times = [] # reset
+
+    if calc_avg:
+        times = calc_avg_times(times)
+    
+    return times
