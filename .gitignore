@@ -1,4 +1,5 @@
-src/data/datasets/mnist_train.csv
-src/data/datasets/normal.csv
-datasets/mnist_train.csv
-datasets/normal.csv
+# ignore all files in datasets
+datasets/*
+
+# so git will commit datasets folder
+!datasets/.gitkeep
