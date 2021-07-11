@@ -50,12 +50,13 @@ def cube():
     #TODO: find out what this means
     pass
 
-def uniform_point_in_ball(d, lb, ub):
+def uniform_point_in_ball(d, c, lb, ub):
     """
     Generates a uniform point in d-dimensions in a ball with minimum length lb and maximum length ub
 
     Input:
         d (int): dimension of points
+        c (np.array): relative origin of point
         lb (float): lower bound for length
         ub (float): ubber bound for length
     
@@ -65,7 +66,7 @@ def uniform_point_in_ball(d, lb, ub):
     length = np.random.uniform(low=lb, high=ub)
     direction = np.random.uniform(low=-1, high=1, size=d)
     direction = direction/np.linalg.norm(direction)
-    point = length*direction
+    point = length*direction + c
     return point
 
 def uniform_ball_with_ouliters(n, d, eta, c, r1, r2, sep=0) -> np.array:
@@ -91,8 +92,8 @@ def uniform_ball_with_ouliters(n, d, eta, c, r1, r2, sep=0) -> np.array:
     n_inner = int(np.floor(eta*n))
     n_outer = int(np.ceil((1-eta)*n))
 
-    data_inner = [uniform_point_in_ball(d=d, lb=0, ub=r1) for _ in range(n_inner)]
-    data_outer = [uniform_point_in_ball(d=d, lb=r1+sep, ub=r2) for _ in range(n_outer)]
+    data_inner = [uniform_point_in_ball(c=c, d=d, lb=0, ub=r1) for _ in range(n_inner)]
+    data_outer = [uniform_point_in_ball(c=c, d=d, lb=r1+sep, ub=r2) for _ in range(n_outer)]
 
     data = data_inner + data_outer
     np.random.shuffle(data)

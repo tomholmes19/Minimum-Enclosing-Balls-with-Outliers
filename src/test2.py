@@ -4,20 +4,20 @@ import numpy as np
 
 import timeit
 
-eta = 0.99
+eta = 0.9
 
-test_data = data.generation.two_clusters(
+test_data = data.generation.uniform_ball_with_ouliters(
     n=100,
     d=2,
     eta=eta,
-    m1=0,
-    v1=1,
-    m2=10,
-    v2=1
+    c=[5,-10],
+    r1=1,
+    r2=3,
+    sep=1
 )
 
 start = timeit.default_timer()
-ball = MEBwO().fit(calc_pct=True, data=test_data, method="exact", eta=eta, log_file=r"src/test/test_log.log")
+ball = MEBwO().fit(calc_pct=True, data=test_data, method="exact", eta=eta)
 elapsed = timeit.default_timer() - start
 
 print("Total time:\t", elapsed)
