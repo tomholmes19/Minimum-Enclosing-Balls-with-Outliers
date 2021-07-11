@@ -55,7 +55,7 @@ def run_trials_exact(n, d, eta, num_trials, data_, log_file=None, data_file=None
         trials = [0]*num_trials
 
         for i in range(num_trials):
-            utils.progress_report(n_,i)
+            utils.progress_report(x, trial_param, i)
 
             # get combination of rows/columns
             rows = np.random.choice(num_rows, size=n_, replace=False)
