@@ -1,5 +1,6 @@
-import logging
 import time
+import logging
+import subprocess
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -51,12 +52,13 @@ def plot_times(x_axis, times, xlabel, ylabel, title, plot, filepath=None) -> Non
     
     return None
 
-def progress_report(x, i) -> None:
+def progress_report(x, param_name, i) -> None:
     """
     Prints the current step in the benchmarking process
 
     Input:
         x (float): the parameter being benchmarked (i.e. number of points/dimension)
+        param_name (str): name of the parameter being benchmarked
         i (int): current trial of x
     
     Return:
@@ -65,7 +67,7 @@ def progress_report(x, i) -> None:
     bar = "===================="
     print(bar)
     print("PROGRESS:")
-    print("\tParam:\t{}".format(x))
+    print("\t{0}:\t{1}".format(param_name, x))
     print("\tTrial:\t{}".format(i+1))
     print(bar)
 
@@ -167,4 +169,11 @@ def check_log(log_file, time_limit=20) -> None:
             except KeyboardInterrupt:
                 exit("Aborting.")
     
+    return None
+
+def notify() -> None:
+    """
+    Sends a notification to the notify-run channel in notify.sh
+    """
+    subprocess.call(["sh", "src/notify.sh"])
     return None
