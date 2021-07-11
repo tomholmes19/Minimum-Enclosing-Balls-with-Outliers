@@ -1,3 +1,5 @@
+import numpy as np
+
 import benchmarking.trials, benchmarking.utils
 import data.loading
 
@@ -9,13 +11,13 @@ normal_data = data.loading.from_csv(normal_filepath)
 print("Finished loading data")
 
 if True:
-    n = [50+ 50*i for i in range(3)]
+    n = [200+ 50*i for i in range(10)]
     eta = 0.9
-    d = 8
+    d = 10
 
     file_name = r"{0}/func_n_d{1}_eta{2}_{3}".format(data_type, d, str(eta).replace(".","p"), data_type)
     log_file = r"benchmarks/exact/{0}.log".format(file_name)
-
+    np.random.seed(1234)
     times = benchmarking.trials.run_trials_exact(n, d, eta, num_trials, normal_data, log_file=log_file, data_file=normal_filepath)
 
     benchmarking.utils.plot_times(
