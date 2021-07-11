@@ -10,15 +10,19 @@ normal_filepath = r"datasets/normal.csv"
 normal_data = data.loading.from_csv(normal_filepath)
 print("Finished loading data")
 
-if True:
+if False:
     n = [200+ 50*i for i in range(10)]
     eta = 0.9
     d = 10
 
     file_name = r"{0}/func_n_d{1}_eta{2}_{3}".format(data_type, d, str(eta).replace(".","p"), data_type)
     log_file = r"benchmarks/exact/{0}.log".format(file_name)
+    
     np.random.seed(1234)
+
     times = benchmarking.trials.run_trials_exact(n, d, eta, num_trials, normal_data, log_file=log_file, data_file=normal_filepath)
+
+    benchmarking.utils.notify()
 
     benchmarking.utils.plot_times(
         x_axis=n,
@@ -31,24 +35,26 @@ if True:
     )
 
 
-if False:
-    times = []
-    eta = 0.9
+if True:
     n = 300
+    eta = 0.9
+    d = [2 + 2*i for i in range(10)]
 
-    for d in d_list:
-        data = utils.load_normal(n,d)
-        M = M_estimate(data)
-        times.append(mebwo_exact(data, eta, M))
+    file_name = r"{0}/func_d_n{1}_eta{2}_{3}".format(data_type, n, str(eta).replace(".","p"), data_type)
+    log_file = r"benchmarks/exact/{0}.log".format(file_name)
+
+    times = benchmarking.trials.run_trials_exact(n, d, eta, num_trials, normal_data, log_file=log_file, data_file=normal_filepath)
     
-    utils.plot_times(
-        x_axis=d_list,
+    benchmarking.utils.notify()
+    
+    benchmarking.utils.plot_times(
+        x_axis=d,
         times=times,
         xlabel="d",
         ylabel="Time",
         title="Running time for MEBwO as a function of d, n={}, eta={}".format(n, eta),
         plot=True,
-        filepath=r"images\benchmarks\mebwo_runtimes_n{}.png".format(n)
+        filepath=r"benchmarks/exact/{0}.png".format(file_name)
     )
 
 if False:
