@@ -66,7 +66,7 @@ def run_trials_exact(n, d, eta, num_trials, data_, log_file=None, data_file=None
             M = meb.geometry.M_estimate(trial_data)
 
             # solve model and store variables
-            c, r, xi, trials[i] = meb.gurobi_solvers.mebwo_exact(trial_data, eta_, M)
+            c, r, xi, trials[i] = meb.gurobi_solvers.mebwo_exact(trial_data, eta_, M, log_file=log_file)
             
             if log_file is not None:
                 utils.benchmark_logger(filepath=log_file, elapsed=trials[i], n=n_, d=d_, eta=eta_, M=M, r=r, c=c, xi=xi, trial_number=i, num_trials=num_trials, data_filepath=data_file, rows=rows, columns=columns)
