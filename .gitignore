@@ -1,6 +1,5 @@
 # ignore all files in datasets
 datasets/*
-
 # so git will commit datasets folder
 !datasets/README.md
 
