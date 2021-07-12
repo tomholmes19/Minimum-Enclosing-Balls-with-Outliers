@@ -177,3 +177,16 @@ def notify() -> None:
     """
     subprocess.call(["sh", "src/notify.sh"])
     return None
+
+def format_eta(eta) -> str:
+    """
+    Formats eta for use in a file name, e.g. 0.95 -> 0p95
+
+    Input:
+        eta (float): eta value
+    
+    Return:
+        eta_str (str): eta as a string
+    """
+    eta_str = str(eta).replace(".","p")
+    return eta_str
