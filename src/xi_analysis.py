@@ -2,10 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from meb.gurobi_solvers import mebwo_exact
-from data.loading import from_csv
+from data.loading import from_csv, subset_data
 from meb.geometry import M_estimate
 
-data = from_csv(r"src\data\datasets\normal\normal_n200_d4.csv")
+data = from_csv(r"datasets/normal.csv")
+data = subset_data(data, rows=range(300), columns=range(10))
 
 eta = 0.9
 M_UB = M_estimate(data)
