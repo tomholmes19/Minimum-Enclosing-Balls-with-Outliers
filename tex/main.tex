@@ -1,10 +1,12 @@
-\documentclass[11pt,twoside]{article}
+\documentclass[11pt,twoside]{report}
 \usepackage{geometry}
 \usepackage{enumerate}
 \usepackage{latexsym,booktabs}
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
 \usepackage[singlespacing]{setspace}
+% ===== Defaults^
+\usepackage{hyperref}
 
 \geometry{a4paper,left=2cm,right=2.0cm, top=2cm, bottom=2.0cm}
 
@@ -57,27 +59,36 @@ MSc in Operational Research with Computational Optimization}\\
 % =============================================================================
 % Abstract, acknowledgments, and own work declaration
 % =============================================================================
+\vspace*{10mm}
 \begin{center}
-\Large{Abstract}
+\textbf{\huge{Abstract}}
 \end{center}
 
 Here comes your abstract ...
 
 \clearpage
-
+\vspace*{10mm}
 \begin{center}
-\Large{Acknowledgments}
+\textbf{\huge{Acknowledgments}}
 \end{center}
 
 Here come your acknowledgments ...
 
 \clearpage
 
+\vspace*{10mm}
 \begin{center}
-\Large{Own Work Declaration}
+\textbf{\huge{Own Work Declaration}}
 \end{center}
+\vspace*{20mm}
 
-Here comes your own work declaration
+\noindent I declare that this thesis was composed by myself and that the work contained therein is my own, except where explicitly stated otherwise in the text.
+
+\vspace*{10mm}
+
+\begin{flushright}
+\textit{(Thomas Holmes)}
+\end{flushright}
 
 \cleardoublepage
 
@@ -106,8 +117,32 @@ Here comes your own work declaration
 % Main body
 % =============================================================================
 
+\chapter{Introduction}
+\section{Motivation}
+\section{Outline}
 
+\chapter{Optimisation Model Formulation}
+\section{Minimum Enclosing Ball}
+\section{Minimum Enclosing Ball with Outliers}
+\subsection{Formulation}
+\subsection{Analysis of the big M parameter}
+\subsection{Benchmarks and Analysis}
 
+\chapter{Heuristic Methods}
+\section{Relaxation-based Heuristic}
+\section{Shenmaier Heuristic}
+\section{Peeling-based Heuristics}
+
+\chapter{Implementation and Heuristic Benchmarks}
+\section{Code Implementation}
+\section{Data}
+\section{Experiments}
+\section{Methodology}
+\section{Results}
+
+\chapter{Analysis and Conclusion}
+
+% =============================================================================
 %the entries have to be in the file literature.bib
 \bibliography{literature}
 \clearpage
