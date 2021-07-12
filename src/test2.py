@@ -16,7 +16,7 @@ test_data = data.generation.uniform_ball_with_ouliters(
 )
 
 start = timeit.default_timer()
-ball = MEBwO().fit(calc_pct=True, data=test_data, method="heuristic", eta=eta)
+ball = MEBwO().fit(calc_pct=True, data=test_data, method="heuristic", eps=1e-4, eta=eta)
 elapsed = timeit.default_timer() - start
 
 print("Total time:\t", elapsed)
