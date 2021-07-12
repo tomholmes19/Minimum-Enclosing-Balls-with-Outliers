@@ -69,7 +69,7 @@ def uniform_point_in_ball(d, c, lb, ub):
     point = length*direction + c
     return point
 
-def uniform_ball_with_ouliters(n, d, eta, c, r1, r2, sep=0) -> np.array:
+def uniform_ball_with_ouliters(n, d, eta, r1, r2, c=None, sep=0) -> np.array:
     """
     Generates n many data points where eta*n many are uniformly inside a ball B1 with centre c and radius r1,
     and (1-eta)*n many are uniformly inside a ball B2 with centre c and radius r2 but not in B1
@@ -78,16 +78,19 @@ def uniform_ball_with_ouliters(n, d, eta, c, r1, r2, sep=0) -> np.array:
         n (int): total number of data points to generate
         d (int): dimension of data points
         eta (float): percentage of data points to be inside B1
-        c (np.array): centre of balls
+        c (np.array): centre of ball
         r1 (float): radius of inner ball
         sep (float): separation between inner ball and lower bound of outer ball
-        r2 (float): radius of outer blal
+        r2 (float): radius of outer ball
     
     Return:
         data (np.array): generated data
     """
     if r1+sep > r2:
         raise ValueError("Value of r1+sep greater than r2")
+    
+    if c is None:
+        c = [0]*d
 
     n_inner = int(np.floor(eta*n))
     n_outer = int(np.ceil((1-eta)*n))
