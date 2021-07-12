@@ -1,7 +1,9 @@
 import numpy as np
+from numpy.lib.twodim_base import tri
 
 import benchmarking.trials, benchmarking.utils
 import data.loading
+from meb import gurobi_solvers, geometry
 
 num_trials = 5
 
@@ -15,7 +17,7 @@ if False:
     eta = 0.9
     d = 10
 
-    file_name = r"{0}/func_n_d{1}_eta{2}_{3}".format(data_type, d, str(eta).replace(".","p"), data_type)
+    file_name = r"{0}/func_n_d{1}_eta{2}_{3}".format(data_type, d, benchmarking.utils.format_eta(eta), data_type)
     log_file = r"benchmarks/exact/{0}.log".format(file_name)
     
     np.random.seed(1234)
@@ -35,12 +37,12 @@ if False:
     )
 
 
-if True:
+if False:
     n = 300
     eta = 0.9
     d = [2 + 2*i for i in range(10)]
 
-    file_name = r"{0}/func_d_n{1}_eta{2}_{3}".format(data_type, n, str(eta).replace(".","p"), data_type)
+    file_name = r"{0}/func_d_n{1}_eta{2}_{3}".format(data_type, n, benchmarking.utils.format_eta(eta), data_type)
     log_file = r"benchmarks/exact/{0}.log".format(file_name)
 
     times = benchmarking.trials.run_trials_exact(n, d, eta, num_trials, normal_data, log_file=log_file, data_file=normal_filepath)
@@ -58,46 +60,68 @@ if True:
     )
 
 if False:
-    times = []
+    n = 300
+    d = 10
+    eta = [0.75, 0.8, 0.85, 0.9, 0.95, 1]
 
-    n = 500
-    d = 12
-    data = utils.load_normal(n,d)
-    M = M_estimate(data)
+    file_name = r"{0}/func_eta_n{1}_d{2}_{3}".format(data_type, n, d, data_type)
+    log_file = r"benchmarks/exact/{0}.log".format(file_name)
 
-    eta_list = [0.75, 0.8, 0.85, 0.9, 0.95, 1]
+    times = benchmarking.trials.run_trials_exact(n, d, eta, num_trials, normal_data, log_file=log_file, data_file=normal_filepath)
 
-    for eta in eta_list:
-        times.append(mebwo_exact(data, eta, M))
-    
-    utils.plot_times(
-        x_axis=eta_list,
+    benchmarking.utils.plot_times(
+        x_axis=eta,
         times=times,
         xlabel="eta",
         ylabel="Time",
         title="Running time for MEBwO as a function of eta, n={}, d={}".format(n, d),
         plot=True,
-        filepath=r"images\benchmarks\mebwo_runtimes_eta.png"
+        filepath=r"benchmarks/exact/{0}.png".format(file_name)
     )
 
-if False:
+if True:
     times = []
 
-    n = 200
-    d = 7
+    n = 300
+    d = 10
     eta = 0.9
 
-    data = utils.load_normal(n,d)
+    file_name = r"{0}/func_M_n{1}_d{2}_eta{3}_{4}".format(data_type, n, d, data_type)
+    log_file = r"benchmarks/exact/{0}.log".format(file_name)
 
-    M_UB = M_estimate(data)
-    M_list = [M_UB*m for m in range(1,11)]
+    rows = range(n)
+    columns = range(d)
+
+    exp_data = data.loading.subset_data(normal_data, rows, columns)
+
+    M_UB = geometry.M_estimate(exp_data)
+    M_list = [M_UB*i for i in range(1,11)]
+
+    file_name = r"{0}/func_M_n{1}_d{2}_eta{3}_{4}".format(data_type, n, d, benchmarking.utils.format_eta(eta), data_type)
+    log_file = r"benchmarks/exact/{0}.log".format(file_name)
+
+    benchmarking.utils.check_log(log_file)
+
+    data_shape = normal_data.shape
+    num_rows = data_shape[0]
+    num_columns = data_shape[1]
 
     for M in M_list:
-        times.append(mebwo_exact(data, eta, M))
+        trials = [0]*num_trials
+        for i in range(num_trials):
+            benchmarking.utils.progress_report(M, "M", i)
+
+            c, r, xi, trials[i] = gurobi_solvers.mebwo_exact(exp_data, eta, M, log_file=log_file)
+
+            benchmarking.utils.benchmark_logger(filepath=log_file, elapsed=trials[i], n=n, d=d, M=M, r=r, c=c, xi=xi, trial_number=i, num_trials=num_trials, data_filepath=normal_filepath, rows=rows, columns=columns)
+
+        times.append(trials)
     
-    utils.plot_times(
+    avg_times = benchmarking.utils.calc_avg_times(times)
+
+    benchmarking.utils.plot_times(
         x_axis=M_list,
-        times=times,
+        times=avg_times,
         xlabel="M",
         ylabel="Time",
         title="Running time for MEBwO as a function of M, n={}, d={}, eta={}".format(n, d, eta),
