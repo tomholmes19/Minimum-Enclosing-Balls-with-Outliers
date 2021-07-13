@@ -6,25 +6,37 @@
 \usepackage{graphicx}
 \usepackage[singlespacing]{setspace}
 % ===== Defaults^
-\usepackage{hyperref}
+\usepackage{amsthm}
+\usepackage{hyperref}           % hyperlinks
+\usepackage{array}              % for \newcolumntype macro
+\newcolumntype{C}{>{$}c<{$}}    % math-mode version of "l" column type
+
+\newcommand{\A}{\mathcal{A}} %% I am lazy
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+\DeclareMathOperator{\MEB}{MEB}
+\DeclareMathOperator{\MEBwO}{MEBwO}
+
+
+\theoremstyle{definition}
+% ==== Mine^
 
 \geometry{a4paper,left=2cm,right=2.0cm, top=2cm, bottom=2.0cm}
 
-\newtheorem{Definition}{Definition}
-\newtheorem{Theorem}{Theorem}
-\newtheorem{Lemma}{Lemma}
-\newtheorem{Corollary}{Corollary}
-\newtheorem{Proposition}{Proposition}
-\newtheorem{Algorithm}{Algorithm}
-\numberwithin{Theorem}{section}
-\numberwithin{Definition}{section}
-\numberwithin{Lemma}{section}
-\numberwithin{Algorithm}{section}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corr}{Corollary}
+\newtheorem{prop}{Proposition}
+\newtheorem{algorithm}{Algorithm}
+\numberwithin{theorem}{section}
+\numberwithin{definition}{section}
+\numberwithin{lemma}{section}
+\numberwithin{algorithm}{section}
 \numberwithin{equation}{section}
 
 
 \begin{document}
-
 \pagestyle{empty}
 
 % =============================================================================
@@ -123,7 +135,46 @@ Here come your acknowledgments ...
 \section{Outline}
 
 \chapter{Optimisation Model Formulation}
+\section{Preliminaries}
+In this paper we shall denote our data set of finite vectors as $\mathcal{A} = \left\{a^1,\ldots,a^n\right\}\subseteq\mathbb{R}^d$ for $n,d\in\mathbb{N}$.
+
+\begin{definition}
+Let $c\in\mathbb{R}^n$ and $r\in\mathbb{R}$. Then the \textit{ball} with center $c$ and radius $r$ is the set
+\begin{equation*}
+    B(c;r) = \left\{x\in\mathbb{R}^n : \norm{x-c} \leq r\right\}
+\end{equation*}
+where $\norm{\cdot}:L\to\mathbb{R}$ denotes the standard Euclidean norm on a vector space $L$ (in this paper, $L=\mathbb{R}^n$).
+\end{definition}
+
+\begin{definition}
+The \textit{minimum enclosing ball} of $\A$, denoted by $\MEB(\A)$, is the ball $B(c^*;r^*)$ where $\A\subseteq B(c^*;r^*)$ and if any $B(c,r)$ exists such that $\mathcal{A}\subseteq B(c,r)$ then $r^*\leq r$.
+\end{definition}
+
+\begin{theorem}
+For a given set $\A$, $\MEB(\A)$ is unique.
+\end{theorem}
+\begin{proof}
+See (paper).
+\end{proof}
+
+\begin{definition}[{{\cite[page 2]{core-sets}}}]
+Let $r^*$ be the radius of $\MEB(\A)$. A ball $B(c;(1+\epsilon)r)$ is a \textit{$(1+\epsilon)$-approximation} of $\MEB(\A)$ if $r\leq r^*$ and $\mathcal{A}\subseteq B(c;(1+\epsilon)r)$.
+\end{definition}
 \section{Minimum Enclosing Ball}
+\begin{definition} \label{MEB}
+Let $\mathcal{A} = \left\{a^1,\ldots,a^n\right\}\subseteq\mathbb{R}^d$ for $n,d\in\mathbb{N}$. The optimisation model formulation of the Minimum Enclosing Ball (MEB) problem is as follows:
+\begin{center}
+    \begin{tabular}{CCC}
+        \displaystyle\min_{c,r} & r \\
+        \text{s.t.} & \norm{c-a^i} \leq r & i=1,\ldots,n
+    \end{tabular}
+\end{center}
+where $c\in\mathbb{R}^d$ and $r\in\mathbb{R}$ are the decision variables corresponding to the center and radius of the ball respectively.
+\end{definition}
+
+
+
+
 \section{Minimum Enclosing Ball with Outliers}
 \subsection{Formulation}
 \subsection{Analysis of the big M parameter}
@@ -137,9 +188,8 @@ Here come your acknowledgments ...
 \chapter{Implementation and Heuristic Benchmarks}
 \section{Code Implementation}
 \section{Data}
-\section{Experiments}
 \section{Methodology}
-\section{Results}
+\section{Experiments}
 
 \chapter{Analysis and Conclusion}
 
