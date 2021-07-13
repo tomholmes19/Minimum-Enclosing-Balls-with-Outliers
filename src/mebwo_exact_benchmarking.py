@@ -60,7 +60,7 @@ if False:
     )
 
 if False:
-    n = 300
+    n = 500
     d = 10
     eta = [0.75, 0.8, 0.85, 0.9, 0.95, 1]
 
@@ -75,18 +75,18 @@ if False:
         xlabel="eta",
         ylabel="Time",
         title="Running time for MEBwO as a function of eta, n={}, d={}".format(n, d),
-        plot=True,
+        plot=False,
         filepath=r"benchmarks/exact/{0}.png".format(file_name)
     )
 
 if True:
     times = []
 
-    n = 300
+    n = 500
     d = 10
     eta = 0.9
 
-    file_name = r"{0}/func_M_n{1}_d{2}_eta{3}_{4}".format(data_type, n, d, data_type)
+    file_name = r"{0}/func_M_n{1}_d{2}_eta{3}_{4}".format(data_type, n, d, benchmarking.utils.format_eta(eta), data_type)
     log_file = r"benchmarks/exact/{0}.log".format(file_name)
 
     rows = range(n)
@@ -113,7 +113,7 @@ if True:
 
             c, r, xi, trials[i] = gurobi_solvers.mebwo_exact(exp_data, eta, M, log_file=log_file)
 
-            benchmarking.utils.benchmark_logger(filepath=log_file, elapsed=trials[i], n=n, d=d, M=M, r=r, c=c, xi=xi, trial_number=i, num_trials=num_trials, data_filepath=normal_filepath, rows=rows, columns=columns)
+            benchmarking.utils.benchmark_logger(filepath=log_file, elapsed=trials[i], n=n, d=d, eta=eta, M=M, r=r, c=c, xi=xi, trial_number=i, num_trials=num_trials, data_filepath=normal_filepath, rows=rows, columns=columns)
 
         times.append(trials)
     
