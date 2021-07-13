@@ -24,3 +24,46 @@ pages = {1.1–es},
 numpages = {29},
 keywords = {minimum enclosing ball, second-order cone programming, approximation algorithms}
 }
+
+@article{two-algorithms,
+author = {Yildirim, E. Alper},
+title = {Two Algorithms for the Minimum Enclosing Ball Problem},
+year = {2008},
+issue_date = {October 2008},
+publisher = {Society for Industrial and Applied Mathematics},
+address = {USA},
+volume = {19},
+number = {3},
+issn = {1052-6234},
+url = {https://doi.org/10.1137/070690419},
+doi = {10.1137/070690419},
+abstract = {Given ${cal A} := {a^1,dots,a^m} subset mathbb{R}^n$ and $epsilon > 0$, we
+propose and analyze two algorithms for the problem of computing a $(1 + epsilon)$-approximation
+to the radius of the minimum enclosing ball of ${cal A}$. The first algorithm is
+closely related to the Frank-Wolfe algorithm with a proper initialization applied
+to the dual formulation of the minimum enclosing ball problem. We establish that this
+algorithm converges in $O(1/epsilon)$ iterations with an overall complexity bound
+of $O(mn/epsilon)$ arithmetic operations. In addition, the algorithm returns a “core
+set” of size $O(1/epsilon)$, which is independent of both $m$ and $n$. The latter
+algorithm is obtained by incorporating “away” steps into the former one at each iteration
+and achieves the same asymptotic complexity bound as the first one. While the asymptotic
+bound on the size of the core set returned by the second algorithm also remains the
+same as the first one, the latter algorithm has the potential to compute even smaller
+core sets in practice, since, in contrast to the former one, it allows “dropping”
+points from the working core set at each iteration. Our analysis reveals that the
+leading terms in the asymptotic complexity analysis are reasonably small. In contrast
+to the first algorithm, we also establish that the second algorithm asymptotically
+exhibits linear convergence, which provides further insight into our computational
+results, indicating that the latter algorithm indeed terminates faster with smaller
+core sets in comparison with the first one. We also discuss how our algorithms can
+be extended to compute an approximation to the minimum enclosing ball of more general
+input sets without sacrificing the iteration complexity and the bound on the core
+set size. In particular, we establish the existence of a core set of size $O(1/epsilon)$
+for a much wider class of input sets. We adopt the real number model of computation
+in our analysis.},
+journal = {SIAM J. on Optimization},
+month = nov,
+pages = {1368–1391},
+numpages = {24},
+keywords = {approximation algorithms, minimum enclosing balls, core sets}
+}
