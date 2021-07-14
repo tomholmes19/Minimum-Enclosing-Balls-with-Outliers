@@ -62,7 +62,7 @@ if False:
 if False:
     n = 500
     d = 10
-    eta = [0.75, 0.8, 0.85, 0.9, 0.95, 1]
+    eta = [0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1]
 
     file_name = r"{0}/func_eta_n{1}_d{2}_{3}".format(data_type, n, d, data_type)
     log_file = r"benchmarks/exact/{0}.log".format(file_name)
@@ -82,7 +82,7 @@ if False:
 if True:
     times = []
 
-    n = 500
+    n = 300
     d = 10
     eta = 0.9
 
