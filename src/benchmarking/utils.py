@@ -124,13 +124,14 @@ def get_times_from_log(filepath, calc_avg=True) -> list:
     trial_times = []
 
     with open(filepath, "r") as f:
-        num_trials = f.readline().split(sep=", ")[0].split("/")[1]
+        #num_trials = f.readline().split(sep=", ")[0].split("/")[1]
 
         for line in f: # iterate over each line
             line_split = line.split(sep=", ") # split into elements of a list
             first_part = line_split[0]
 
             if "Finished trial" in first_part: # indicator that this is a log written by benchmark_logger
+                num_trials = first_part.split("/")[1]
                 time = float(line_split[1].split("=")[1]) # line_split[1] will be "elapsed=<time>"
                 trial_times.append(time)
 
