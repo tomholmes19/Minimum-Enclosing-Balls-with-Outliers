@@ -3,7 +3,7 @@ import numpy as np
 import gurobipy as gp
 from gurobipy import GRB
 
-def meb_exact(data):
+def meb(data):
     """
     Solves the MEB problem using Gurobi
 
@@ -43,7 +43,7 @@ def meb_exact(data):
 
     return c_soln, r_soln, None
 
-def mebwo_exact(data, eta, M, relax=False, time_limit=None, log_file=""):
+def mebwo(data, eta, M, relax=False, time_limit=None, log_file=""):
     """
     Solves the MEBwO problem for eta% of the points covered using Gurobi
 
@@ -62,7 +62,7 @@ def mebwo_exact(data, eta, M, relax=False, time_limit=None, log_file=""):
         m.Runtime (float): time taken to solve model
     """
     n = len(data) # number of points
-    d = len(data[0]) # dimension TODO: make this better
+    d = len(data[0]) # dimension
     k = int(np.ceil(n*(1-eta))) # number of points that are outliers
 
     m = gp.Model("MEBwO")
@@ -74,14 +74,14 @@ def mebwo_exact(data, eta, M, relax=False, time_limit=None, log_file=""):
         m.setParam(GRB.Param.TimeLimit, time_limit)
 
     c = m.addMVar(shape=d, lb=-GRB.INFINITY, name="center")
-    r = m.addVar(name="radius")
+    gamma = m.addVar(name="radius")
 
     if relax:
         xi = m.addVars(n, lb=0, ub=1, vtype=GRB.CONTINUOUS)
     else:
         xi = m.addVars(n, vtype=GRB.BINARY)
 
-    m.setObjective(r, GRB.MINIMIZE)
+    m.setObjective(gamma, GRB.MINIMIZE)
 
     for i in range(n):
         m.addMQConstr(
@@ -91,7 +91,7 @@ def mebwo_exact(data, eta, M, relax=False, time_limit=None, log_file=""):
             rhs=-1*(data[i]@data[i]),
             xQ_L=c,
             xQ_R=c,
-            xc=c.tolist() + [xi[i], r]
+            xc=c.tolist() + [xi[i], gamma]
         )
     
     m.addConstr(gp.quicksum(xi[i] for i in range(n)) <= k)
@@ -99,7 +99,56 @@ def mebwo_exact(data, eta, M, relax=False, time_limit=None, log_file=""):
     m.optimize()
 
     c_soln = [v.x for v in c.tolist()]
-    r_soln = np.sqrt(r.x)
+    r_soln = np.sqrt(gamma.x)
     xi_soln = [xi[i].x for i in range(n)]
 
     return c_soln, r_soln, xi_soln, m.Runtime
+
+def dc_meb(data, c, a, time_limit=None, log_file=""):
+    """
+    Solves the direction-constrained MEB problem
+
+    Input:
+        data (np.array): data set
+        c (np.array): center of initial ball
+        a (np.array): furthest point from center in data (direction vector)
+        time_limit (float): time limit for solver (if not set then no limit)
+        log_file (str): file location for logging (if not set then do not log)
+    
+    Return:
+        x_soln (float): proportion along direction c->a to move c
+        r_soln (float): new radius
+    """
+    n = len(data) # number of points
+
+    m = gp.Model("MEBwO")
+
+    if log_file != "":
+        m.setParam(GRB.Param.LogFile, log_file)
+
+    if time_limit is not None:
+        m.setParam(GRB.Param.TimeLimit, time_limit)
+
+    x = m.addVar()
+    gamma = m.addVar()
+
+    m.setObjective(gamma, GRB.MINIMIZE)
+
+    alphas = [c-point for point in data]
+    beta = a-c
+
+    beta_beta = beta@beta
+
+    for alpha in alphas:
+        m.addQConstr(
+            lhs=beta_beta*(x*x) + 2*x*(alpha@beta) + (alpha@alpha),
+            sense=GRB.LESS_EQUAL,
+            rhs=gamma
+        )
+
+    m.optimize()
+
+    x_soln = x.x
+    r_soln = np.sqrt(gamma.x)
+
+    return x_soln, r_soln

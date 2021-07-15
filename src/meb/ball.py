@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+from meb import improvement_algorithms
+
 from . import meb_algorithms, mebwo_algorithms, geometry, utils
 
 class Ball:
@@ -155,19 +157,20 @@ class MEB(Ball):
     def __init__(self, center=None, radius=None, core_set=None) -> None:
         super().__init__(center=center, radius=radius, core_set=core_set)
     
-    def fit(self, data, method="heuristic", **kwargs):
+    def fit(self, data, method, **kwargs):
         """
         Fits a MEB to the given data using the specified method
 
         Input:
             data (array like): data to fit the MEB to
             method (str): which method to use to find MEB
+            kwargs: parameters for algorithm
         
         Return:
             self (Ball): the MEB for the data
         """
         # get the function corresponding to method
-        algorithm = meb_algorithms.algorithms.get("alg__{}".format(method)) # returns none if 'alg_method' not in algorithms dict
+        algorithm = meb_algorithms.algorithms.get("alg__{}".format(method)) # returns None if 'alg_method' not in algorithms dict
         if algorithm is None:
             raise NotImplementedError("Method '{}' not implemented".format(method))
         
@@ -177,6 +180,31 @@ class MEB(Ball):
         self.radius = r
         self.core_set = X
         
+        return self
+    
+    def improve(self, data, method, **kwargs):
+        """
+        Runs an improvement heuristic on the ball
+
+        Input:
+            data (np.array): data set
+            method (str): which improvement heuristic to use
+            kwargs: parameters for heuristic
+        
+        Return:
+            self (Ball): improved MEB
+        """
+        self.check_params()
+
+        algorithm = improvement_algorithms.algorithms.get("alg__{}".format(method)) # returns None if 'alg_method' not in algorithms dict
+        if algorithm is None:
+            raise NotImplementedError("Method '{}' not implemented".format(method))
+        
+        c, r = algorithm(data, **kwargs)
+
+        self.center = c
+        self.radius = r
+
         return self
 
 class MEBwO(MEB):
@@ -195,9 +223,21 @@ class MEBwO(MEB):
         )
     
     def fit(self, data, method, calc_pct=False, **kwargs):
+        """
+        Fits a MEBwO to the given data using the specified method
+
+        Input:
+            data (array like): data to fit the MEBwO to
+            method (str): which method to use to find MEBwO
+            calc_pct (bool): if True, calculate percentage of points covered after fitting
+            kwargs: parameters for algorithm
+        
+        Return:
+            self (Ball): the MEB for the data
+        """
         #TODO: refactor input sanitation and algorithm retrieval
         # get the function corresponding to method
-        algorithm = mebwo_algorithms.algorithms.get("alg__{}".format(method)) # returns none if 'alg_method' not in algorithms dict
+        algorithm = mebwo_algorithms.algorithms.get("alg__{}".format(method)) # returns None if 'alg_method' not in algorithms dict
         if algorithm is None:
             raise NotImplementedError("Method '{}' not implemented".format(method))
 
