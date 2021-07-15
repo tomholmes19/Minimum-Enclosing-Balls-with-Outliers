@@ -1,6 +1,6 @@
 import numpy as np
 
-from meb import geometry
+from meb import geometry, gurobi_solvers
 
 from meb.ball import MEBwO
 from data import generation
@@ -19,15 +19,13 @@ data = generation.uniform_ball_with_ouliters(
 inliers = [x for x in data if np.linalg.norm(x) <= 11]
 c = geometry.find_furthest([0]*d, data=inliers, find_closest=True)
 r = max([np.linalg.norm(c-x) for x in inliers])
-gamma = r**2
 a = geometry.find_furthest(c, inliers)
 
 MEBwO(c, r).plot(data, show=False)
 
-x = min([geometry.Q(c, a, point, gamma) for point in inliers])
+x, new_r = gurobi_solvers.dc_meb(c, a, inliers)
 
-new_c = c - (c-a)*x/2
-new_r = max([np.linalg.norm(new_c - point) for point in inliers])
+new_c = c + x*(a-c)
 
 new_ball = MEBwO(new_c, new_r)
 
