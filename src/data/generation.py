@@ -46,28 +46,73 @@ def poisson(lam, n, dimension) -> np.array:
     data = np.array([np.random.poisson(lam, dimension) for _ in range(n)])
     return data
 
-def cube():
-    #TODO: find out what this means
-    pass
-
-def uniform_point_in_ball(d, c, lb, ub):
+def check_c(c, d):
     """
-    Generates a uniform point in d-dimensions in a ball with minimum length lb and maximum length ub
+    Utility function for generating spherical data
+    If c is None (default), set it to d-dimensional 0 vector
 
     Input:
-        d (int): dimension of points
-        c (np.array): relative origin of point
-        lb (float): lower bound for length
-        ub (float): ubber bound for length
+        c (array like): center
+        d (int): dimension
     
     Return:
-        point (np.array): data point
+        c (array like): center
     """
-    length = np.random.uniform(low=lb, high=ub)
-    direction = np.random.uniform(low=-1, high=1, size=d)
-    direction = direction/np.linalg.norm(direction)
-    point = length*direction + c
-    return point
+    if c is None:
+        c = np.zeros(d)
+    
+    return c
+
+def point_on_hypersphere(d):
+    """
+    Generates a unit point on the surface of a unit (d-1)-dimension hypersphere
+
+    Input:
+        d (int): dimension
+    
+    Return:
+        unit_point (np.array): generated point
+    """
+    point = np.random.normal(loc=0, scale=1, size=d)
+    unit_point = point/np.linalg.norm(point)
+    return unit_point
+
+def uniform_ball(n, d, c, r):
+    """
+    Generates n points in a uniform d dimensional ball with centre c and radius r
+
+    Input:
+        n (int): number of points
+        d (int): dimension
+        c (array like): center of ball
+        r (float): radius of ball
+    
+    Return:
+        data (np.array): generated data
+    """
+    c = check_c(c, d)
+
+    data = [point_on_hypersphere(d)*np.random.uniform(low=0, high=r) + c for _ in range(n)]
+    return data
+
+def hyperspherical_shell(n, d, c, r1, r2):
+    """
+    Generates n points in a d-dimensional hyperspherical shell with centre c and inner radius r1 and outer radius r2
+
+    Input:
+        n (int): number of points
+        d (int): dimension
+        c (array like): center of hyperspherical shell
+        r1 (float): inner radius
+        r2 (float): outer radius
+
+    Return:
+        data (np.array): generated data
+    """
+    c = check_c(c, d)
+
+    data = [point_on_hypersphere(d)*np.random.uniform(low=r1, high=r2) + c for _ in range(n)]
+    return data
 
 def uniform_ball_with_ouliters(n, d, eta, r1, r2, c=None, sep=0) -> np.array:
     """
@@ -89,14 +134,13 @@ def uniform_ball_with_ouliters(n, d, eta, r1, r2, c=None, sep=0) -> np.array:
     if r1+sep > r2:
         raise ValueError("Value of r1+sep greater than r2")
     
-    if c is None:
-        c = [0]*d
+    c = check_c(c,d)
 
     n_inner = int(np.floor(eta*n))
     n_outer = int(np.ceil((1-eta)*n))
 
-    data_inner = [uniform_point_in_ball(c=c, d=d, lb=0, ub=r1) for _ in range(n_inner)]
-    data_outer = [uniform_point_in_ball(c=c, d=d, lb=r1+sep, ub=r2) for _ in range(n_outer)]
+    data_inner = uniform_ball(n_inner, d, c, r1)
+    data_outer = hyperspherical_shell(n_outer, d, c, r1+sep, r2)
 
     data = data_inner + data_outer
     np.random.shuffle(data)
@@ -119,8 +163,6 @@ def two_clusters(n, d, eta, m1, v1, m2, v2) -> np.array:
         data (np.array): generated data
     """
     k = int(np.floor(n*eta)) # number of points in cluster 1
-
-    print(n, k, n-k)
 
     cluster1 = normal(m1, v1, k, d)
     cluster2 = normal(m2, v2, n-k, d)
