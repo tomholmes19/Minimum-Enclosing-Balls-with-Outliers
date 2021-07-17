@@ -77,15 +77,15 @@ def point_on_hypersphere(d):
     unit_point = point/np.linalg.norm(point)
     return unit_point
 
-def uniform_ball(n, d, c, r):
+def uniform_ball(n, d, r, c):
     """
     Generates n points in a uniform d dimensional ball with centre c and radius r
 
     Input:
         n (int): number of points
         d (int): dimension
-        c (array like): center of ball
         r (float): radius of ball
+        c (array like): center of ball
     
     Return:
         data (np.array): generated data
@@ -95,16 +95,16 @@ def uniform_ball(n, d, c, r):
     data = [point_on_hypersphere(d)*np.random.uniform(low=0, high=r) + c for _ in range(n)]
     return data
 
-def hyperspherical_shell(n, d, c, r1, r2):
+def hyperspherical_shell(n, d, r1, r2, c=None):
     """
     Generates n points in a d-dimensional hyperspherical shell with centre c and inner radius r1 and outer radius r2
 
     Input:
         n (int): number of points
         d (int): dimension
-        c (array like): center of hyperspherical shell
         r1 (float): inner radius
         r2 (float): outer radius
+        c (array like): center of hyperspherical shell
 
     Return:
         data (np.array): generated data
