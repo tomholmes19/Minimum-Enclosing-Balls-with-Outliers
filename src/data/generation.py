@@ -77,9 +77,9 @@ def point_on_hypersphere(d):
     unit_point = point/np.linalg.norm(point)
     return unit_point
 
-def uniform_ball(n, d, r, c):
+def uniform_ball(n, d, r, c=None):
     """
-    Generates n points in a uniform d dimensional ball with centre c and radius r
+    Uses an acceptance-rejection method to generate n points in a uniform d dimensional ball with centre c and radius r
 
     Input:
         n (int): number of points
@@ -92,7 +92,13 @@ def uniform_ball(n, d, r, c):
     """
     c = check_c(c, d)
 
-    data = [point_on_hypersphere(d)*np.random.uniform(low=0, high=r) + c for _ in range(n)]
+    data = []
+
+    while len(data) < n:
+        point = np.random.uniform(low=-r, high=r, size=d)
+        if np.linalg.norm(point) < r:
+            data.append(point+c)
+    
     return data
 
 def hyperspherical_shell(n, d, r1, r2, c=None):
@@ -111,10 +117,16 @@ def hyperspherical_shell(n, d, r1, r2, c=None):
     """
     c = check_c(c, d)
 
-    data = [point_on_hypersphere(d)*np.random.uniform(low=r1, high=r2) + c for _ in range(n)]
+    data = []
+
+    while len(data) < n:
+        point = np.random.uniform(low=-r2, high=r2, size=d)
+        if np.linalg.norm(point) > r1 and np.linalg.norm(point) < r2:
+            data.append(point)
+
     return data
 
-def uniform_ball_with_ouliters(n, d, eta, r1, r2, c=None, sep=0) -> np.array:
+def uniform_ball_with_ouliters(n, d, eta, r, r1, r2, c=None, sep=0) -> np.array:
     """
     Generates n many data points where eta*n many are uniformly inside a ball B1 with centre c and radius r1,
     and (1-eta)*n many are uniformly inside a ball B2 with centre c and radius r2 but not in B1
@@ -124,23 +136,20 @@ def uniform_ball_with_ouliters(n, d, eta, r1, r2, c=None, sep=0) -> np.array:
         d (int): dimension of data points
         eta (float): percentage of data points to be inside B1
         c (np.array): centre of ball
-        r1 (float): radius of inner ball
-        sep (float): separation between inner ball and lower bound of outer ball
-        r2 (float): radius of outer ball
+        r (float): radius of  ball
+        r1 (float): inner radius of hyperspherical shell
+        r2 (float): outer radius of hyperspherical shell
     
     Return:
         data (np.array): generated data
     """
-    if r1+sep > r2:
-        raise ValueError("Value of r1+sep greater than r2")
-    
     c = check_c(c,d)
 
     n_inner = int(np.floor(eta*n))
     n_outer = int(np.ceil((1-eta)*n))
 
-    data_inner = uniform_ball(n_inner, d, c, r1)
-    data_outer = hyperspherical_shell(n_outer, d, c, r1+sep, r2)
+    data_inner = uniform_ball(n_inner, d, r, c)
+    data_outer = hyperspherical_shell(n_outer, d, r1, r2, c)
 
     data = data_inner + data_outer
     np.random.shuffle(data)
