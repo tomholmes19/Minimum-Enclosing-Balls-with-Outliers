@@ -7,7 +7,7 @@ from meb import gurobi_solvers, geometry
 
 num_trials = 5
 
-data_types = ["poisson", "uniform"]
+data_types = ["normal"]
 
 np.random.seed(1234)
 
@@ -16,7 +16,7 @@ for data_type in data_types:
     data_set = data.loading.from_csv(data_filepath)
 
     if True:
-        n = [250+ 50*i for i in range(10)]
+        n = [300 + 50*i for i in range(10)]
         eta = 0.9
         d = 10
 
