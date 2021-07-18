@@ -10,9 +10,11 @@
 \usepackage{hyperref}           % hyperlinks
 \usepackage{array}              % for \newcolumntype macro
 \newcolumntype{C}{>{$}c<{$}}    % math-mode version of "l" column type
+\newcolumntype{L}{>{$}l<{$}} 
 
 \newcommand{\A}{\mathcal{A}} %% I am lazy
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\binary}{\left\{0,1\right\}}
 
 \DeclareMathOperator{\MEB}{MEB}
 \DeclareMathOperator{\MEBwO}{MEBwO}
@@ -26,12 +28,14 @@
 \newtheorem{definition}{Definition}
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
-\newtheorem{corr}{Corollary}
-\newtheorem{prop}{Proposition}
+\newtheorem{corollary}{Corollary}
+\newtheorem{proposition}{Proposition}
 \newtheorem{algorithm}{Algorithm}
+\newtheorem*{remark}{Remark}
 \numberwithin{theorem}{section}
 \numberwithin{definition}{section}
 \numberwithin{lemma}{section}
+\numberwithin{proposition}{section}
 \numberwithin{algorithm}{section}
 \numberwithin{equation}{section}
 
@@ -134,15 +138,15 @@ Here come your acknowledgments ...
 % =============================================================================
 \chapter{Introduction}
 \section{Motivation}
-\section{Literature Review}
+\section{Literature Review}\label{lit review}
 \section{Outline}
 
 % =============================================================================
 % Chapter 2
 % =============================================================================
-\chapter{Exact Methods}
+\chapter{Exact Methods}\label{exact}
 \section{Preliminaries}
-In this paper we shall denote our data set of finite vectors as $\mathcal{A} = \left\{a^1,\ldots,a^n\right\}\subseteq\mathbb{R}^d$ for $n,d\in\mathbb{N}$.
+In this paper we shall denote our data set of finite vectors as $\mathcal{A} = \left\{a^1,\ldots,a^n\right\}\subseteq\mathbb{R}^d$ for $n,d\in\mathbb{N}$. The center of a ball is represented by a vector $c\in\mathbb{R}^d$, the radius a scalar $r\in\mathbb{R}$, and the squared radius $\gamma=r^2$. We denote the percentage of inliers for a minimum enclosing ball with outliers by $\eta\in(0,1]$, i.e. if $\eta=0.9$ then we seek a ball which covers $90\%$ of our data.
 
 \begin{definition}
 Let $c\in\mathbb{R}^n$ and $r\in\mathbb{R}$. Then the \textit{ball} with center $c$ and radius $r$ is the set
@@ -153,7 +157,7 @@ where $\norm{\cdot}:L\to\mathbb{R}$ denotes the standard Euclidean norm on a vec
 \end{definition}
 
 \begin{definition}
-The \textit{minimum enclosing ball} of $\A$, denoted by $\MEB(\A)$, is the ball $B(c^*;r^*)$ where $\A\subseteq B(c^*;r^*)$ and if any $B(c,r)$ exists such that $\mathcal{A}\subseteq B(c,r)$ then $r^*\leq r$.
+The \textit{minimum enclosing ball} of $\A$, denoted by $\MEB(\A)$, is the ball $B(c^*,r^*)$ where $\A\subseteq B(c^*,r^*)$ and if any $B(c,r)$ exists such that $\mathcal{A}\subseteq B(c,r)$ then $r^*\leq r$.
 \end{definition}
 
 \begin{theorem}
@@ -163,12 +167,25 @@ For a given set $\A$, $\MEB(\A)$ exists and is unique.
 See \cite[page 5]{two-algorithms}.
 \end{proof}
 
+\begin{proposition}\label{adding data}
+Let $a'\in\mathbb{R}^n$ where $a'\notin\A$. Suppose $B(c,r)=\MEB(\A)$ and $B(c',r')=\MEB(\A\cap\left\{a'\right\})$. Then $r\leq r'$.
+\end{proposition}
+\begin{proof}
+Clearly we have $\A\subseteq\A\cap\left\{a'\right\}$, then since $\A\cap\left\{a'\right\}\subseteq B(c',r')$ we have $\mathcal{A}\subseteq B(c',r')$ by transitivity. Thus $r\leq r'$ with equality only if $a'\in B(c,r)$ by uniqueness.
+\end{proof}
+\begin{remark}
+The prior proposition tells us that if we have the MEB of a data set $\mathcal{A}$, then adding a new point to $\mathcal{A}$ which is not inside $\MEB(\A)$ yields a new MEB with larger radius.
+\end{remark}
+
 \begin{definition}[{{\cite[page 2]{core-sets}}}]
 Let $r^*$ be the radius of $\MEB(\A)$. A ball $B(c;(1+\epsilon)r)$ is a \textit{$(1+\epsilon)$-approximation} of $\MEB(\A)$ if $r\leq r^*$ and $\mathcal{A}\subseteq B(c;(1+\epsilon)r)$.
 \end{definition}
+
+
+
 \section{Minimum Enclosing Ball}
-\begin{definition} \label{MEB}
-Let $\mathcal{A} = \left\{a^1,\ldots,a^n\right\}\subseteq\mathbb{R}^d$ for $n,d\in\mathbb{N}$. The optimisation model formulation of the Minimum Enclosing Ball (MEB) problem is as follows:
+\begin{definition}\label{meb}
+The optimization model formulation of the Minimum Enclosing Ball (MEB) problem is as follows:
 \begin{center}
     \begin{tabular}{CCC}
         \displaystyle\min_{c,r} & r \\
@@ -176,29 +193,85 @@ Let $\mathcal{A} = \left\{a^1,\ldots,a^n\right\}\subseteq\mathbb{R}^d$ for $n,d\
     \end{tabular}
 \end{center}
 where $c\in\mathbb{R}^d$ and $r\in\mathbb{R}$ are the decision variables corresponding to the center and radius of the ball respectively.
-\end{definition}
 
+As detailed in \cite{two-algorithms}, the MEB problem can be transformed to a convex quadratic problem (QP) by squaring the constraints and defining a new decision variable $\gamma=r^2$:
+
+\begin{center}
+    \begin{tabular}{CLC}
+        \displaystyle\min_{c,\gamma} & \gamma \\
+        \text{s.t.} & \left(a^i\right)^Ta^i - 2\left(a^i\right)^Tc + c^Tc \leq \gamma & i=1,\ldots,n
+    \end{tabular}
+\end{center}
+\end{definition}
+This problem has $d+1$ variables and $n$ constraints, which can make it slow to find an optimal solution by using a solver such as Xpress or Gurobi, but many alternative approaches are present in the literature which offer very fast solutions within a guaranteed accuracy (\cite{core-sets}, \cite{two-algorithms}).
 
 
 
 \section{Minimum Enclosing Ball with Outliers}
 \subsection{Formulation}
-\subsection{Analysis of the big M parameter}
-\subsection{Benchmarks and Analysis}
+\begin{definition}\label{mebwo}
+We may extend Definition \ref{meb} to the Minimum Enclosing Ball with Outliers (MEBwO) problem as follows:
+\begin{center}
+    \begin{tabular}{CCC}
+         \displaystyle\min_{c,r,\xi} & r \\
+         \text{s.t.} & \norm{c-a^i} \leq r + M\xi_i & i=1,\ldots,n \\
+         & \displaystyle\sum_{i=1}^n\xi_i \leq k \\
+         & \xi_i \in \binary & i=1,\ldots,n
+    \end{tabular}
+\end{center}
+
+where $\xi_i$ are binary variables corresponding to the distance constraint on each variable, with $M\in\mathbb{R}$ a sufficiently large scalar. One can interpret this as, if $\xi_i=1$ for some $i\in\left\{1,\ldots,n\right\}$, then $a_i$ does not need to be inside the ball. The constraint $\sum_{i=1}^n\xi_i\leq k$ where $k=\eta\cdot n$ ensures that $\eta\%$ of the data is covered.
+
+We can instead extend the quadratic program in Definition \ref{meb} to get the following mixed integer quadratic program formulation:
+\begin{center}
+    \begin{tabular}{CLC}
+        \displaystyle\min_{c,\gamma, \xi} & \gamma \\
+        \text{s.t.} & \left(a^i\right)^Ta^i - 2\left(a^i\right)^Tc + c^Tc \leq \gamma + M\xi_i & i=1,\ldots,n \\
+        & \displaystyle\sum_{i=1}^n\xi_i \leq k \\
+        & \xi_i \in \binary & i=1,\ldots,n
+    \end{tabular}
+\end{center}
+\end{definition}
+\begin{remark}
+One may note that when we relax $\xi_i$ to be continuous variables, i.e. $0\leq\xi_i\leq1$ for $i=1,\ldots,n$, we have again a convex quadratic program since we have then added only continuous variables and linear constraints to the base quadratic program.
+\end{remark}
+
+This model gives us a way to solve the MEBwO problem optimally for a given data set. However, by examining the structure of this model we can expect the solution times to be unreasonable for any meaningfully large instance. Note that, of $n$ many binary variables $\xi_i$, we can choose up to $k\leq n$ many of them to have a value of 1, though by Proposition \ref{adding data} we know that adding data gives us an MEB with potentially higher radius, so conversely removing data can potentially lower the radius, meaning we will always pick the highest possible number of points ($k$ many) to be excluded. Thus, by a total brute force search we may expect to explore $\binom{n}{k}$ many individual MEB problems. Modern optimization solvers will work more efficiently than this, utilizing techniques such as branch-and-bound (first proposed by \cite{bnb}). Regardless, we expect a very large solution space which leads to exponentially larger solution times as we will see in Section \ref{exact benchmarks}.
+
+
+\subsection{On the Big M Parameter}
+The ``big $M$ constraint" in Definition \ref{mebwo} is a commonly known technique within Operational Research and an important question is that of what $M$ do we choose? A sufficiently large $M$ is required such that when the corresponding binary variable is equal to $1$, the constraint is effectively nullified. But, as we will see within this section, a value of $M$ which is too large will lead to a less effective model.
+
+\subsubsection{An Upper Bound on $M$}
+Finding a suitable value of $M$ depends heavily on the nature of the problem the constraint is being applied to. For the minimum enclosing ball with outliers problem, where we are concerned with the distances $\norm{c-a^i}$ being less than the radius $r$, we look to add a value to $r$ such that for any reasonable $c$, this constraint is always satisfied. Thus, a candidate upper bound for $M$ may be found by calculating each pairwise distance within the data and recording the largest distance. Formally, this may be written as $M:= \max\left\{\norm{a^i-a^j}: i,j = 1,\ldots,n, i\neq j\right\}$.
+\subsubsection{Solution Times}
+One concern with our choice of $M$ is the effect on the solution time of the solver.
+
+\subsubsection{Quality of $\xi_i$ Solutions in the QP Relaxation}
+Another concern regarding the value of $M$ is the effect on the optimal solutions for the relaxed $\xi_i$ variables in the QP relaxation. This is important as good quality relaxed solutions are essential to (TODO: reference to relaxation-based heuristic goes here).
+
+
+
+\subsection{Benchmarks}\label{exact benchmarks}
 
 % =============================================================================
 % Chapter 3
 % =============================================================================
 
 \chapter{Algorithmic Methods}
-\section{Relaxation-based Heuristic}
-\section{Shenmaier Heuristic}
-\section{Peeling-based Heuristics}
+\section{Construction Methods}
+\subsection{Relaxation-based Heuristic}
+\subsection{Peeling-based Heuristics}
+\subsection{Shenmaier's Approximation}
+
+\section{Improvement Heuristics}
+\subsection{Direction-Constrained Single-Step Heuristic}
+\subsection{Direction-Constrained MEB}
 
 % =============================================================================
 % Chapter 4
 % =============================================================================
-\chapter{Implementation and Heuristic Benchmarks}
+\chapter{Implementation and Benchmarks}\label{implementation}
 \section{Code Implementation}
 \section{Data}
 \section{Methodology}
