@@ -15,7 +15,7 @@ for data_type in data_types:
     data_filepath = r"datasets/{}.csv".format(data_type)
     data_set = data.loading.from_csv(data_filepath)
 
-    if True:
+    if False:
         n = [300 + 50*i for i in range(10)]
         eta = 0.9
         d = 10
@@ -58,15 +58,15 @@ for data_type in data_types:
             filepath=r"benchmarks/exact/{0}.png".format(file_name)
         )
 
-    if False:
-        n = 500
+    if True:
+        n = 300
         d = 10
         eta = [0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1]
 
         file_name = r"{0}/func_eta_n{1}_d{2}_{3}".format(data_type, n, d, data_type)
         log_file = r"benchmarks/exact/{0}.log".format(file_name)
 
-        times = benchmarking.trials.run_trials_exact(n, d, eta, num_trials, normal_data, log_file=log_file, data_file=normal_filepath)
+        times = benchmarking.trials.run_trials_exact(n, d, eta, num_trials, data_set, log_file=log_file, data_file=data_filepath)
 
         benchmarking.utils.plot_times(
             x_axis=eta,
