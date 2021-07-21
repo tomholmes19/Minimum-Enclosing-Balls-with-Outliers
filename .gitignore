@@ -1,7 +1,6 @@
-# ignore all files in datasets
-datasets/*
-# so git will commit datasets folder
-!datasets/README.md
+# ignore all datasets
+datasets/*.csv
+datasets/*/*.csv
 
 # so no one can scrape github for url's and spam me with notifications
 src/notify.sh
