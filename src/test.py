@@ -9,7 +9,7 @@ n = 5000
 d = 2
 r = 10
 
-data_ = data.generation.hyperspherical_shell(n, d, 1, 2)
+data_ = data.generation.uniform_ball_with_ouliters(n, d, 0.9, 1, 2, 3)
 
 ball = MEBwO(center=[0]*d, radius=1.5)
 ball.calc_pct(data_)

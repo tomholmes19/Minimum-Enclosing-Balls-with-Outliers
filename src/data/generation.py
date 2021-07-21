@@ -164,7 +164,7 @@ def uniform_ball_with_ouliters(n, d, eta, r, r1, r2, c=None) -> np.array:
     data_inner = uniform_ball(n_inner, d, r, c)
     data_outer = hyperspherical_shell(n_outer, d, r1, r2, c)
 
-    data = data_inner + data_outer
+    data = np.vstack((data_inner, data_outer))
     np.random.shuffle(data)
     return np.array(data)
 
