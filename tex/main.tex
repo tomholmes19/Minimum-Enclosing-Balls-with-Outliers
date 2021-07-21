@@ -178,8 +178,15 @@ Let $a'\in\mathbb{R}^n$ where $a'\notin\A$. Suppose $B(c,r)=\MEB(\A)$ and $B(c',
 \begin{proof}
 Clearly we have $\A\subseteq\A\cap\left\{a'\right\}$, then since $\A\cap\left\{a'\right\}\subseteq B(c',r')$ we have $\mathcal{A}\subseteq B(c',r')$ by transitivity. Thus $r\leq r'$ with equality only if $a'\in B(c,r)$ by uniqueness.
 \end{proof}
+
+\begin{proposition}\label{removing data}
+Suppose $a'\in\A$. Let $B(c,r)=\MEB(\A)$, $B(c',r')=\MEB(\A\setminus\left\{a'\right\})$. Then $r'\leq r$.
+\end{proposition}
+\begin{proof}
+Clearly we have $\A\setminus\left\{a'\right\}\subseteq\A$ then since $\A\setminus\left\{a'\right\}\subseteq B(c',r')$ and $\A\setminus\left\{a'\right\}\subseteq B(c,r)$ we have $r'\leq r$ since $B(c',r')$ is the MEB for $\A\setminus\left\{a'\right\}$, with equality only if $\MEB(\A\setminus\left\{a'\right\} = \MEB(\A)$ by uniqueness.
+\end{proof}
 \begin{remark}
-This proposition tells us that if we have the MEB of a data set $\mathcal{A}$, then adding a new point to $\mathcal{A}$ which is not inside $\MEB(\A)$ yields a new MEB with larger radius.
+The prior two propositions tell us that when we add data to a set, the resulting MEB is either unchanged or bigger. Conversely, when we remove data from a set, the resulting MEB is either unchanged or smaller.
 \end{remark}
 
 \begin{definition}[{{\cite[page 2]{core-sets}}}]
@@ -210,6 +217,34 @@ As detailed in \cite{two-algorithms}, the MEB problem can be transformed to a co
 \end{definition}
 This problem has $d+1$ variables and $n$ constraints, which can make it slow to find an optimal solution by using a solver such as Xpress or Gurobi, but many alternative approaches are present in the literature which offer very fast solutions within a guaranteed accuracy (\cite{core-sets}, \cite{two-algorithms}).
 
+We will discuss here one such algorithm to solve the MEB problem from \cite{core-sets} that will be used in algorithms in Chapter \ref{algorithms}. The central idea is that of the \textit{core-set} \cite{agarwal2005geometric}, which is a small set of points that approximate the shape of a larger set of points. For example, a circle can be represented by a core-set of three points which lie on the boundary of the circle.
+
+%TODO: image of 2d circle with core-set here
+
+The idea of the algorithm is to create a candidate core-set, check if the MEB of this core-set contains all of the input data, and if so return the MEB, if not grow the core-set by adding the furthest point from the center of the candidate MEB. For further details please see \cite{core-sets}.
+
+\begin{algorithm}[H]\label{core-set algorithm}
+    \SetAlgoLined
+    \KwIn{Data set $\A=\left\{a^1,\ldots,a^n\right\}$, error tolerance $\epsilon>0$}
+    \KwOut{$(1+\epsilon)$-approximation to $\MEB(\A)$ and an $O(1/\epsilon)$-size core-set}
+    
+    Let $p$ be any point in $\A$ (can be chosen randomly)\;
+    $q=\arg\max_{a\in\A}\norm{p-a}$\;
+    $q'=\arg\max_{a\in\A}\norm{q-a}$\;
+    $X := \left\{q,q'\right\}$\;
+    $\delta := \epsilon^2/163$\;
+    \While{True}{
+        Let $B(c',r')$ denote the $(1+\delta)$-approximation to $\MEB(X)$ returned by solver\;
+        \eIf{$\A\subseteq B(c',(1+\epsilon/2)r'$}{
+            break\;
+        }{
+            $p:=\arg\max_{a\in\A}\norm{a-X}$
+        }
+        $X := X\cup\left\{a\right\}$
+    }
+    \KwRet $B(c',(1+\epsilon/2))$, $X$
+    \caption{Core-Set Algorithm for the MEB Problem \cite{core-sets}}
+\end{algorithm}
 
 
 \section{Minimum Enclosing Ball with Outliers}
@@ -241,7 +276,7 @@ We can instead extend the quadratic program in Definition \ref{meb} to get the f
 One may note that when we relax $\xi_i$ to be continuous variables, i.e. $0\leq\xi_i\leq1$ for $i=1,\ldots,n$, we have again a convex quadratic program since we have then added only continuous variables and linear constraints to the base quadratic program.
 \end{remark}
 
-This model gives us a way to solve the MEBwO problem optimally for a given data set. However, by examining the structure of this model we can expect the solution times to be unreasonable for any meaningfully large instance. Note that, of $n$ many binary variables $\xi_i$, we can choose up to $k\leq n$ many of them to have a value of 1, though by Proposition \ref{adding data} we know that adding data gives us an MEB with potentially higher radius, so conversely removing data can potentially lower the radius, meaning we will always pick the highest possible number of points ($k$ many) to be excluded. Thus, by a total brute force search we may expect to explore $\binom{n}{k}$ many individual MEB problems. Modern optimization solvers will work more efficiently than this, utilizing techniques such as branch-and-bound (first proposed by \cite{bnb}). Regardless, we expect a very large solution space which leads to exponentially larger solution times as we will see in Section \ref{exact benchmarks}.
+This model gives us a way to solve the MEBwO problem optimally for a given data set. However, by examining the structure of this model we can expect the solution times to be unreasonable for any meaningfully large instance. Note that, of $n$ many binary variables $\xi_i$, we can choose up to $k\leq n$ many of them to have a value of 1, though by Proposition \ref{removing data} we know that removing data gives us an MEB with potentially lower radius, meaning we will always pick the highest possible number of points ($k$ many) to be excluded. Thus, by a total brute force search we may expect to explore $\binom{n}{k}$ many individual MEB problems. Modern optimization solvers will work more efficiently than this, utilizing techniques such as branch-and-bound (first proposed by \cite{bnb}). Regardless, we expect a very large solution space which leads to exponentially larger solution times as we will see in Section \ref{exact benchmarks}.
 
 
 \subsection{On the Big M Parameter}
@@ -253,14 +288,14 @@ Finding a suitable value of $M$ depends heavily on the nature of the problem the
 One concern with our choice of $M$ is the effect on the solution time of the solver.
 
 \subsubsection{Quality of $\xi_i$ Solutions in the QP Relaxation}
-Another concern regarding the value of $M$ is the effect on the optimal solutions for the relaxed $\xi_i$ variables in the QP relaxation. This is important as good quality relaxed solutions are essential to (TODO: reference to relaxation-based heuristic goes here).
+Another concern regarding the value of $M$ is the effect on the optimal solutions for the relaxed $\xi_i$ variables in the QP relaxation. This is important as good quality relaxed solutions are essential to Algorithm \ref{relaxation heuristic}.
 
 
 % =============================================================================
 % Chapter 3
 % =============================================================================
 
-\chapter{Algorithmic Methods}
+\chapter{Algorithmic Methods}\label{algorithms}
 In this chapter we propose some non-exact construction methods to solving the MEBwO problem which return a feasible solution. We also investigate some improvement heuristics which, given a feasible MEB or MEBwO, seek to locally find a new center such that a smaller radius can be found.
 
 \section{Construction Methods}
@@ -276,7 +311,8 @@ This method will always return a feasible solution that covers $\eta\%$ of the d
      $\xi=\left[\xi_1,\ldots,\xi_n\right]$ relaxed binary variables returned by relaxed MEBwO solver for $\A$, $\eta$, and $M$\;
      Let $\xi'$ be the smallest $k=\floor{\eta\cdot n}$ elements of $\xi$\;
      Let $\A':=\left\{a^i\in\A: \xi_i\in\xi',\ i=1,\ldots,n\right\}$\;
-     Let $c,r$ be the center and radius of $\MEB(\A')$\;
+     Let $c,r$ be the center and radius of $\MEB(\A')$ returned by heuristic\;
+     \KwRet $B(c, r)$
      
     \caption{Relaxation-Based Heuristic}
 \end{algorithm}
