@@ -73,7 +73,7 @@ def progress_report(x, param_name, i) -> None:
 
     return None
 
-def benchmark_logger(filepath, elapsed, n, d, eta, M, r, c, xi, trial_number, num_trials, data_filepath, rows, columns):
+def benchmark_logger(filepath, elapsed, n, d, eta, M, r, c, trial_number, num_trials, data_filepath, rows, columns):
     """
     After a trial has been completed, logs details to the specified file
 
@@ -86,7 +86,6 @@ def benchmark_logger(filepath, elapsed, n, d, eta, M, r, c, xi, trial_number, nu
         M (float): big M parameter for solving exact model
         r (float): solution for radius
         c (list): solution for center
-        xi (list): solutions for binary variables
         trial_number (int): current trial in experiment
         num_trials (int): total number of trials in experiment
         data_filepath (str): filepath of data used
