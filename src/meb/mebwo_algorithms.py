@@ -14,25 +14,16 @@ def M_approx(data):
     M = sq_3*diam
     return M
 
-def alg__exact(data, eta, M=None, relax=False, time_limit=None, log_file=""):
-    if M is None:
-        M_ = M_approx(data)
-    else:
-        M_ = M
-
-    c, r, xi, _  = gurobi_solvers.mebwo(data, eta, M_, relax, time_limit, log_file)
+def alg__exact(data, eta, M, relax=False, time_limit=None, log_file=""):
+    c, r, xi, _  = gurobi_solvers.mebwo(data, eta, M, relax, time_limit, log_file)
     return c, r, xi
 
-def alg__heuristic(data, eta, eps=1e-4, M=None):
-    if M is None:
-        M_ = M_approx(data)
-    else:
-        M_ = M
+def alg__heuristic(data, eta, M, eps=1e-4):
 
     n = len(data)
     k = int(eta*n)
 
-    _, _, xi, _ = gurobi_solvers.mebwo(data=data, eta=eta, M=M_, relax=True)
+    _, _, xi, _ = gurobi_solvers.mebwo(data=data, eta=eta, M=M, relax=True)
     
     indices = np.argsort(xi) # the indices of the sorted list
     indices_dash = indices[:k]
