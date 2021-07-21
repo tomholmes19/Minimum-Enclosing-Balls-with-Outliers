@@ -73,7 +73,7 @@ def progress_report(x, param_name, i) -> None:
 
     return None
 
-def benchmark_logger(filepath, elapsed, n, d, eta, M, r, c, trial_number, num_trials, data_filepath, rows, columns):
+def benchmark_logger(filepath, elapsed, n, d, eta, M, r, c, trial_number, num_trials, data_filepath, rows=None, columns=None):
     """
     After a trial has been completed, logs details to the specified file
 
@@ -104,6 +104,7 @@ def benchmark_logger(filepath, elapsed, n, d, eta, M, r, c, trial_number, num_tr
         "r={0}, c={1}, ".format(r,c) +
         "data={0}, rows={1}, columns={2}".format(data_filepath, rows, columns)
     )
+
     logging.info(msg)
     print("Recorded log to {}".format(filepath))
     return None
