@@ -14,4 +14,4 @@ for image, label in tfds.as_numpy(ds):
 
 data = np.array(data)
 
-to_csv(data, filename="src\data\datasets\mnist\mnist_train.csv")
+to_csv(data, filename="datasets/mnist_train.csv")
