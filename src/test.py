@@ -9,17 +9,9 @@ n = 5000
 d = 2
 r = 10
 
-data_ = data.generation.uniform_ball_with_ouliters(n, d, 0.9, 1, 2, 3)
+data_ = data.generation.hyperspherical_shell(n, d, 1, 2)
 
-data_shape = data_.shape
-num_rows = data_shape[0]
-num_columns = data_shape[1]
-
-rows = np.random.choice(num_rows, size=n, replace=False)
-columns = np.random.choice(num_columns, size=d, replace=False)
-
-test_data = data.loading.subset_data(data_, rows, columns)
 ball = MEBwO(center=[0]*d, radius=1.5)
 ball.calc_pct(data_)
 print(ball.pct_containment)
-ball.plot(test_data, alpha=0.25)
+ball.plot(data_, alpha=0.25)
