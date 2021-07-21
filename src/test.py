@@ -1,17 +1,25 @@
 import numpy as np
+import timeit
 
-import data.generation
-from meb.ball import MEBwO
+import data.generation, data.loading
+from meb import geometry, meb_algorithms
+from meb.ball import Ball, MEBwO
 
-
-
-n = 10000
+n = 5000
 d = 2
-r = 1
-c = None
+r = 10
 
-data =  data.generation.uniform_ball_with_ouliters(n=n, d=d, eta=0.9, r=1 ,r1=2, r2=3)
+data_ = data.generation.uniform_ball_with_ouliters(n, d, 0.9, 1, 2, 3)
 
-ball = MEBwO(center=[0]*d, radius=0)
+data_shape = data_.shape
+num_rows = data_shape[0]
+num_columns = data_shape[1]
 
-ball.plot(data, alpha=0.5)
+rows = np.random.choice(num_rows, size=n, replace=False)
+columns = np.random.choice(num_columns, size=d, replace=False)
+
+test_data = data.loading.subset_data(data_, rows, columns)
+ball = MEBwO(center=[0]*d, radius=1.5)
+ball.calc_pct(data_)
+print(ball.pct_containment)
+ball.plot(test_data, alpha=0.25)

@@ -58,7 +58,7 @@ for data_type in data_types:
             filepath=r"benchmarks/exact/{0}.png".format(file_name)
         )
 
-    if True:
+    if False:
         n = 300
         d = 10
         eta = [0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1]
