@@ -29,28 +29,32 @@ d = 1000
 
 np.random.seed(seed=1234)
 
-wrapper(
-    "normal",
-    generation.normal,
-    mean=0,
-    variance=1,
-    n=n,
-    dimension=d
-)
+if False:
+    wrapper(
+        "normal",
+        generation.normal,
+        mean=0,
+        variance=1,
+        n=n,
+        dimension=d
+    )
 
-wrapper(
-    "uniform",
-    generation.uniform,
-    lb=0,
-    ub=1,
-    n=n,
-    dimension=d
-)
+if False:
+    wrapper(
+        "uniform_ball",
+        generation.uniform_ball,
+        n=n,
+        d=d,
+        r=1,
+        c=[0]*d
+    )
 
-wrapper(
-    "poisson",
-    generation.poisson,
-    lam=1,
-    n=n,
-    dimension=d
-)
+if False:
+    wrapper(
+        "hyperspherical_shell",
+        generation.hyperspherical_shell,
+        n=n,
+        d=d,
+        r1=1,
+        r2=2
+    )
