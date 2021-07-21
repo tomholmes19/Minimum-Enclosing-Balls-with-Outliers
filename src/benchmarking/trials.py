@@ -5,7 +5,7 @@ import meb.geometry, meb.gurobi_solvers
 import data
 
 #TODO: aaaaaaa
-def run_trials(method, n, d, eta, num_trials, data_, need_M, M=None, log_file=None, data_file=None):
+def run_trials_exact(n, d, eta, num_trials, data_, log_file=None, data_file=None):
     """
     Runs trials for the exact solver for MEBwO and returns averaged runtimes
     One of n, d, eta should be a list for benchmarking on that parameter
@@ -16,8 +16,6 @@ def run_trials(method, n, d, eta, num_trials, data_, need_M, M=None, log_file=No
         eta (float): proportion of data covered by MEBwO
         num_trials (int): number of trials to run for each experiment (for averaging)
         data_ (np.array): data set
-        need_M (bool): if True, the chosen method needs an M parameter
-        M (float): M value for exact models, if N
         log_file (str) (default None): file path for log file (if None, no logging)
         data_file (str): file path for original data (for logging)
     
@@ -71,3 +69,10 @@ def run_trials(method, n, d, eta, num_trials, data_, need_M, M=None, log_file=No
     avg_times = utils.calc_avg_times(times)
 
     return avg_times
+
+def run_trials_alg(method, n, d, eta, num_trials, data_path, log_file=None, **kwargs):
+    params = {"n": n, "d": d, "eta": eta}
+
+    trial_param, trial_param_vals = utils.find_trial_param
+
+    utils.check_log(log_file)
