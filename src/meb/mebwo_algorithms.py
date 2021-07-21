@@ -52,7 +52,7 @@ def alg__heuristic_2(data, eta, eps):
         
     return c, r, None
 
-def alg__shrink(data, eps, eta):
+def alg__shrink(data, eta, eps=1e-4):
     """
     Fits a MEB to the data, then finds the k closest points such that eta% of the data is contained
     """
