@@ -77,9 +77,27 @@ def point_on_hypersphere(d):
     unit_point = point/np.linalg.norm(point)
     return unit_point
 
+def point_in_ball(d, r, c):
+    """
+    Generates a uniform point inside the volume of a d-ball with center c and radius r
+
+    Input:
+        d (int): dimension
+        r (float): radius
+        c (array like): center
+    
+    Return:
+        point (np.array): generated point
+    """
+    direction = point_on_hypersphere(d)
+    magnitude = r*np.random.uniform(low=0, high=1)**(1/d)
+    point = direction*magnitude + c
+
+    return point
+
 def uniform_ball(n, d, r, c=None):
     """
-    Uses an acceptance-rejection method to generate n points in a uniform d dimensional ball with centre c and radius r
+    Generates n points in a uniform d dimensional ball with centre c and radius r
 
     Input:
         n (int): number of points
@@ -92,13 +110,8 @@ def uniform_ball(n, d, r, c=None):
     """
     c = check_c(c, d)
 
-    data = []
+    data = [point_in_ball(d, r, c) for _ in range(n)]
 
-    while len(data) < n:
-        point = np.random.uniform(low=-r, high=r, size=d)
-        if np.linalg.norm(point) < r:
-            data.append(point+c)
-    
     return data
 
 def hyperspherical_shell(n, d, r1, r2, c=None):
@@ -120,13 +133,13 @@ def hyperspherical_shell(n, d, r1, r2, c=None):
     data = []
 
     while len(data) < n:
-        point = np.random.uniform(low=-r2, high=r2, size=d)
-        if np.linalg.norm(point) > r1 and np.linalg.norm(point) < r2:
+        point = point_in_ball(d, r2, c)
+        if np.linalg.norm(point - c) > r1:
             data.append(point)
 
     return data
 
-def uniform_ball_with_ouliters(n, d, eta, r, r1, r2, c=None, sep=0) -> np.array:
+def uniform_ball_with_ouliters(n, d, eta, r, r1, r2, c=None) -> np.array:
     """
     Generates n many data points where eta*n many are uniformly inside a ball B1 with centre c and radius r1,
     and (1-eta)*n many are uniformly inside a ball B2 with centre c and radius r2 but not in B1
