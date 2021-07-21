@@ -1,10 +1,10 @@
 import numpy as np
+import timeit
 
 from . import utils
 import meb.geometry, meb.gurobi_solvers
 import data
 
-#TODO: aaaaaaa
 def run_trials_exact(n, d, eta, num_trials, data_, log_file=None, data_file=None):
     """
     Runs trials for the exact solver for MEBwO and returns averaged runtimes
@@ -62,7 +62,7 @@ def run_trials_exact(n, d, eta, num_trials, data_, log_file=None, data_file=None
             c, r, xi, trials[i] = meb.gurobi_solvers.mebwo(trial_data, eta_, M, log_file=log_file)
             
             if log_file is not None:
-                utils.benchmark_logger(filepath=log_file, elapsed=trials[i], n=n_, d=d_, eta=eta_, M=M, r=r, c=c, xi=xi, trial_number=i, num_trials=num_trials, data_filepath=data_file, rows=rows, columns=columns)
+                utils.benchmark_logger(filepath=log_file, elapsed=trials[i], n=n_, d=d_, eta=eta_, M=M, r=r, c=c, trial_number=i, num_trials=num_trials, data_filepath=data_file, rows=rows, columns=columns)
         
         times.append(trials)
     
@@ -70,9 +70,49 @@ def run_trials_exact(n, d, eta, num_trials, data_, log_file=None, data_file=None
 
     return avg_times
 
-def run_trials_alg(method, n, d, eta, num_trials, data_path, log_file=None, **kwargs):
+def run_trials_alg(func, n, d, eta, num_trials, data_type, log_file=None, **kwargs):
     params = {"n": n, "d": d, "eta": eta}
 
     trial_param, trial_param_vals = utils.find_trial_param
 
     utils.check_log(log_file)
+
+    times = []
+
+    for x in trial_param_vals:
+        # update trial parameter in vars dictionary
+        params[trial_param] = x
+
+        # update all parameters (will be unchanged except for the trial parameter)
+        n_ = params["n"]
+        d_ = params["d"]
+        eta_ = params["eta"]
+
+        # elapsed time for each trial
+        trials = [0]*num_trials
+
+        for i in range(num_trials):
+            utils.progress_report(x, trial_param, i)
+
+            # load data
+            filename = r"datasets/{0}/{1}_n{2}_d{3}_{4}".format(data_type, data_type, n, d, i)
+            data_ = data.loading.from_csv(filename)
+
+            start = timeit.default_timer()
+            c, r, _ = func(data, eta, **kwargs)
+            elapsed = timeit.default_timer() - start
+
+            trials[i] = elapsed
+
+            if log_file is not None:
+                if "M" in kwargs:
+                    M = kwargs["M"]
+                else:
+                    M = None
+                utils.benchmark_logger(filepath=log_file, elapsed=trials[i], n=n_, d=d_, eta=eta_, M=M, r=r, c=c, trial_number=i, num_trials=num_trials, data_filepath=filename)
+
+        times.append(trials)
+    
+    avg_times = utils.calc_avg_times(times)
+
+    return avg_times
