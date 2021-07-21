@@ -112,7 +112,7 @@ def uniform_ball(n, d, r, c=None):
 
     data = [point_in_ball(d, r, c) for _ in range(n)]
 
-    return data
+    return np.array(data)
 
 def hyperspherical_shell(n, d, r1, r2, c=None):
     """
@@ -136,8 +136,8 @@ def hyperspherical_shell(n, d, r1, r2, c=None):
         point = point_in_ball(d, r2, c)
         if np.linalg.norm(point - c) > r1:
             data.append(point)
-
-    return data
+    
+    return np.array(data)
 
 def uniform_ball_with_ouliters(n, d, eta, r, r1, r2, c=None) -> np.array:
     """
