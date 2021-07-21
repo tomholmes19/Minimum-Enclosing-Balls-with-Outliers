@@ -95,7 +95,7 @@ def benchmark_logger(filepath, elapsed, n, d, eta, M, r, c, trial_number, num_tr
     Return:
         None
     """
-    logging.basicConfig(filename=filepath, encoding='utf-8', format='%(asctime)s %(message)s', level=logging.INFO)
+    logging.basicConfig(filename=filepath, format='%(asctime)s %(message)s', level=logging.INFO)
     
     msg = (
         "Finished trial {0}/{1}, ".format(trial_number+1, num_trials) +

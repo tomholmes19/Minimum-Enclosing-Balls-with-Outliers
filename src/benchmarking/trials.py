@@ -2,7 +2,7 @@ import numpy as np
 import timeit
 
 from . import utils
-import meb.geometry, meb.gurobi_solvers
+import meb.geometry, meb.gurobi_solvers, meb.mebwo_algorithms
 import data
 
 def run_trials_exact(n, d, eta, num_trials, data_, log_file=None, data_file=None):
@@ -59,7 +59,7 @@ def run_trials_exact(n, d, eta, num_trials, data_, log_file=None, data_file=None
             M = meb.geometry.M_estimate(trial_data)
 
             # solve model and store variables
-            c, r, xi, trials[i] = meb.gurobi_solvers.mebwo(trial_data, eta_, M, log_file=log_file)
+            c, r, _, trials[i] = meb.gurobi_solvers.mebwo(trial_data, eta_, M, log_file=log_file)
             
             if log_file is not None:
                 utils.benchmark_logger(filepath=log_file, elapsed=trials[i], n=n_, d=d_, eta=eta_, M=M, r=r, c=c, trial_number=i, num_trials=num_trials, data_filepath=data_file, rows=rows, columns=columns)
@@ -73,7 +73,7 @@ def run_trials_exact(n, d, eta, num_trials, data_, log_file=None, data_file=None
 def run_trials_alg(func, n, d, eta, num_trials, data_type, log_file=None, **kwargs):
     params = {"n": n, "d": d, "eta": eta}
 
-    trial_param, trial_param_vals = utils.find_trial_param
+    trial_param, trial_param_vals = utils.find_trial_param(params)
 
     utils.check_log(log_file)
 
@@ -95,21 +95,24 @@ def run_trials_alg(func, n, d, eta, num_trials, data_type, log_file=None, **kwar
             utils.progress_report(x, trial_param, i)
 
             # load data
-            filename = r"datasets/{0}/{1}_n{2}_d{3}_{4}".format(data_type, data_type, n, d, i)
+            filename = r"datasets/{0}/{1}_n{2}_d{3}_{4}.csv".format(data_type, data_type, n_, d_, i)
             data_ = data.loading.from_csv(filename)
 
+            # only need to calculate M when data is normal
+            if data_type == "normal" and func == meb.mebwo_algorithms.alg__heuristic:
+                kwargs["M"] = meb.geometry.M_estimate(data_)
+
             start = timeit.default_timer()
-            c, r, _ = func(data, eta, **kwargs)
+            c, r, _ = func(data_, eta_, **kwargs)
             elapsed = timeit.default_timer() - start
 
             trials[i] = elapsed
 
             if log_file is not None:
-                if "M" in kwargs:
-                    M = kwargs["M"]
-                else:
-                    M = None
-                utils.benchmark_logger(filepath=log_file, elapsed=trials[i], n=n_, d=d_, eta=eta_, M=M, r=r, c=c, trial_number=i, num_trials=num_trials, data_filepath=filename)
+                if func in [meb.mebwo_algorithms.alg__peeling, meb.mebwo_algorithms.alg__shenmaier]:
+                    kwargs["M"] = None
+
+                utils.benchmark_logger(filepath=log_file, elapsed=trials[i], n=n_, d=d_, eta=eta_, M=kwargs["M"], r=r, c=c, trial_number=i, num_trials=num_trials, data_filepath=filename)
 
         times.append(trials)
     

@@ -18,7 +18,7 @@ def alg__exact(data, eta, M, relax=False, time_limit=None, log_file=""):
     c, r, xi, _  = gurobi_solvers.mebwo(data, eta, M, relax, time_limit, log_file)
     return c, r, xi
 
-def alg__heuristic(data, eta, M, eps=1e-4):
+def alg__relaxation_heuristic(data, eta, M, eps=1e-4):
 
     n = len(data)
     k = int(eta*n)
@@ -52,7 +52,7 @@ def alg__heuristic_2(data, eta, eps):
         
     return c, r, None
 
-def alg__shrink(data, eta, eps=1e-4):
+def alg__peeling(data, eta, eps=1e-4, **kwargs):
     """
     Fits a MEB to the data, then finds the k closest points such that eta% of the data is contained
     """
@@ -64,7 +64,7 @@ def alg__shrink(data, eta, eps=1e-4):
 
     return c, r, None
 
-def alg__shenmaier(data, eta):
+def alg__shenmaier(data, eta, **kwargs):
     """
     Algorithm 1 of Shenmaier 2015 https://link.springer.com/chapter/10.1007/978-88-7642-475-5_92
 

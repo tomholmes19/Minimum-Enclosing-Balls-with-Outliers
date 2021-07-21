@@ -1,5 +1,4 @@
 import numpy as np
-from numpy.lib.twodim_base import tri
 
 import benchmarking.trials, benchmarking.utils
 import data.loading
