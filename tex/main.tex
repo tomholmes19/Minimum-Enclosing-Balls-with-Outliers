@@ -9,6 +9,9 @@
 \usepackage{amsthm}
 \usepackage{hyperref}           % hyperlinks
 \usepackage{array}              % for \newcolumntype macro
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\usepackage{mathtools}
+
 \newcolumntype{C}{>{$}c<{$}}    % math-mode version of "l" column type
 \newcolumntype{L}{>{$}l<{$}} 
 
@@ -19,6 +22,8 @@
 \DeclareMathOperator{\MEB}{MEB}
 \DeclareMathOperator{\MEBwO}{MEBwO}
 
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 
 \theoremstyle{definition}
 % ==== Mine^
@@ -30,13 +35,11 @@
 \newtheorem{lemma}{Lemma}
 \newtheorem{corollary}{Corollary}
 \newtheorem{proposition}{Proposition}
-\newtheorem{algorithm}{Algorithm}
 \newtheorem*{remark}{Remark}
 \numberwithin{theorem}{section}
 \numberwithin{definition}{section}
 \numberwithin{lemma}{section}
 \numberwithin{proposition}{section}
-\numberwithin{algorithm}{section}
 \numberwithin{equation}{section}
 
 
@@ -174,7 +177,7 @@ Let $a'\in\mathbb{R}^n$ where $a'\notin\A$. Suppose $B(c,r)=\MEB(\A)$ and $B(c',
 Clearly we have $\A\subseteq\A\cap\left\{a'\right\}$, then since $\A\cap\left\{a'\right\}\subseteq B(c',r')$ we have $\mathcal{A}\subseteq B(c',r')$ by transitivity. Thus $r\leq r'$ with equality only if $a'\in B(c,r)$ by uniqueness.
 \end{proof}
 \begin{remark}
-The prior proposition tells us that if we have the MEB of a data set $\mathcal{A}$, then adding a new point to $\mathcal{A}$ which is not inside $\MEB(\A)$ yields a new MEB with larger radius.
+This proposition tells us that if we have the MEB of a data set $\mathcal{A}$, then adding a new point to $\mathcal{A}$ which is not inside $\MEB(\A)$ yields a new MEB with larger radius.
 \end{remark}
 
 \begin{definition}[{{\cite[page 2]{core-sets}}}]
@@ -251,17 +254,31 @@ One concern with our choice of $M$ is the effect on the solution time of the sol
 Another concern regarding the value of $M$ is the effect on the optimal solutions for the relaxed $\xi_i$ variables in the QP relaxation. This is important as good quality relaxed solutions are essential to (TODO: reference to relaxation-based heuristic goes here).
 
 
-
-\subsection{Benchmarks}\label{exact benchmarks}
-
 % =============================================================================
 % Chapter 3
 % =============================================================================
 
 \chapter{Algorithmic Methods}
+In this chapter we propose some non-exact construction methods to solving the MEBwO problem which return a feasible solution. We also investigate some improvement heuristics which, given a feasible MEB or MEBwO, seek to locally find a new center such that a smaller radius can be found.
+
 \section{Construction Methods}
-\subsection{Relaxation-based Heuristic}
-\subsection{Peeling-based Heuristics}
+\subsection{Relaxation-Based Heuristic}
+This heuristic works by first solving the relaxed QP formulation for the MEBwO problem in Definition \ref{mebwo}, and then making the assumption that a higher value of $\xi_i$ (i.e. closer to 1) means that the model treats the data point $a^i$ as ``more" of an outlier. From this assumption, we pick the largest $k$ values of $xi_i$ and treat each corresponding $a^i$ as an outlier, therefore treating the remaining data as inliers. We then solve the MEB problem for this remaining data. A more formal outline of this algorithm is detailed in Algorithm \ref{relaxation heuristic}.
+
+This method will always return a feasible solution that covers $\eta\%$ of the data as we will always remove $k=n(1-\eta)$ many points. As discussed in the previous chapter, solving the final MEB problem is relatively easy and selecting outliers using the MEBwO QP relaxation is trivial, but the difficulty lays in solving the initial QP relaxation, and as such a heuristic method which can solve this model quickly and return approximate solutions to each $xi_i$ is a valuable direction for further research in order to speed up this method.
+
+\begin{algorithm}[H]\label{relaxation heuristic}
+    \SetAlgoLined
+    \KwIn{Data set $\A=\left\{a^1,\ldots,a^n\right\}$, percentage of data to be covered $\eta\in[0,1]$, error tolerance for MEB heuristic $\epsilon>0$, big $M$ parameter $M>0$}
+    \KwOut{Center $c\in\mathbb{R}^d$, radius $r\in\mathbb{R}$}
+     $\xi=\left[\xi_1,\ldots,\xi_n\right]$ relaxed binary variables returned by relaxed MEBwO solver for $\A$, $\eta$, and $M$\;
+     Let $\xi'$ be the smallest $k=\floor{\eta\cdot n}$ elements of $\xi$\;
+     Let $\A':=\left\{a^i\in\A: \xi_i\in\xi',\ i=1,\ldots,n\right\}$\;
+     Let $c,r$ be the center and radius of $\MEB(\A')$\;
+     
+    \caption{Relaxation-Based Heuristic}
+\end{algorithm}
+\subsection{Peeling-based Heuristic}
 \subsection{Shenmaier's Approximation}
 
 \section{Improvement Heuristics}
@@ -276,7 +293,16 @@ Another concern regarding the value of $M$ is the effect on the optimal solution
 \section{Data}
 \section{Methodology}
 \section{Experiments}
-\section{Analysis}
+\subsection{Exact Method}\label{exact benchmarks}
+\subsection{Construction Methods}
+\subsubsection{Relaxation-based Heuristic}
+\subsubsection{Peeling-based Heuristic}
+\subsubsection{Shenmaier's Approximation}
+
+\subsection{Improvement Heuristics}
+\subsubsection{Direction-Constrained Single-Step Heuristic}
+\subsubsection{Direction-Constrained MEB}
+\section{Discussion}
 
 % =============================================================================
 % Chapter 5
