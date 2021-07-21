@@ -191,3 +191,21 @@ def format_eta(eta) -> str:
     """
     eta_str = str(eta).replace(".","p")
     return eta_str
+
+def find_trial_param(params):
+    """
+    From a dictionary of parameters, identifies which is a list and returns the name of
+    that parameter and the list
+    """
+    trial_param = None
+    # find which parameter is the list
+    for param, val in params.items():
+        if type(val) == list:
+            trial_param = param
+            trial_param_vals = val.copy()
+            break
+    
+    if trial_param is None:
+        raise TypeError("No list of parameters was found")
+    
+    return trial_param, trial_param_vals
