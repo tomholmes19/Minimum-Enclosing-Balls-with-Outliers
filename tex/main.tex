@@ -143,13 +143,12 @@ Here come your acknowledgments ...
 % =============================================================================
 \chapter{Introduction}
 \section{Motivation}
-\section{Literature Review}\label{lit review}
 \section{Outline}
 
 % =============================================================================
 % Chapter 2
 % =============================================================================
-\chapter{Exact Methods}\label{exact}
+\chapter{Problem Definition and Literature Review}\label{exact}
 \section{Preliminaries}
 In this paper we shall denote our data set of finite vectors as $\mathcal{A} = \left\{a^1,\ldots,a^n\right\}\subseteq\mathbb{R}^d$ for $n,d\in\mathbb{N}$. The center of a ball is represented by a vector $c\in\mathbb{R}^d$, the radius a scalar $r\in\mathbb{R}$, and the squared radius $\gamma=r^2$. We denote the percentage of inliers for a minimum enclosing ball with outliers by $\eta\in(0,1]$, i.e. if $\eta=0.9$ then we seek a ball which covers $90\%$ of our data.
 
@@ -290,12 +289,14 @@ One concern with our choice of $M$ is the effect on the solution time of the sol
 \subsubsection{Quality of $\xi_i$ Solutions in the QP Relaxation}
 Another concern regarding the value of $M$ is the effect on the optimal solutions for the relaxed $\xi_i$ variables in the QP relaxation. This is important as good quality relaxed solutions are essential to Algorithm \ref{relaxation heuristic}.
 
+\section{Literature Review}\label{lit review}
 
 % =============================================================================
 % Chapter 3
 % =============================================================================
 
-\chapter{Algorithmic Methods}\label{algorithms}
+\chapter{Heuristic and Approximation Algorithms}\label{algorithms}
+
 In this chapter we propose some non-exact construction methods to solving the MEBwO problem which return a feasible solution. We also investigate some improvement heuristics which, given a feasible MEB or MEBwO, seek to locally find a new center such that a smaller radius can be found.
 
 \section{Construction Methods}
@@ -316,7 +317,8 @@ This method will always return a feasible solution that covers $\eta\%$ of the d
      
     \caption{Relaxation-Based Heuristic}
 \end{algorithm}
-\subsection{Peeling-based Heuristic}
+\subsection{Shrinking Heuristic}
+This heuristic works by simply computing an initial MEB $B(c,r)$ using a heuristic such as Algorithm \ref{core-set algorithm}, then computing the $k$ closest points and returning the ball $B(c,r')$ where $r'$ is the maximum distance from $c$ to each of the $k$ closest points.
 \subsection{Shenmaier's Approximation}
 
 \section{Improvement Heuristics}
@@ -326,16 +328,16 @@ This method will always return a feasible solution that covers $\eta\%$ of the d
 % =============================================================================
 % Chapter 4
 % =============================================================================
-\chapter{Implementation and Benchmarks}\label{implementation}
+\chapter{Implementation and Experiments}\label{implementation}
 \section{Code Implementation}
 \subsection{Data}
 
 \section{Experiments}
 \subsection{Methodology}
-\subsection{Exact Method}\label{exact benchmarks}
+\subsection{Exact Model}\label{exact benchmarks}
 \subsection{Construction Methods}
 \subsubsection{Relaxation-based Heuristic}
-\subsubsection{Peeling-based Heuristic}
+\subsubsection{Shrinking Heuristic}
 \subsubsection{Shenmaier's Approximation}
 
 \subsection{Improvement Heuristics}
