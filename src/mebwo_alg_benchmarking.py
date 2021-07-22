@@ -11,7 +11,7 @@ data_types = {"uniform_ball": 1}
 
 # func name and func pairs
 #func_names = {"relaxation_heuristic": mebwo_algorithms.alg__relaxation_heuristic}
-func_names = {"peeling": mebwo_algorithms.alg__peeling}
+func_names = {"peeling": mebwo_algorithms.alg__shrink}
 for func_name in func_names:
     for data_type in data_types:
         if True:

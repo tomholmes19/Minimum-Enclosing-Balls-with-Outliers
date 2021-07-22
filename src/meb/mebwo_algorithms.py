@@ -52,7 +52,7 @@ def alg__heuristic_2(data, eta, eps):
         
     return c, r, None
 
-def alg__peeling(data, eta, eps=1e-4, **kwargs):
+def alg__shrink(data, eta, eps=1e-4, **kwargs):
     """
     Fits a MEB to the data, then finds the k closest points such that eta% of the data is contained
     """
@@ -62,6 +62,16 @@ def alg__peeling(data, eta, eps=1e-4, **kwargs):
     k = int(np.floor(eta*n))
     _, r = geometry.k_closest(data, c, k)
 
+    return c, r, None
+
+def alg__shrink_avg(data, eta, **kwargs):
+    """
+    Calculates the avg vector, then finds the k closest points such that eta% of the data is contained
+    """
+    n = len(data)
+    k = int(np.floor(eta*n))
+    c = geometry.mean_vector(data)
+    r = geometry.k_closest(data, c, k)
     return c, r, None
 
 def alg__shenmaier(data, eta, **kwargs):

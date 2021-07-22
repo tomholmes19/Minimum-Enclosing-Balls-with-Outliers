@@ -109,7 +109,7 @@ def run_trials_alg(func, n, d, eta, num_trials, data_type, log_file=None, **kwar
             trials[i] = elapsed
 
             if log_file is not None:
-                if func in [meb.mebwo_algorithms.alg__peeling, meb.mebwo_algorithms.alg__shenmaier]:
+                if func in [meb.mebwo_algorithms.alg__shrink, meb.mebwo_algorithms.alg__shenmaier]:
                     kwargs["M"] = None
 
                 utils.benchmark_logger(filepath=log_file, elapsed=trials[i], n=n_, d=d_, eta=eta_, M=kwargs["M"], r=r, c=c, trial_number=i, num_trials=num_trials, data_filepath=filename)
