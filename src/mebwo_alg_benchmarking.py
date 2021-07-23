@@ -4,7 +4,7 @@ import benchmarking.trials, benchmarking.utils
 import data.loading
 from meb import mebwo_algorithms
 
-num_trials = 1
+num_trials = 5
 
 # data and M value pairs
 data_types = {"uniform_ball": 2, "hyperspherical_shell": 4}
