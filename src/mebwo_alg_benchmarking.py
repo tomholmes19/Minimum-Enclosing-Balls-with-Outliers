@@ -4,18 +4,17 @@ import benchmarking.trials, benchmarking.utils
 import data.loading
 from meb import mebwo_algorithms
 
-num_trials = 5
+num_trials = 1
 
 # data and M value pairs
-data_types = {"uniform_ball": 1}
+data_types = {"uniform_ball": 2, "hyperspherical_shell": 4}
 
 # func name and func pairs
-#func_names = {"relaxation_heuristic": mebwo_algorithms.alg__relaxation_heuristic}
-func_names = {"peeling": mebwo_algorithms.alg__shrink}
+func_names = {"relaxation_heuristic": mebwo_algorithms.alg__relaxation_heuristic}
 for func_name in func_names:
     for data_type in data_types:
         if True:
-            n = [1000 + 3000*i for i in range(3)]
+            n = [1000 + 3000*i for i in range(10)]
             d = 30
             eta = 0.9
 
@@ -43,7 +42,7 @@ for func_name in func_names:
                 xlabel="n",
                 ylabel="Time",
                 title="Runtime for Relaxation-Based Heuristic as a function of n, d={0}, eta={1}".format(d,eta),
-                plot=True,
+                plot=False,
                 filepath=r"{}.png".format(path)
             )
 

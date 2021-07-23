@@ -95,17 +95,30 @@ def benchmark_logger(filepath, elapsed, n, d, eta, M, r, c, trial_number, num_tr
     Return:
         None
     """
-    logging.basicConfig(filename=filepath, format='%(asctime)s %(message)s', level=logging.INFO)
+    fileh = logging.FileHandler(filepath, "a")
+    formatter = logging.Formatter('%(asctime)s %(message)s')
+    fileh.setFormatter(formatter)
     
-    msg = (
+    log = logging.getLogger()
+    for handler in log.handlers[:]:
+        log.removeHandler(handler)
+    log.addHandler(fileh)
+    log.setLevel("INFO")
+    
+    msg1 = (
         "Finished trial {0}/{1}, ".format(trial_number+1, num_trials) +
-        "elapsed={}, ".format(elapsed) +
+        "elapsed={}, ".format(elapsed)
+    )
+    msg2 = (
         "n={0}, d={1}, eta={2}, M={3}, ".format(n,d,eta,M) +
         "r={0}, c={1}, ".format(r,c) +
         "data={0}, rows={1}, columns={2}".format(data_filepath, rows, columns)
     )
 
+    msg = msg1 + msg2
+    
     logging.info(msg)
+    print(msg1)
     print("Recorded log to {}".format(filepath))
     return None
 
