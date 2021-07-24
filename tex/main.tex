@@ -313,14 +313,44 @@ This method will always return a feasible solution that covers $\eta\%$ of the d
      Let $\xi'$ be the smallest $k=\floor{\eta\cdot n}$ elements of $\xi$\;
      Let $\A':=\left\{a^i\in\A: \xi_i\in\xi',\ i=1,\ldots,n\right\}$\;
      Let $c,r$ be the center and radius of $\MEB(\A')$ returned by heuristic\;
-     \KwRet $B(c, r)$
+     \KwRet $B(c, r)$\;
      
     \caption{Relaxation-Based Heuristic}
 \end{algorithm}
 \subsection{Shrinking Heuristic}
-This heuristic works by simply computing an initial MEB $B(c,r)$ using a heuristic such as Algorithm \ref{core-set algorithm}, then computing the $k$ closest points and returning the ball $B(c,r')$ where $r'$ is the maximum distance from $c$ to each of the $k$ closest points.
-\subsection{Shenmaier's Approximation}
+This heuristic works by simply computing an initial MEB $B(c,r)$ using a heuristic such as Algorithm \ref{core-set algorithm}, then computing the $k$ closest points and returning the ball $B(c,r')$ where $r'$ is the maximum distance from $c$ to each of the $k$ closest points. See Algorithm \ref{shrink} for a detailed outline of this algorithm.
 
+\begin{algorithm}[H]\label{shrink}
+    \SetAlgoLined
+    \KwIn{Data set $\A$, $\eta\in[0,1]$, $\epsilon>0$}
+    \KwOut{Center $c\in\mathbb{R}^d$, radius $r\in\mathbb{R}$}
+    Let $c$ be the center of the MEB returned by a heuristic for $\MEB(\A)$\;
+    $D:=\left\{\norm{c-x}: x\in\A\right\}$\;
+    Let $D'$ be $D$ sorted in ascending order\;
+    Let $\delta$ be the $(k-1)$th element of $D'$ (indexing from 0)\;
+    $\A' = \left\{a^i\in\A: D[i] \leq \delta, i=1,\ldots,n\right\}$\;
+    $r = \max_{a\in\A'}\norm{c-a}$\;
+    \KwRet $B(c,r)$\;
+    
+    \caption{Shrinking Heurstic}
+\end{algorithm}
+\subsection{Shenmaier's Approximation}
+This approximation scheme developed by Vladimir Shenmaier in \cite[Algorithm 1]{SHENMAIER201581} is a brute-force algorithm to solving the MEBwO problem with $O(n^2d)$ time complexity. It works by considering each point in the input set, finding the $k$-closest points to that point, then returning the point-distance pair such that the maximum distance from each point to each other point in its $k$-closest points is minimised. See Algorithm \ref{shenmaier} for a detailed outline of this algorithm.
+\begin{algorithm}\label{shenmaier}
+    \KwIn{Data set $\A$, $\eta\in[0,1]$}
+    \KwOut{Center $c\in\mathbb{R}^d$, radius $r\in\mathbb{R}$}
+    \For{$i=1,\ldots,n$}{
+        $D:=\left\{\norm{c-x}: x\in\A\right\}$\;
+        Let $D'$ be $D$ sorted in ascending order\;
+        Let $\delta_i$ be the $(k-1)$th element of $D'$ (indexing from 0)\;
+    }
+    $i^* := \arg\min_{i=1,\ldots,n}$\;
+    $c := a^{i^*}$\;
+    $r := \delta_{i^*}$\;
+    \KwRet{$B(c,r)$}\;
+    
+    \caption{Shenmaier's Approximation \cite[Algorithm 1]{SHENMAIER201581}}
+\end{algorithm}
 \section{Improvement Heuristics}
 \subsection{Direction-Constrained Single-Step Heuristic}
 \subsection{Direction-Constrained MEB}
