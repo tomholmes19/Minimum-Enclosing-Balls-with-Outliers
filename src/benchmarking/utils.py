@@ -222,3 +222,13 @@ def find_trial_param(params):
         raise TypeError("No list of parameters was found")
     
     return trial_param, trial_param_vals
+
+def confirm_benchmark(types):
+    run = {typ: False for typ in types}
+    for typ in types:
+        msg = input("Run benchmarks for {}? (y/n) ".format(typ))
+        if msg == "y":
+            run[typ] = True
+    
+    confirmed_types = {typ: types[typ] for typ in types if run[typ] == True}
+    return confirmed_types

@@ -2,7 +2,7 @@ import numpy as np
 import timeit
 
 from . import utils
-import meb.geometry, meb.gurobi_solvers, meb.mebwo_algorithms
+import meb
 import data
 
 def run_trials_exact(n, d, eta, num_trials, data_, log_file=None, data_file=None):
@@ -99,8 +99,8 @@ def run_trials_alg(func, n, d, eta, num_trials, data_type, log_file=None, **kwar
             data_ = data.loading.from_csv(filename)
 
             # only need to calculate M when data is normal
-            if data_type == "normal" and func == meb.mebwo_algorithms.alg__heuristic:
-                kwargs["M"] = meb.geometry.M_estimate(data_)
+            if data_type == "normal" and func == meb.mebwo_algorithms.alg__relaxation_heuristic:
+                _, _, kwargs["M"] = meb.geometry.diameter_approx(data_[0], data_, return_diameter=True)
 
             start = timeit.default_timer()
             c, r, _ = func(data_, eta_, **kwargs)
