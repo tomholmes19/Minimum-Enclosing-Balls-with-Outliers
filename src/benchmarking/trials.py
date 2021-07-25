@@ -95,7 +95,10 @@ def run_trials_alg(func, n, d, eta, num_trials, data_type, log_file=None, **kwar
             utils.progress_report(x, trial_param, i)
 
             # load data
-            filename = r"datasets/{0}/{1}_n{2}_d{3}_{4}.csv".format(data_type, data_type, n_, d_, i)
+            filename = r"datasets/{0}/{1}_n{2}_d{3}".format(data_type, data_type, n_, d_)
+            if data_type == "uniform_ball_with_outliers":
+                filename += r"_eta{}".format(utils.format_eta(eta_))
+            filename += r"_{}.csv".format(i)
             data_ = data.loading.from_csv(filename)
 
             # only need to calculate M when data is normal

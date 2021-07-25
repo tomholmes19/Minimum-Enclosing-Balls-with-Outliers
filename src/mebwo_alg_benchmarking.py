@@ -41,7 +41,7 @@ if msg == "y":
     for func_name in confirmed_funcs:
         for data_type in confirmed_data:
             if confirmed_experiments["n"]:
-                n = [1000 + 3000*i for i in range(10)]
+                n = [1000 + 3000*i for i in range(10) if 1000 + 3000*i > 13000]
                 d = 30
                 eta = 0.9
 
