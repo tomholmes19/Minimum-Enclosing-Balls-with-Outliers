@@ -11,6 +11,7 @@
 \usepackage{array}              % for \newcolumntype macro
 \usepackage[ruled,vlined,linesnumbered]{algorithm2e}
 \usepackage{mathtools}
+\usepackage{tikz}
 
 %TC:ignore
 \newcolumntype{C}{>{$}c<{$}}    % math-mode version of "l" column type
@@ -43,6 +44,7 @@
 \numberwithin{lemma}{section}
 \numberwithin{proposition}{section}
 \numberwithin{equation}{section}
+\numberwithin{figure}{section}
 
 
 \begin{document}
@@ -352,9 +354,100 @@ This approximation scheme developed by Vladimir Shenmaier in \cite[Algorithm 1]{
     \caption{Shenmaier's Approximation \cite[Algorithm 1]{SHENMAIER201581}}
 \end{algorithm}
 \section{Improvement Heuristics}
-\subsection{Direction-Constrained Single-Step Heuristic}
-\subsection{Direction-Constrained MEB}
+We now consider some improvement heuristics. The two heuristics described here are, strictly speaking, designed to improve an existing MEB rather than an MEBwO. However, quick and effective methods exist for solving the MEB problem and so improvement heuristics have not been needed, while heuristics which solve the MEBwO problem may return a solution which has considerable space for improvement.
 
+The two improvement heuristics work in a similar way, by considering an improving direction in which moving the centre of the MEB in that direction while keeping the same radius retains a feasible solution, then shrinking the radius to the furthest point from the new centre. The Direction-Constrained Single Step Heuristic (DCSSH) works by pure geometric reasoning to find a new centre, while the Direction-Constrained MEB (DCMEB) uses an optimization solver such as Gurobi to find an optimal step in the improving direction to minimize the radius of the new ball.
+
+The inspiration for these heuristics comes from Shenmaier's Approximation, which returns a ball with some centre $c\in\A$. Our assumption is that a better solution exists in a local neighbourhood around $c$, i.e. we find a new centre that does not have to lie on a point in $\A$.
+\subsection{Direction-Constrained Single Step Heuristic}
+For a visual aid to this derivation please refer to Figure \ref{vis aid derivation}. Consider $B(\hat{c}, r) = \MEB(\A)$. To find an improving direction we choose the furthest point from $c$, $\hat{a}=\arg\max_{a\in\A}\norm{c-a}$, then the (negative) improving direction is defined to be $\beta=\hat{c}-\hat{a}$. We choose the direction $\hat{a}\to\hat{c}$ as opposed to $\hat{c}\to\hat{a}$ in order to simplify later derivations.
+
+Now that we have a direction $\beta$, we can move the initial ball in this direction by simply subtracting $\beta x$ from $\hat{c}$ where $x\in\mathbb{R}^{\geq0}$ is some scalar, i.e. our new centre is $c=\hat{c}-\beta x$. We would like to choose $x$ such that the new ball remains feasible by ensuring that $\norm{c-a^i}\leq r$ for $i=1,\ldots,n$, and we can do this by considering the distance from each $a^i$ in the direction of $\beta$ to the surface of the initial ball and choose $x$ such that each of these distances is greater than $\norm{\beta x}$.
+
+More formally, for each $a^i\in\A$ let $x_i$ be the scalar such that $a^i+\beta x_i$ lies on the surface of the initial ball, i.e. $\norm{(a^i+\beta x^i)-\hat{c}}=r$. Again, to simplify derivations, denote the direction $\hat{c}\to a^i$ by $\alpha_i=a^i-\hat{c}$. To calculate each $x_i$, we square this equation and set $\gamma=r^2$ to get
+\begin{align*}
+    \alpha_i^T\alpha_i + 2x\alpha_i^T\beta + x^2\beta^T\beta &= \gamma \\
+    \implies \beta^T\beta x + 2x\alpha_i^T\beta + \alpha_i^T\alpha_i - \gamma &= 0.
+\end{align*}
+Using the quadratic formula we then have
+\begin{align*}
+    x &= \frac{-2\alpha_i^T\beta \pm \sqrt{4\left(\alpha_i^T\beta\right)^2 - 4\beta^T \beta\left(\alpha_i^T\alpha_i-\gamma\right)}}{2\beta^T\beta} \\[4pt]
+    &= \frac{-\alpha_i^T\beta \pm \sqrt{\left(\alpha_i^T\beta\right)^2 - \beta^T \beta\left(\alpha_i^T\alpha_i-\gamma\right)}}{\beta^T\beta}.
+\end{align*}
+The two solutions to $x$ corresponding to the positive and negative discriminants represent the steps in the positive and negative $\beta$ directions respectively, then since from our derivations we are only interested in the positive $\beta$ direction we can disregard the negative solution for $x$, so we can define the function $Q:\mathbb{R}^d\times\mathbb{R}^d\times\mathbb{R}\to\mathbb{R}$ by
+\begin{equation*}
+    Q(\alpha_i,\beta,\gamma) = \frac{-\alpha_i^T\beta + \sqrt{\left(\alpha_i^T\beta\right)^2 - \beta^T \beta\left(\alpha_i^T\alpha_i-\gamma\right)}}{\beta^T\beta}.
+\end{equation*}
+
+
+Then let $x=\min\left\{Q(\alpha_i, \beta, \gamma):i=1,\ldots,n\right\}$, so $\norm{\beta x}$ is the smallest distance from each $a^i$ to the surface of the ball in the direction of $\beta$. Finally, by moving by some scalar multiple of $-\beta x$ from $\hat{c}$, we get a new feasible centre $c=\hat{c}-\beta x/s$ for some scalar $s\geq1$. We give a simple proof that this new centre with unchanged radius indeed yields a feasible solution and a visual aid is provided in Figure \ref{vis aid feasibility}.
+
+\begin{figure}
+    \centering
+    \begin{tikzpicture}
+        % lines
+        \draw[->, color=magenta] (-3,0) -- (-0.05,0) node[midway, below]{$\beta$};
+        \draw[->, color=cyan] (0,0) -- (59/60,59/40) node[midway, below right]{$\alpha$};
+        \draw[dashed] (1,1.5) -- (2.598, 1.5) node[midway, below]{$\norm{\beta}{x}$};
+        
+        % points
+        \draw[fill] (0,0) circle (1.5pt) node[below]{$\hat{c}$};
+        \draw[fill] (-3,0) circle (1.5pt) node[left]{$\hat{a}$};
+        \draw[fill] (1, 1.5) circle (1.5pt) node[above left]{$a^i$};
+        \draw[fill] (2.598, 1.5) circle (1.5pt) node[above right]{$a^i + \beta x$};
+        \draw[fill] (-0.75,0) circle (1.5pt) node[above]{$\hat{c}-\frac{\beta x}{s}$};
+
+        % ball
+        \draw (0,0) circle (3);
+    \end{tikzpicture}
+    \caption{Visual Aid for Direction-Constrained Single Step Heuristic}
+    \label{vis aid derivation}
+\end{figure}
+
+\begin{proposition}\label{imp heuristic feasibility}
+Consider the MEB problem for a data set $\A$ denoted by $(P)$. Let $B(\hat{c},r)$ be a feasible solution to $(P)$. Then the ball $B(\hat{c}-\beta x/s, r)$ with $\beta$, $x$, and $s$ as described above, is also a feasible solution to $(P)$.
+\end{proposition}
+\begin{proof}
+For each $a^i\in\A$ let $\hat{a}^i_\beta$ be the point on the surface of $B(\hat{c},r)$ in the direction of $\beta$ from $a^i$. Let $a^i_\beta=\hat{a^i}_\beta - \beta x/s$ be the point on the surface of $B(\hat{c}-\beta x/s, r)$ in the direction of $\beta$ from $a^i$. Let $c=\hat{c}-\beta x/s$. Then, by the triangle inequality, we have
+\begin{align*}
+    \norm{c-a^i_\beta} &\geq \norm{c-a^i} + \norm{a^i-a^i_\beta} \\
+    \implies \norm{c-a^i} &\leq \norm{c-a^i_\beta} - \norm{a^i-a^i_\beta} \\
+    &= r-\norm{a^i-a^i_\beta} \\
+    &\leq r
+\end{align*}
+since $\norm{a^i-a^i_\beta}\geq0$. Hence $\norm{c-a^i}\leq r$ for $i=1,\ldots,n$ and so $B(c, r)$ is feasible for $(P$).
+\end{proof}
+\begin{figure}
+    \centering
+    \begin{tikzpicture}
+        % lines
+        \draw (0,0) -- (1.598, 1.5) node[midway, above left]{$\norm{c-a^i}$} -- (2.598, 1.5) -- cycle node[midway, below right]{$\norm{c-a^i_\beta}$};
+        \draw[dotted] (2.598, 1.5) -- (3.598, 1.5);
+        
+        \draw[->, color=magenta] (-2,0) -- (0.95,0) node[pos=0.3333, below]{$\beta$};
+        
+        % points
+        \draw[fill] (0,0) circle (1.5pt) node[below] {$c$};
+        \draw[fill] (-2,0) circle (1.5pt) node[left]{$\hat{a}$};
+        \draw[fill] (1,0) circle (1.5pt) node[below]{$\hat{c}$};
+        
+        \draw[fill] (1.598, 1.5) circle (1.5pt) node[above left]{$a^i$};
+        \draw[fill] (2.598, 1.5) circle (1.5pt) node[above right]{$a^i_\beta$};
+        \draw[fill] (3.598, 1.5) circle (1.5pt) node[above right]{$\hat{a}^i_\beta$};
+        
+        % balls
+        \draw (0,0) circle (3);
+        \draw[dashed] (1,0) circle (3);
+        
+        % labels
+        \node at (2.598, 3.5) {$\norm{a^i-a^i_\beta}$};
+        \draw[->] (2.598, 3) to[bend left=10] (2.098, 1.625);
+        
+    \end{tikzpicture}
+    \caption{Visual Aid for Proposition \ref{imp heuristic feasibility}}
+    \label{vis aid feasibility}
+\end{figure}
+\subsection{Direction-Constrained MEB}
 % =============================================================================
 % Chapter 4
 % =============================================================================
@@ -371,7 +464,7 @@ This approximation scheme developed by Vladimir Shenmaier in \cite[Algorithm 1]{
 \subsubsection{Shenmaier's Approximation}
 
 \subsection{Improvement Heuristics}
-\subsubsection{Direction-Constrained Single-Step Heuristic}
+\subsubsection{Direction-Constrained Single Step Heuristic}
 \subsubsection{Direction-Constrained MEB}
 
 \section{Discussion}
