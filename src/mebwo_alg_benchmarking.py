@@ -22,26 +22,31 @@ func_types = {
     "shenmaier": mebwo_algorithms.alg__shenmaier
 }
 
-experiment_types = {
-    "n": True,
-    "d": True,
-    "eta": True
+param_types = {
+    "n": False,
+    "d": False,
+    "eta": False
 }
 
 confirmed_funcs = benchmarking.utils.confirm_benchmark(func_types)
 confirmed_data = benchmarking.utils.confirm_benchmark(data_types)
-confirmed_experiments = benchmarking.utils.confirm_benchmark(experiment_types)
 
+for param in param_types:
+        msg = input("Run benchmarks for {}? (y/n) ".format(param))
+        if msg == "y":
+            param_types[param] = True
+
+confirmed_params = {param: param_types[param] for param in param_types if param_types[param] == True}
 print(confirmed_funcs.keys())
 print(confirmed_data.keys())
-print(confirmed_experiments.keys())
-msg = input("Running {} benchmarks. Continue? (y/n) ".format(len(confirmed_funcs)*len(confirmed_data)*len(confirmed_experiments)))
+print(confirmed_params.keys())
+msg = input("Running {} benchmarks. Continue? (y/n) ".format(len(confirmed_funcs)*len(confirmed_data)*len(confirmed_params)))
 
 if msg == "y":
     for func_name in confirmed_funcs:
         for data_type in confirmed_data:
-            if confirmed_experiments["n"]:
-                n = [1000 + 3000*i for i in range(10) if 1000 + 3000*i > 13000]
+            if param_types["n"]:
+                n = [1000 + 3000*i for i in range(10)]
                 d = 30
                 eta = 0.9
 
@@ -72,5 +77,38 @@ if msg == "y":
                     plot=False,
                     filepath=r"{}.png".format(path)
                 )
+            
+            if param_types["d"]:
+                n = 10000
+                d = [10 + 10*i for i in range(10)]
+                eta = 0.9
 
-benchmarking.utils.notify()
+                if func_name == "relaxation_heuristic":
+                    M = confirmed_data[data_type]
+                else:
+                    M = None
+                
+                path = r"benchmarks/{0}/{1}/func_d_n{2}_eta{3}_{4}".format(func_name, data_type, n, benchmarking.utils.format_eta(eta), data_type)
+
+                times = benchmarking.trials.run_trials_alg(
+                    func=confirmed_funcs[func_name],
+                    n=n,
+                    d=d,
+                    eta=eta,
+                    num_trials=num_trials,
+                    data_type=data_type,
+                    log_file=r"{}.log".format(path),
+                    M=M
+                )
+
+                benchmarking.utils.plot_times(
+                    x_axis=d,
+                    times=times,
+                    xlabel="d",
+                    ylabel="Time",
+                    title="Runtime for Relaxation-Based Heuristic as a function of d, n={0}, eta={1}".format(n,eta),
+                    plot=False,
+                    filepath=r"{}.png".format(path)
+                )
+
+    benchmarking.utils.notify()
