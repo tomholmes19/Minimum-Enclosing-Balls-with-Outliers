@@ -47,7 +47,8 @@ def alg__min_parallel_dist(data, c, gamma, a=None, s=2):
     if a is None:
         a = geometry.find_furthest(c, data)
     
-    x = min([geometry.Q(c, a, point, gamma) for point in data])
+    beta = c - a
+    x = min([geometry.Q(c, beta, point, gamma) for point in data])
 
     new_c = c - (c-a)*x/2
     new_r = max([np.linalg.norm(new_c - point) for point in data])

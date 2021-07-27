@@ -132,13 +132,13 @@ def k_closest(data, x, k) -> np.array:
 
     return k_data, key_dist
 
-def Q(c, a, point, gamma) -> float:
+def Q(c, beta, point, gamma) -> float:
     """
     Solves quadratic equation Q and returns x>=0
 
     Input:
         c (np.array): center of ball
-        a (np.array): furthest point in ball from center
+        beta (np.array): direction from furthest point to c
         point (np.array): chosen point
         gamma (float): squared radius of ball
     
@@ -146,7 +146,6 @@ def Q(c, a, point, gamma) -> float:
         x (float): multiplier for direction to get from point a to the surface of the ball
     """
     alpha = point - c
-    beta = c - a
 
     beta_beta = beta @ beta
     alpha_beta = alpha @ beta
