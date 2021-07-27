@@ -80,7 +80,7 @@ if msg == "y":
             
             if param_types["d"]:
                 n = 10000
-                d = [10 + 10*i for i in range(10)]
+                d = [10 + 10*i for i in range(10) if 10+10*i > 40]
                 eta = 0.9
 
                 if func_name == "relaxation_heuristic":
