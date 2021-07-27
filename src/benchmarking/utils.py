@@ -232,3 +232,42 @@ def confirm_benchmark(types):
     
     confirmed_types = {typ: types[typ] for typ in types if run[typ] == True}
     return confirmed_types
+
+def get_title(func_name, n, d, eta):
+    """
+    Formats a title for plotting
+
+    Input:
+        func_name (str): name of method being benchmarked
+        n, d, eta (list/float): parameters, one of which is a list
+    
+    Return:
+        title (str): formatted title
+    """
+    # find key param being benchmarked
+    params = {"n": n, "d": d, "eta": eta}
+    for param in params:
+        if type(params[param]) == list:
+            key_param = param
+            break
+    
+    # remove key param from params dictionary
+    params = {param: params[param] for param in params if param != key_param}
+
+    # initialise method names
+    func_names = {
+        "relaxation_heuristic": "Relaxation-Based Heuristic",
+        "shrink": "Shrink Heuristic",
+        "shenmaier": "Shenmaier's Approximation"
+    }
+
+    # first part of title
+    title = "Runtime for {0} as a function of {1}, ".format(func_names[func_name], key_param)
+
+    # add each param value
+    for param in params:
+        title += "{0}={1}, ".format(param, params[param])
+    
+    # remove ", " from end of title
+    title = title[:-2]
+    return title

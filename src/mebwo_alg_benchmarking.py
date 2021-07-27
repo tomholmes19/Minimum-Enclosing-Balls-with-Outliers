@@ -68,12 +68,13 @@ if msg == "y":
                     M=M
                 )
 
+                title = benchmarking.utils.get_title(func_name, n, d, eta)
                 benchmarking.utils.plot_times(
                     x_axis=n,
                     times=times,
                     xlabel="n",
-                    ylabel="Time",
-                    title="Runtime for Relaxation-Based Heuristic as a function of n, d={0}, eta={1}".format(d,eta),
+                    ylabel="Time (s)",
+                    title=title,
                     plot=False,
                     filepath=r"{}.png".format(path)
                 )
@@ -101,14 +102,47 @@ if msg == "y":
                     M=M
                 )
 
+                title = benchmarking.utils.get_title(func_name, n, d, eta)
                 benchmarking.utils.plot_times(
                     x_axis=d,
                     times=times,
                     xlabel="d",
-                    ylabel="Time",
-                    title="Runtime for Relaxation-Based Heuristic as a function of d, n={0}, eta={1}".format(n,eta),
+                    ylabel="Time (s)",
+                    title=title,
                     plot=False,
                     filepath=r"{}.png".format(path)
                 )
+            
+            if param_types["eta"]:
+                n = 10000
+                d = 30
+                eta = [0.5+0.1*i for i in range(5)]
 
+                if func_name == "relaxation_heuristic":
+                    M = confirmed_data[data_type]
+                else:
+                    M = None
+
+                times = benchmarking.trials.run_trials_alg(
+                    func=confirmed_funcs[func_name],
+                    n=n,
+                    d=d,
+                    eta=eta,
+                    num_trials=num_trials,
+                    data_type=data_type,
+                    log_file=r"{}.log".format(path),
+                    M=M
+                )
+
+                title = benchmarking.utils.get_title(func_name, n, d, eta)
+                benchmarking.utils.plot_times(
+                    x_axis=d,
+                    times=times,
+                    xlabel="eta",
+                    ylabel="Time (s)",
+                    title=title,
+                    plot=False,
+                    filepath=r"{}.png".format(path)
+                )
+                
     benchmarking.utils.notify()
