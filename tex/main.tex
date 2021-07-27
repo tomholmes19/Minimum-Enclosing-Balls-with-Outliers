@@ -447,6 +447,23 @@ since $\norm{a^i-a^i_\beta}\geq0$. Hence $\norm{c-a^i}\leq r$ for $i=1,\ldots,n$
     \caption{Visual Aid for Proposition \ref{imp heuristic feasibility}}
     \label{vis aid feasibility}
 \end{figure}
+
+\begin{algorithm}\label{dcssh}
+    \KwIn{Data set $\A$, Ball $B(\hat{c},\hat{r})$, scalar $s\geq1$}
+    \KwOut{Center $c\in\mathbb{R}^d$, radius $r\in\mathbb{R}$}
+    $\hat{a}:=\arg\max\norm{\hat{c}-\hat{a}}$\;
+    $\beta:=\hat{c}-\hat{a}$\;
+    $\gamma:=\hat{r}^2$\;
+    \For{$i=1,\ldots,n$}{
+        $\alpha_i:=a^i-\hat{c}$\;
+        $x_i:=Q(\alpha_i, \beta, \gamma)$\;
+    }
+    $x:=\min\left\{x_i: i=1,\ldots,n\right\}$
+    $c:= \hat{c}-\beta x/s$\;
+    $r:=\max_{i=1,\ldots,n}\norm{c-a^i}$
+    \KwRet{$B(c,r)$}
+    \caption{Direction-Constrained Single Step Heuristic}
+\end{algorithm}
 \subsection{Direction-Constrained MEB}
 % =============================================================================
 % Chapter 4
