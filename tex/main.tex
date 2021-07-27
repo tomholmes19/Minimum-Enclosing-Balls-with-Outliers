@@ -247,6 +247,7 @@ The idea of the algorithm is to create a candidate core-set, check if the MEB of
     \caption{Core-Set Algorithm for the MEB Problem \cite{core-sets}}
 \end{algorithm}
 
+Algorithm \ref{core-set algorithm} runs in $O\left(\frac{nd}{\epsilon}+\frac{d^2}{\epsilon^{3/2}}\left(\frac{1}{\epsilon}+d\right)\log\frac{1}{\epsilon}\right)$ time \cite[Page 6]{core-sets}.
 
 \section{Minimum Enclosing Ball with Outliers}
 \subsection{Formulation}
@@ -310,7 +311,7 @@ This method will always return a feasible solution that covers $\eta\%$ of the d
 \begin{algorithm}[H]\label{relaxation heuristic}
     \SetAlgoLined
     \KwIn{Data set $\A=\left\{a^1,\ldots,a^n\right\}$, percentage of data to be covered $\eta\in[0,1]$, error tolerance for MEB heuristic $\epsilon>0$, big $M$ parameter $M>0$}
-    \KwOut{Center $c\in\mathbb{R}^d$, radius $r\in\mathbb{R}$}
+    \KwOut{Ball $B(c,r)$}
      $\xi=\left[\xi_1,\ldots,\xi_n\right]$ relaxed binary variables returned by relaxed MEBwO solver for $\A$, $\eta$, and $M$\;
      Let $\xi'$ be the smallest $k=\floor{\eta\cdot n}$ elements of $\xi$\;
      Let $\A':=\left\{a^i\in\A: \xi_i\in\xi',\ i=1,\ldots,n\right\}$\;
@@ -325,7 +326,7 @@ This heuristic works by simply computing an initial MEB $B(c,r)$ using a heurist
 \begin{algorithm}[H]\label{shrink}
     \SetAlgoLined
     \KwIn{Data set $\A$, $\eta\in[0,1]$, $\epsilon>0$}
-    \KwOut{Center $c\in\mathbb{R}^d$, radius $r\in\mathbb{R}$}
+    \KwOut{Ball $B(c,r)$}
     Let $c$ be the center of the MEB returned by a heuristic for $\MEB(\A)$\;
     $D:=\left\{\norm{c-x}: x\in\A\right\}$\;
     Let $D'$ be $D$ sorted in ascending order\;
@@ -337,29 +338,39 @@ This heuristic works by simply computing an initial MEB $B(c,r)$ using a heurist
     \caption{Shrinking Heurstic}
 \end{algorithm}
 \subsection{Shenmaier's Approximation}
+\subsubsection{Statement}
 This approximation scheme developed by Vladimir Shenmaier in \cite[Algorithm 1]{SHENMAIER201581} is a brute-force algorithm to solving the MEBwO problem with $O(n^2d)$ time complexity. It works by considering each point in the input set, finding the $k$-closest points to that point, then returning the point-distance pair such that the maximum distance from each point to each other point in its $k$-closest points is minimised. See Algorithm \ref{shenmaier} for a detailed outline of this algorithm.
 \begin{algorithm}\label{shenmaier}
     \KwIn{Data set $\A$, $\eta\in[0,1]$}
-    \KwOut{Center $c\in\mathbb{R}^d$, radius $r\in\mathbb{R}$}
+    \KwOut{Ball $B(c,r)$}
     \For{$i=1,\ldots,n$}{
-        $D:=\left\{\norm{c-x}: x\in\A\right\}$\;
+        $D:=\left\{\norm{c-a}: a\in\A\right\}$\;
         Let $D'$ be $D$ sorted in ascending order\;
         Let $\delta_i$ be the $(k-1)$th element of $D'$ (indexing from 0)\;
     }
-    $i^* := \arg\min_{i=1,\ldots,n}$\;
+    $i^* := \arg\min_{i=1,\ldots,n}\delta_i$\;
     $c := a^{i^*}$\;
     $r := \delta_{i^*}$\;
     \KwRet{$B(c,r)$}\;
     
     \caption{Shenmaier's Approximation \cite[Algorithm 1]{SHENMAIER201581}}
 \end{algorithm}
+\subsubsection{Approximation Guarantee}
+ From \cite[Theorem 4]{SHENMAIER201581} we know that Algorithm \ref{shenmaier} returns a 2-approximation solution to the MEBwO problem. What this means is that if we have a minimum radius of $r$ returned by Algorithm \ref{shenmaier} for a data set $\A$, then the true optimal value to the MEBwO problem on that data is no less than $r/2$. This is useful for assessing how close a heuristic is to an optimal solution in the worst case when we have a solution via Algorithm \ref{shenmaier}, but not an optimal solution via solving the exact model.
+
+\subsubsection{Complexity}
+Referring to Algorithm \ref{shenmaier}, on lines 1 through 4 we have a \texttt{for} loop which runs $n$ many times, and on line 2 we compute a list of $n$ many distances, which for $d$-dimensional vectors runs in $O(nd)$ time. Line 3 involves sorting the aforementioned list, so the time complexity depends on the sorting algorithm used. It is well known within computer science that algorithms are often subject to a time-memory trade off, meaning that it is possible to design algorithms that run faster as a result of using less memory, and vice-versa. We can then assume that a sensible implementation of Algorithm \ref{shenmaier} would use the fastest available sorting algorithm given that the size of our data sets are small enough that we do not run into memory constraints, so the recommended sorting algorithm is Quicksort \cite{hoare1962quicksort} which runs on average in $O(n\log n)$ time. Line 4 simply accesses the $(k-1)$th element of the sorted list and so runs in $O(1)$ time.
+
+Line 5 finds the minimum element from a set of values and runs in $O(n)$ time. Lines 6 and 7 are simple assignments and run in $O(1)$ time. Finally, our overall time complexity is then $O(n^2(d+\log n))$. This will usually reduce to $O(n^2d)$ as typically $d>\log n$, though for particularly large $n$ and very small $d$ the alternative reduction of $O(n^2\log n)$ is of course possible.
 \section{Improvement Heuristics}
 We now consider some improvement heuristics. The two heuristics described here are, strictly speaking, designed to improve an existing MEB rather than an MEBwO. However, quick and effective methods exist for solving the MEB problem and so improvement heuristics have not been needed, while heuristics which solve the MEBwO problem may return a solution which has considerable space for improvement.
 
 The two improvement heuristics work in a similar way, by considering an improving direction in which moving the centre of the MEB in that direction while keeping the same radius retains a feasible solution, then shrinking the radius to the furthest point from the new centre. The Direction-Constrained Single Step Heuristic (DCSSH) works by pure geometric reasoning to find a new centre, while the Direction-Constrained MEB (DCMEB) uses an optimization solver such as Gurobi to find an optimal step in the improving direction to minimize the radius of the new ball.
 
 The inspiration for these heuristics comes from Shenmaier's Approximation, which returns a ball with some centre $c\in\A$. Our assumption is that a better solution exists in a local neighbourhood around $c$, i.e. we find a new centre that does not have to lie on a point in $\A$.
+
 \subsection{Direction-Constrained Single Step Heuristic}
+\subsubsection{Derivation}
 For a visual aid to this derivation please refer to Figure \ref{vis aid derivation}. Consider $B(\hat{c}, r) = \MEB(\A)$. To find an improving direction we choose the furthest point from $c$, $\hat{a}=\arg\max_{a\in\A}\norm{c-a}$, then the (negative) improving direction is defined to be $\beta=\hat{c}-\hat{a}$. We choose the direction $\hat{a}\to\hat{c}$ as opposed to $\hat{c}\to\hat{a}$ in order to simplify later derivations.
 
 Now that we have a direction $\beta$, we can move the initial ball in this direction by simply subtracting $\beta x$ from $\hat{c}$ where $x\in\mathbb{R}^{\geq0}$ is some scalar, i.e. our new centre is $c=\hat{c}-\beta x$. We would like to choose $x$ such that the new ball remains feasible by ensuring that $\norm{c-a^i}\leq r$ for $i=1,\ldots,n$, and we can do this by considering the distance from each $a^i$ in the direction of $\beta$ to the surface of the initial ball and choose $x$ such that each of these distances is greater than $\norm{\beta x}$.
@@ -367,7 +378,7 @@ Now that we have a direction $\beta$, we can move the initial ball in this direc
 More formally, for each $a^i\in\A$ let $x_i$ be the scalar such that $a^i+\beta x_i$ lies on the surface of the initial ball, i.e. $\norm{(a^i+\beta x^i)-\hat{c}}=r$. Again, to simplify derivations, denote the direction $\hat{c}\to a^i$ by $\alpha_i=a^i-\hat{c}$. To calculate each $x_i$, we square this equation and set $\gamma=r^2$ to get
 \begin{align*}
     \alpha_i^T\alpha_i + 2x\alpha_i^T\beta + x^2\beta^T\beta &= \gamma \\
-    \implies \beta^T\beta x + 2x\alpha_i^T\beta + \alpha_i^T\alpha_i - \gamma &= 0.
+    \implies \beta^T\beta x^2 + 2\alpha_i^T\beta x + \alpha_i^T\alpha_i - \gamma &= 0.
 \end{align*}
 Using the quadratic formula we then have
 \begin{align*}
@@ -380,14 +391,14 @@ The two solutions to $x$ corresponding to the positive and negative discriminant
 \end{equation*}
 
 
-Then let $x=\min\left\{Q(\alpha_i, \beta, \gamma):i=1,\ldots,n\right\}$, so $\norm{\beta x}$ is the smallest distance from each $a^i$ to the surface of the ball in the direction of $\beta$. Finally, by moving by some scalar multiple of $-\beta x$ from $\hat{c}$, we get a new feasible centre $c=\hat{c}-\beta x/s$ for some scalar $s\geq1$. We give a simple proof that this new centre with unchanged radius indeed yields a feasible solution and a visual aid is provided in Figure \ref{vis aid feasibility}.
+Then let $x=\min\left\{Q(\alpha_i, \beta, \gamma):i=1,\ldots,n\right\}$, so $\norm{\beta x}$ is the smallest distance from each $a^i$ to the surface of the ball in the direction of $\beta$. Finally, by moving by some scalar multiple of $-\beta x$ from $\hat{c}$, we get a new feasible centre $c=\hat{c}-\beta x/s$ for some scalar $s\geq1$. We give a simple proof that this new centre with unchanged radius indeed yields a feasible solution and a visual aid is provided in Figure \ref{vis aid feasibility}. See Algorithm \ref{fig:dcssh} for a detailed outline of this algorithm.
 
 \begin{figure}
     \centering
     \begin{tikzpicture}
         % lines
         \draw[->, color=magenta] (-3,0) -- (-0.05,0) node[midway, below]{$\beta$};
-        \draw[->, color=cyan] (0,0) -- (59/60,59/40) node[midway, below right]{$\alpha$};
+        \draw[->, color=cyan] (0,0) -- (59/60,59/40) node[midway, below right]{$\alpha_i$};
         \draw[dashed] (1,1.5) -- (2.598, 1.5) node[midway, below]{$\norm{\beta}{x}$};
         
         % points
@@ -417,6 +428,23 @@ For each $a^i\in\A$ let $\hat{a}^i_\beta$ be the point on the surface of $B(\hat
 \end{align*}
 since $\norm{a^i-a^i_\beta}\geq0$. Hence $\norm{c-a^i}\leq r$ for $i=1,\ldots,n$ and so $B(c, r)$ is feasible for $(P$).
 \end{proof}
+
+\begin{algorithm}[H]\label{fig:dcssh}
+    \KwIn{Data set $\A$, Ball $B(\hat{c},\hat{r})$, scalar $s\geq1$}
+    \KwOut{Ball $B(c,r)$}
+    $\hat{a}:=\arg\max_{a\in\A}\norm{\hat{c}-a}$\;
+    $\beta:=\hat{c}-\hat{a}$\;
+    $\gamma:=\hat{r}^2$\;
+    \For{$i=1,\ldots,n$}{
+        $\alpha_i:=a^i-\hat{c}$\;
+        $x_i:=Q(\alpha_i, \beta, \gamma)$\;
+    }
+    $x:=\min\left\{x_i: i=1,\ldots,n\right\}$\;
+    $c:= \hat{c}-\beta x/s$\;
+    $r:=\max_{i=1,\ldots,n}\norm{c-a^i}$\;
+    \KwRet{$B(c,r)$}\;
+    \caption{Direction-Constrained Single Step Heuristic}
+\end{algorithm}
 \begin{figure}
     \centering
     \begin{tikzpicture}
@@ -447,24 +475,60 @@ since $\norm{a^i-a^i_\beta}\geq0$. Hence $\norm{c-a^i}\leq r$ for $i=1,\ldots,n$
     \caption{Visual Aid for Proposition \ref{imp heuristic feasibility}}
     \label{vis aid feasibility}
 \end{figure}
+\subsubsection{Complexity}
 
-\begin{algorithm}\label{dcssh}
-    \KwIn{Data set $\A$, Ball $B(\hat{c},\hat{r})$, scalar $s\geq1$}
-    \KwOut{Center $c\in\mathbb{R}^d$, radius $r\in\mathbb{R}$}
-    $\hat{a}:=\arg\max\norm{\hat{c}-\hat{a}}$\;
-    $\beta:=\hat{c}-\hat{a}$\;
-    $\gamma:=\hat{r}^2$\;
-    \For{$i=1,\ldots,n$}{
-        $\alpha_i:=a^i-\hat{c}$\;
-        $x_i:=Q(\alpha_i, \beta, \gamma)$\;
-    }
-    $x:=\min\left\{x_i: i=1,\ldots,n\right\}$
-    $c:= \hat{c}-\beta x/s$\;
-    $r:=\max_{i=1,\ldots,n}\norm{c-a^i}$
-    \KwRet{$B(c,r)$}
-    \caption{Direction-Constrained Single Step Heuristic}
+The complexity of the DCSSH is easy to determine. Referring to Algorithm \ref{fig:dcssh}, on line 1 we have a loop over each data point which runs in $O(n)$ time. On lines 4 through 6 we have a \texttt{for} loop which runs $n$ many times, with the operations on lines 5 and 6 both being $O(d)$ as they are each single operations on $d$-dimensional vectors, so overall this loop runs in $O(nd)$ time. On lines 7 and 8 we find the minimum and maximum of two lists respectively, again $O(n)$. Finally, on line 8, a single operation on $d$-dimensional vectors runs in $O(d)$ time. Our dominating term is then $O(nd)$.
+\subsection{Direction-Constrained MEB Heuristic}
+For a visual aid to this derivation please refer to Figure \ref{fig:dcmeb}. Consider $B(\hat{c},\hat{r})$. Similarly to the DCSSH, for an improving direction we choose the furthest point in $\A$ from $\hat{c}$, $\hat{a}=\arg\max_{a\in\A}\norm{\hat{c}-a}$, and let $\beta=\hat{a}-\hat{c}$ be this direction. Note that this is the negative of $\beta$ used in the derivation of the DCSSH, as we are now considering the direction $\hat{c}\to\hat{a}$. Now, instead of calculating distances between each point in data and the surface of the ball to find a feasible step length from $\hat{c}$ towards $\hat{a}$, we formulate an optimization model to find an optimal step length such that the new ball still contains all data, but has a smaller radius.
+
+We modify the optimization model for the MEB problem, adding the constraint that $c$ must lie on the direction $\beta$ from $\hat{c}$. It is possible to formulate this exactly using the constraint $c=x(\hat{c}+\beta)$, however a better formulation is to consider a variable $x\in\mathbb{R}^{\geq0}$, then write $c=\hat{c}+\beta x$. Obviously $\hat{c}$ is a constant vector so this reduces the problem of finding the new $c$ to that of finding the optimal solution to one variable $x$, as opposed to $d$ many decision variables for each element of the vector $c$. The optimization model for the DBMEB problem is as follows:
+\begin{center}
+    \begin{tabular}{CCC}
+        \displaystyle\min_{x,r} & r \\
+        \text{s.t.} & \norm{\hat{c}+\beta x - a^i} \leq r & i=1,\ldots,n \\
+        & x\geq0
+    \end{tabular}
+\end{center}
+
+By setting $\gamma=r^2$, $\alpha^i=\hat{c}-a^i$ for $i=1,\ldots,n$, and squaring the norm constraints, we get the following quadratic model:
+\begin{center}
+    \begin{tabular}{CCC}
+        \displaystyle\min_{x,\gamma} & \gamma \\
+        \text{s.t.} & \beta^T\beta x^2 + 2\alpha_i^T\beta x + \alpha_i^T\alpha_i \leq \gamma & i=1,\ldots,n \\
+        & x\geq0
+    \end{tabular}
+\end{center}
+
+This model has $n+1$ constraints and most crucially, 2 decision variables. This makes the model extremely computationally easy to solve by modern solvers such as Gurobi. The DCMEB heuristic is then to simply solve the DCMEB, given a data set $\A$ and initial ball $B(\hat{c},\hat{r}$, using the solutions of the solved DCMEB problem for the new ball.
+
+\begin{algorithm}
+    \KwIn{Data set $\A$, Ball $B(\hat{c},\hat{r}$)}
+    \KwOut{Ball $B(c,r)$}
+    $\hat{a}:=\arg\max_{a\in\A}\norm{\hat{c}-a}$\;
+    Let $x$, $r$ be the solutions returned by solver for the DCMEB problem for $B(\hat{c},\hat{r}$\;
+    $c:=c+x(\hat{a}-\hat{c})$\;
+    \KwRet{$B(c,r)$}\;
+    \caption{Direction-Constrained MEB Heuristic}
 \end{algorithm}
-\subsection{Direction-Constrained MEB}
+
+\begin{figure}
+    \centering
+    \begin{tikzpicture}
+        % lines
+        \draw[->, color=magenta] (0,0) -- (-2.95,0) node[pos=0.6666, above]{$\beta$};
+        \draw[dashed] (-1,0) -- (1.598, 1.5) node[midway, above left]{$\norm{\hat{c}+\beta x - a^i}$};
+        % points
+        \draw[fill] (0,0) circle (1.5pt) node[below]{$\hat{c}$};
+        \draw[fill] (-3,0) circle (1.5pt) node[left]{$\hat{a}$};
+        \draw[fill] (1.598, 1.5) circle (1.5pt) node[above]{$a^i$};
+        \draw[fill] (-1,0) circle(1.5pt) node[below]{$\hat{c}+\beta x$};
+        
+        % ball
+        \draw (0,0) circle (3);
+    \end{tikzpicture}
+    \caption{Visual Aid for Direction-Constrained MEB}
+    \label{fig:dcmeb}
+\end{figure}
 % =============================================================================
 % Chapter 4
 % =============================================================================
