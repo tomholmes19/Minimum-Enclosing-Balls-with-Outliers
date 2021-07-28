@@ -71,7 +71,7 @@ def alg__shrink_avg(data, eta, **kwargs):
     n = len(data)
     k = int(np.floor(eta*n))
     c = geometry.mean_vector(data)
-    r = geometry.k_closest(data, c, k)
+    _, r = geometry.k_closest(data, c, k)
     return c, r, None
 
 def alg__shenmaier(data, eta, **kwargs):
