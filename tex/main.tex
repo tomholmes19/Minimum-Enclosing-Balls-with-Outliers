@@ -12,6 +12,7 @@
 \usepackage[ruled,vlined,linesnumbered]{algorithm2e}
 \usepackage{mathtools}
 \usepackage{tikz}
+\usepackage{mathrsfs} %% mathscr for powerset
 
 %TC:ignore
 \newcolumntype{C}{>{$}c<{$}}    % math-mode version of "l" column type
@@ -19,8 +20,9 @@
 %TC:endignore
 
 \newcommand{\A}{\mathcal{A}} %% I am lazy
-\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
-\newcommand{\binary}{\left\{0,1\right\}}
+\newcommand{\K}{\mathcal{K}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert} % norm
+\newcommand{\binary}{\left\{0,1\right\}} % lazy
 
 \DeclareMathOperator{\MEB}{MEB}
 \DeclareMathOperator{\MEBwO}{MEBwO}
@@ -29,6 +31,11 @@
 \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 
 \theoremstyle{definition}
+
+\usetikzlibrary{shapes.misc} % crosses
+\tikzset{cross/.style={cross out, draw=black, minimum size=2*(#1-\pgflinewidth), inner sep=0pt, outer sep=0pt},
+%default radius will be 1pt. 
+cross/.default={2pt}}
 % ==== Mine^
 
 \geometry{a4paper,left=2cm,right=2.0cm, top=2cm, bottom=2.0cm}
@@ -155,66 +162,102 @@ Here come your acknowledgments ...
 In this paper we shall denote our data set of finite vectors as $\mathcal{A} = \left\{a^1,\ldots,a^n\right\}\subseteq\mathbb{R}^d$ for $n,d\in\mathbb{N}$. The center of a ball is represented by a vector $c\in\mathbb{R}^d$, the radius a scalar $r\in\mathbb{R}$, and the squared radius $\gamma=r^2$. We denote the percentage of inliers for a minimum enclosing ball with outliers by $\eta\in(0,1]$, i.e. if $\eta=0.9$ then we seek a ball which covers $90\%$ of our data.
 
 \begin{definition}
-Let $c\in\mathbb{R}^n$ and $r\in\mathbb{R}$. Then the \textit{ball} with center $c$ and radius $r$ is the set
-\begin{equation*}
-    B(c;r) = \left\{x\in\mathbb{R}^n : \norm{x-c} \leq r\right\}
-\end{equation*}
-where $\norm{\cdot}:L\to\mathbb{R}$ denotes the standard Euclidean norm on a vector space $L$ (in this paper, $L=\mathbb{R}^n$).
+    Let $c\in\mathbb{R}^n$ and $r\in\mathbb{R}$. Then the \textit{ball} with center $c$ and radius $r$ is the set
+    \begin{equation*}
+        B(c;r) = \left\{x\in\mathbb{R}^n : \norm{x-c} \leq r\right\}
+    \end{equation*}
+    where $\norm{\cdot}:L\to\mathbb{R}$ denotes the standard Euclidean norm on a vector space $L$ (in this paper, $L=\mathbb{R}^n$).
 \end{definition}
 
 \begin{definition}
-The \textit{minimum enclosing ball} of $\A$, denoted by $\MEB(\A)$, is the ball $B(c^*,r^*)$ where $\A\subseteq B(c^*,r^*)$ and if any $B(c,r)$ exists such that $\mathcal{A}\subseteq B(c,r)$ then $r^*\leq r$.
+    The \textit{minimum enclosing ball} of $\A$, denoted by $\MEB(\A)$, is the ball $B(c^*,r^*)$ where $\A\subseteq B(c^*,r^*)$ and if any $B(c,r)$ exists such that $\mathcal{A}\subseteq B(c,r)$ then $r^*\leq r$.
 \end{definition}
 
-\begin{theorem}
-For a given set $\A$, $\MEB(\A)$ exists and is unique.
+\begin{theorem}\label{thm:unique}
+    For a given set $\A$, $\MEB(\A)$ exists and is unique.
 \end{theorem}
 \begin{proof}
-See \cite[page 5]{two-algorithms}.
+    See \cite[page 5]{two-algorithms}.
 \end{proof}
 
 \begin{proposition}\label{adding data}
-Let $a'\in\mathbb{R}^n$ where $a'\notin\A$. Suppose $B(c,r)=\MEB(\A)$ and $B(c',r')=\MEB(\A\cap\left\{a'\right\})$. Then $r\leq r'$.
+    Let $a'\in\mathbb{R}^n$ where $a'\notin\A$. Suppose $B(c,r)=\MEB(\A)$ and $B(c',r')=\MEB(\A\cap\left\{a'\right\})$. Then $r\leq r'$.
 \end{proposition}
 \begin{proof}
-Clearly we have $\A\subseteq\A\cap\left\{a'\right\}$, then since $\A\cap\left\{a'\right\}\subseteq B(c',r')$ we have $\mathcal{A}\subseteq B(c',r')$ by transitivity. Thus $r\leq r'$ with equality only if $a'\in B(c,r)$ by uniqueness.
+    Clearly we have $\A\subseteq\A\cap\left\{a'\right\}$, then since $\A\cap\left\{a'\right\}\subseteq B(c',r')$ we have $\mathcal{A}\subseteq B(c',r')$ by transitivity. Thus $r\leq r'$ with equality only if $a'\in B(c,r)$ by uniqueness.
 \end{proof}
 
 \begin{proposition}\label{removing data}
-Suppose $a'\in\A$. Let $B(c,r)=\MEB(\A)$, $B(c',r')=\MEB(\A\setminus\left\{a'\right\})$. Then $r'\leq r$.
+    Suppose $a'\in\A$. Let $B(c,r)=\MEB(\A)$, $B(c',r')=\MEB(\A\setminus\left\{a'\right\})$. Then $r'\leq r$.
 \end{proposition}
 \begin{proof}
-Clearly we have $\A\setminus\left\{a'\right\}\subseteq\A$ then since $\A\setminus\left\{a'\right\}\subseteq B(c',r')$ and $\A\setminus\left\{a'\right\}\subseteq B(c,r)$ we have $r'\leq r$ since $B(c',r')$ is the MEB for $\A\setminus\left\{a'\right\}$, with equality only if $\MEB(\A\setminus\left\{a'\right\} = \MEB(\A)$ by uniqueness.
+    Clearly we have $\A\setminus\left\{a'\right\}\subseteq\A$ then since $\A\setminus\left\{a'\right\}\subseteq B(c',r')$ and $\A\setminus\left\{a'\right\}\subseteq B(c,r)$ we have $r'\leq r$ since $B(c',r')$ is the MEB for $\A\setminus\left\{a'\right\}$, with equality only if $\MEB(\A\setminus\left\{a'\right\} = \MEB(\A)$ by uniqueness.
 \end{proof}
 \begin{remark}
-The prior two propositions tell us that when we add data to a set, the resulting MEB is either unchanged or bigger. Conversely, when we remove data from a set, the resulting MEB is either unchanged or smaller.
+    The prior two propositions tell us that when we add data to a set, the resulting MEB is either unchanged or bigger. Conversely, when we remove data from a set, the resulting MEB is either unchanged or smaller.
 \end{remark}
 
 \begin{definition}[{{\cite[page 2]{core-sets}}}]
-Let $r^*$ be the radius of $\MEB(\A)$. A ball $B(c;(1+\epsilon)r)$ is a \textit{$(1+\epsilon)$-approximation} of $\MEB(\A)$ if $r\leq r^*$ and $\mathcal{A}\subseteq B(c;(1+\epsilon)r)$.
+    Let $r^*$ be the radius of $\MEB(\A)$. A ball $B(c;(1+\epsilon)r)$ is a \textit{$(1+\epsilon)$-approximation} of $\MEB(\A)$ if $r\leq r^*$ and $\mathcal{A}\subseteq B(c,(1+\epsilon)r)$.
 \end{definition}
 
+\begin{definition}
+    For a set $\A$, the set of $k$-subsets of $\A$ is the set $\mathfrak{K}=\left\{\K\subseteq \mathscr{P}(\A): |\K|=k\right\}$ where $\mathcal{P}:\textbf{Set}\to\textbf{Set}$ is the usual power set functor.
+\end{definition}
 
+\begin{definition}
+    For some $\eta\in[0,1]$, let $k=\floor{n(1-\eta)}$ be the number of outliers in $\A$. Then the \textit{minimum enclosing ball with outliers} of $\A$, denoted by $\MEBwO(\A,\eta)$, which covers $\eta\%$ of $\A$, is the ball $B(c^*,r^*)=\MEB(\K^*)$ for $\K^*\in\mathfrak{K}$ a $k$-subset of $\A$ where for all other $k$-subsets $\K\in\mathfrak{K}$, $\K\neq\K^*$, if $B(c,r)=\MEB(\K)$ then $r^*\leq r$.
+\end{definition}
+
+We may deduce that for a given data set $\A$, an MEBwO exists since an MEBwO is simply the MEB of some $k$-subset of $\A$, which by Theorem \ref{thm:unique} exists and is unique for that $k$-subset. However, MEBwO's are not unique. 
+
+For a simple example, consider the data set $\A=\left\{(-2,-1),(2,-1),(2,1),(-2,1)\right\}$ with $\eta=\frac{1}{2}$. Then $B((-2,0),1)$ and $B((2,0),1)$ are both MEBwO's for $\A$, and MEB's for the $2$-subsets $\left\{(-2,-1), (-2,1)\right\}$, $\left\{(2,-1), (2,1)\right\}$ of $\A$ respectively. See Figure \ref{fig:mebwo non-unique} for a visualisation of this example.
+
+\begin{figure}
+    \centering
+    \begin{tikzpicture}
+        % axes
+        \draw[<->] (0, -2.5) -- (0,2.5);
+        \draw[<->] (-3.5, 0) -- (3.5, 0);
+        
+        % points
+        \foreach \coord in {(-2,-1), (2,-1)}{
+            \draw[fill] \coord circle (1.5pt) node[below]{\coord};
+        }
+        \foreach \coord in {(2,1), (-2,1)}{
+            \draw[fill] \coord circle (1.5pt) node[above]{\coord};
+        }
+        
+        % balls
+        \foreach \coord in {(-2,0), (2,0)}{
+            \draw \coord circle (1);
+            \draw \coord node[cross, red]{};
+        }
+        
+    \end{tikzpicture}
+    \caption{Example of MEBwO non-uniqueness}
+    \label{fig:mebwo non-unique}
+\end{figure}
 
 \section{Minimum Enclosing Ball}
 \begin{definition}\label{meb}
-The optimization model formulation of the Minimum Enclosing Ball (MEB) problem is as follows:
-\begin{center}
-    \begin{tabular}{CCC}
-        \displaystyle\min_{c,r} & r \\
-        \text{s.t.} & \norm{c-a^i} \leq r & i=1,\ldots,n
-    \end{tabular}
-\end{center}
-where $c\in\mathbb{R}^d$ and $r\in\mathbb{R}$ are the decision variables corresponding to the center and radius of the ball respectively.
-
-As detailed in \cite{two-algorithms}, the MEB problem can be transformed to a convex quadratic problem (QP) by squaring the constraints and defining a new decision variable $\gamma=r^2$:
-
-\begin{center}
-    \begin{tabular}{CLC}
-        \displaystyle\min_{c,\gamma} & \gamma \\
-        \text{s.t.} & \left(a^i\right)^Ta^i - 2\left(a^i\right)^Tc + c^Tc \leq \gamma & i=1,\ldots,n
-    \end{tabular}
-\end{center}
+    The optimization model formulation of the Minimum Enclosing Ball (MEB) problem is as follows:
+    \begin{center}
+        \begin{tabular}{CCC}
+            \displaystyle\min_{c,r} & r \\
+            \text{s.t.} & \norm{c-a^i} \leq r & i=1,\ldots,n
+        \end{tabular}
+    \end{center}
+    where $c\in\mathbb{R}^d$ and $r\in\mathbb{R}$ are the decision variables corresponding to the center and radius of the ball respectively.
+    
+    As detailed in \cite{two-algorithms}, the MEB problem can be transformed to a convex quadratic problem (QP) by squaring the constraints and defining a new decision variable $\gamma=r^2$:
+    
+    \begin{center}
+        \begin{tabular}{CLC}
+            \displaystyle\min_{c,\gamma} & \gamma \\
+            \text{s.t.} & \left(a^i\right)^Ta^i - 2\left(a^i\right)^Tc + c^Tc \leq \gamma & i=1,\ldots,n
+        \end{tabular}
+    \end{center}
 \end{definition}
 This problem has $d+1$ variables and $n$ constraints, which can make it slow to find an optimal solution by using a solver such as Xpress or Gurobi, but many alternative approaches are present in the literature which offer very fast solutions within a guaranteed accuracy (\cite{core-sets}, \cite{two-algorithms}).
 
@@ -252,30 +295,30 @@ Algorithm \ref{core-set algorithm} runs in $O\left(\frac{nd}{\epsilon}+\frac{d^2
 \section{Minimum Enclosing Ball with Outliers}
 \subsection{Formulation}
 \begin{definition}\label{mebwo}
-We may extend Definition \ref{meb} to the Minimum Enclosing Ball with Outliers (MEBwO) problem as follows:
-\begin{center}
-    \begin{tabular}{CCC}
-         \displaystyle\min_{c,r,\xi} & r \\
-         \text{s.t.} & \norm{c-a^i} \leq r + M\xi_i & i=1,\ldots,n \\
-         & \displaystyle\sum_{i=1}^n\xi_i \leq k \\
-         & \xi_i \in \binary & i=1,\ldots,n
-    \end{tabular}
-\end{center}
-
-where $\xi_i$ are binary variables corresponding to the distance constraint on each variable, with $M\in\mathbb{R}$ a sufficiently large scalar. One can interpret this as, if $\xi_i=1$ for some $i\in\left\{1,\ldots,n\right\}$, then $a_i$ does not need to be inside the ball. The constraint $\sum_{i=1}^n\xi_i\leq k$ where $k=\eta\cdot n$ ensures that $\eta\%$ of the data is covered.
-
-We can instead extend the quadratic program in Definition \ref{meb} to get the following mixed integer quadratic program formulation:
-\begin{center}
-    \begin{tabular}{CLC}
-        \displaystyle\min_{c,\gamma, \xi} & \gamma \\
-        \text{s.t.} & \left(a^i\right)^Ta^i - 2\left(a^i\right)^Tc + c^Tc \leq \gamma + M\xi_i & i=1,\ldots,n \\
-        & \displaystyle\sum_{i=1}^n\xi_i \leq k \\
-        & \xi_i \in \binary & i=1,\ldots,n
-    \end{tabular}
-\end{center}
+    We may extend Definition \ref{meb} to the Minimum Enclosing Ball with Outliers (MEBwO) problem as follows:
+    \begin{center}
+        \begin{tabular}{CCC}
+             \displaystyle\min_{c,r,\xi} & r \\
+             \text{s.t.} & \norm{c-a^i} \leq r + M\xi_i & i=1,\ldots,n \\
+             & \displaystyle\sum_{i=1}^n\xi_i \leq k \\
+             & \xi_i \in \binary & i=1,\ldots,n
+        \end{tabular}
+    \end{center}
+    
+    where $\xi_i$ are binary variables corresponding to the distance constraint on each variable, with $M\in\mathbb{R}$ a sufficiently large scalar. One can interpret this as, if $\xi_i=1$ for some $i\in\left\{1,\ldots,n\right\}$, then $a_i$ does not need to be inside the ball. The constraint $\sum_{i=1}^n\xi_i\leq k$ where $k=\floor{n(1-\eta)}$ ensures that $\eta\%$ of the data is covered.
+    
+    We can instead extend the quadratic program in Definition \ref{meb} to get the following mixed integer quadratic program formulation:
+    \begin{center}
+        \begin{tabular}{CLC}
+            \displaystyle\min_{c,\gamma, \xi} & \gamma \\
+            \text{s.t.} & \left(a^i\right)^Ta^i - 2\left(a^i\right)^Tc + c^Tc \leq \gamma + M\xi_i & i=1,\ldots,n \\
+            & \displaystyle\sum_{i=1}^n\xi_i \leq k \\
+            & \xi_i \in \binary & i=1,\ldots,n
+        \end{tabular}
+    \end{center}
 \end{definition}
 \begin{remark}
-One may note that when we relax $\xi_i$ to be continuous variables, i.e. $0\leq\xi_i\leq1$ for $i=1,\ldots,n$, we have again a convex quadratic program since we have then added only continuous variables and linear constraints to the base quadratic program.
+    One may note that when we relax $\xi_i$ to be continuous variables, i.e. $0\leq\xi_i\leq1$ for $i=1,\ldots,n$, we have again a convex quadratic program since we have then added only continuous variables and linear constraints to the base quadratic program.
 \end{remark}
 
 This model gives us a way to solve the MEBwO problem optimally for a given data set. However, by examining the structure of this model we can expect the solution times to be unreasonable for any meaningfully large instance. Note that, of $n$ many binary variables $\xi_i$, we can choose up to $k\leq n$ many of them to have a value of 1, though by Proposition \ref{removing data} we know that removing data gives us an MEB with potentially lower radius, meaning we will always pick the highest possible number of points ($k$ many) to be excluded. Thus, by a total brute force search we may expect to explore $\binom{n}{k}$ many individual MEB problems. Modern optimization solvers will work more efficiently than this, utilizing techniques such as branch-and-bound (first proposed by \cite{bnb}). Regardless, we expect a very large solution space which leads to exponentially larger solution times as we will see in Section \ref{exact benchmarks}.
@@ -306,7 +349,7 @@ In this chapter we propose some non-exact construction methods to solving the ME
 \subsection{Relaxation-Based Heuristic}
 This heuristic works by first solving the relaxed QP formulation for the MEBwO problem in Definition \ref{mebwo}, and then making the assumption that a higher value of $\xi_i$ (i.e. closer to 1) means that the model treats the data point $a^i$ as ``more" of an outlier. From this assumption, we pick the largest $k$ values of $xi_i$ and treat each corresponding $a^i$ as an outlier, therefore treating the remaining data as inliers. We then solve the MEB problem for this remaining data. A more formal outline of this algorithm is detailed in Algorithm \ref{relaxation heuristic}.
 
-This method will always return a feasible solution that covers $\eta\%$ of the data as we will always remove $k=n(1-\eta)$ many points. As discussed in the previous chapter, solving the final MEB problem is relatively easy and selecting outliers using the MEBwO QP relaxation is trivial, but the difficulty lays in solving the initial QP relaxation, and as such a heuristic method which can solve this model quickly and return approximate solutions to each $xi_i$ is a valuable direction for further research in order to speed up this method.
+This method will always return a feasible solution that covers $\eta\%$ of the data as we will always remove $k=\floor{n(1-\eta)}$ many points. As discussed in the previous chapter, solving the final MEB problem is relatively easy and selecting outliers using the MEBwO QP relaxation is trivial, but the difficulty lays in solving the initial QP relaxation, and as such a heuristic method which can solve this model quickly and return approximate solutions to each $xi_i$ is a valuable direction for further research in order to speed up this method.
 
 \begin{algorithm}[H]\label{relaxation heuristic}
     \SetAlgoLined
@@ -320,13 +363,17 @@ This method will always return a feasible solution that covers $\eta\%$ of the d
      
     \caption{Relaxation-Based Heuristic}
 \end{algorithm}
-\subsection{Shrinking Heuristic}
-This heuristic works by simply computing an initial MEB $B(c,r)$ using a heuristic such as Algorithm \ref{core-set algorithm}, then computing the $k$ closest points and returning the ball $B(c,r')$ where $r'$ is the maximum distance from $c$ to each of the $k$ closest points. See Algorithm \ref{shrink} for a detailed outline of this algorithm.
+\subsection{Shrinking Heuristics}
+These heuristics work by computing a candidate centre for the ball, then computing the $k$ closest points and returning the ball $B(c,r)$ where $r$ is the maximum distance from $c$ to each of the $k$ closest points.
 
-\begin{algorithm}[H]\label{shrink}
+\subsubsection{MEB Shrinking Heuristic}
+Our first shrinking heuristic finds a candidate centre by first computing $\MEB(\A)=B(c,r')$, then finding the $k$ closest points and returning the ball $B(c,r)$ as described above.
+
+\begin{algorithm}[H]\label{meb shrink}
     \SetAlgoLined
     \KwIn{Data set $\A$, $\eta\in[0,1]$, $\epsilon>0$}
     \KwOut{Ball $B(c,r)$}
+    $k:=\floor{n(1-\eta)}$\;
     Let $c$ be the center of the MEB returned by a heuristic for $\MEB(\A)$\;
     $D:=\left\{\norm{c-x}: x\in\A\right\}$\;
     Let $D'$ be $D$ sorted in ascending order\;
@@ -335,7 +382,25 @@ This heuristic works by simply computing an initial MEB $B(c,r)$ using a heurist
     $r = \max_{a\in\A'}\norm{c-a}$\;
     \KwRet $B(c,r)$\;
     
-    \caption{Shrinking Heurstic}
+    \caption{MEB Shrinking Heuristic}
+\end{algorithm}
+
+\subsubsection{Average Point Shrinking Heuristic}
+Our second heuristic finds a candidate centre by simply finding the average point, i.e. $c=\frac{1}{n}\sum_{i=1}^n a^i$, then finding the $k$ closest points and returning the ball $B(c,r)$ as described above.
+
+\begin{algorithm}[H]\label{avg point shrink}
+    \SetAlgoLined
+    \KwIn{Data set $\A$, $\eta\in[0,1]$}
+    \KwOut{Ball $B(c,r)$}
+    $k:=\floor{n(1-\eta)}$
+    $c:=\frac{1}{n}\sum_{i=1}^na^i$\;
+    $D:=\left\{\norm{c-x}: x\in\A\right\}$\;
+    Let $D'$ be $D$ sorted in ascending order\;
+    Let $\delta$ be the $(k-1)$th element of $D'$ (indexing from 0)\;
+    $r = \max_{a\in\A'}\norm{c-a}$\;
+    \KwRet{$B(c,r)$}
+    
+    \caption{Average Point Shrinking Heuristic}
 \end{algorithm}
 \subsection{Shenmaier's Approximation}
 \subsubsection{Statement}
@@ -343,6 +408,7 @@ This approximation scheme developed by Vladimir Shenmaier in \cite[Algorithm 1]{
 \begin{algorithm}\label{shenmaier}
     \KwIn{Data set $\A$, $\eta\in[0,1]$}
     \KwOut{Ball $B(c,r)$}
+    $k=\floor{n(1-\eta)}$\;
     \For{$i=1,\ldots,n$}{
         $D:=\left\{\norm{c-a}: a\in\A\right\}$\;
         Let $D'$ be $D$ sorted in ascending order\;
@@ -359,9 +425,9 @@ This approximation scheme developed by Vladimir Shenmaier in \cite[Algorithm 1]{
  From \cite[Theorem 4]{SHENMAIER201581} we know that Algorithm \ref{shenmaier} returns a 2-approximation solution to the MEBwO problem. What this means is that if we have a minimum radius of $r$ returned by Algorithm \ref{shenmaier} for a data set $\A$, then the true optimal value to the MEBwO problem on that data is no less than $r/2$. This is useful for assessing how close a heuristic is to an optimal solution in the worst case when we have a solution via Algorithm \ref{shenmaier}, but not an optimal solution via solving the exact model.
 
 \subsubsection{Complexity}
-Referring to Algorithm \ref{shenmaier}, on lines 1 through 4 we have a \texttt{for} loop which runs $n$ many times, and on line 2 we compute a list of $n$ many distances, which for $d$-dimensional vectors runs in $O(nd)$ time. Line 3 involves sorting the aforementioned list, so the time complexity depends on the sorting algorithm used. It is well known within computer science that algorithms are often subject to a time-memory trade off, meaning that it is possible to design algorithms that run faster as a result of using less memory, and vice-versa. We can then assume that a sensible implementation of Algorithm \ref{shenmaier} would use the fastest available sorting algorithm given that the size of our data sets are small enough that we do not run into memory constraints, so the recommended sorting algorithm is Quicksort \cite{hoare1962quicksort} which runs on average in $O(n\log n)$ time. Line 4 simply accesses the $(k-1)$th element of the sorted list and so runs in $O(1)$ time.
+Referring to Algorithm \ref{shenmaier}, on line 1 we have an assignment which runs in $O(1)$ time. On lines 2 through 5 we have a \texttt{for} loop which runs $n$ many times, and on line 3 we compute a list of $n$ many distances, which for $d$-dimensional vectors runs in $O(nd)$ time. Line 4 involves sorting the aforementioned list, so the time complexity depends on the sorting algorithm used. It is well known within computer science that algorithms are often subject to a time-memory trade off, meaning that it is possible to design algorithms that run faster as a result of using less memory, and vice-versa. We can then assume that a sensible implementation of Algorithm \ref{shenmaier} would use the fastest available sorting algorithm given that the size of our data sets are small enough that we do not run into memory constraints, so the recommended sorting algorithm is Quicksort \cite{hoare1962quicksort} which runs on average in $O(n\log n)$ time. Line 5 simply accesses the $(k-1)$th element of the sorted list and so runs in $O(1)$ time.
 
-Line 5 finds the minimum element from a set of values and runs in $O(n)$ time. Lines 6 and 7 are simple assignments and run in $O(1)$ time. Finally, our overall time complexity is then $O(n^2(d+\log n))$. This will usually reduce to $O(n^2d)$ as typically $d>\log n$, though for particularly large $n$ and very small $d$ the alternative reduction of $O(n^2\log n)$ is of course possible.
+Line 6 finds the minimum element from a set of values and runs in $O(n)$ time. Lines 7 and 8 are simple assignments and run in $O(1)$ time. Finally, our overall time complexity is then $O(n^2(d+\log n))$. This will usually reduce to $O(n^2d)$ as typically $d>\log n$, though for particularly large $n$ and very small $d$ the alternative reduction of $O(n^2\log n)$ is of course possible.
 \section{Improvement Heuristics}
 We now consider some improvement heuristics. The two heuristics described here are, strictly speaking, designed to improve an existing MEB rather than an MEBwO. However, quick and effective methods exist for solving the MEB problem and so improvement heuristics have not been needed, while heuristics which solve the MEBwO problem may return a solution which has considerable space for improvement.
 
@@ -505,7 +571,7 @@ This model has $n+1$ constraints and most crucially, 2 decision variables. This 
     \KwIn{Data set $\A$, Ball $B(\hat{c},\hat{r}$)}
     \KwOut{Ball $B(c,r)$}
     $\hat{a}:=\arg\max_{a\in\A}\norm{\hat{c}-a}$\;
-    Let $x$, $r$ be the solutions returned by solver for the DCMEB problem for $B(\hat{c},\hat{r}$\;
+    Let $x$, $r$ be the solutions returned by solver for the DCMEB problem for $B(\hat{c},\hat{r})$\;
     $c:=c+x(\hat{a}-\hat{c})$\;
     \KwRet{$B(c,r)$}\;
     \caption{Direction-Constrained MEB Heuristic}
