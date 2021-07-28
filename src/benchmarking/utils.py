@@ -258,6 +258,7 @@ def get_title(func_name, n, d, eta):
     func_names = {
         "relaxation_heuristic": "Relaxation-Based Heuristic",
         "shrink": "Shrink Heuristic",
+        "shrink_avg": "Shrink (avg) Heuristic",
         "shenmaier": "Shenmaier's Approximation"
     }
 

@@ -19,6 +19,7 @@ data_types = {
 func_types = {
     "relaxation_heuristic": mebwo_algorithms.alg__relaxation_heuristic,
     "shrink": mebwo_algorithms.alg__shrink,
+    "shrink_avg": mebwo_algorithms.alg__shrink_avg,
     "shenmaier": mebwo_algorithms.alg__shenmaier
 }
 
@@ -123,6 +124,8 @@ if msg == "y":
                 else:
                     M = None
 
+                path = r"benchmarks/{0}/{1}/func_eta_n{2}_d{3}_{4}".format(func_name, data_type, n, d, data_type)
+
                 times = benchmarking.trials.run_trials_alg(
                     func=confirmed_funcs[func_name],
                     n=n,
@@ -136,7 +139,7 @@ if msg == "y":
 
                 title = benchmarking.utils.get_title(func_name, n, d, eta)
                 benchmarking.utils.plot_times(
-                    x_axis=d,
+                    x_axis=eta,
                     times=times,
                     xlabel="eta",
                     ylabel="Time (s)",
