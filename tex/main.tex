@@ -353,15 +353,16 @@ We can look to \cite[Lemma 1]{core-sets} for a $1/\sqrt{3}$-approximation to the
     
     \caption{Diameter Approximation Algorithm \cite[Lemma 1]{core-sets}}
 \end{algorithm}
-A caveat to this approach is that it the value of $M$ will change depending on the initial random point chosen, and can vary significantly. To demonstrate this, we generate a uniform ball data set $\A$ with $n=1000$, $d=10$, $r=1$ (see Section \ref{uniform ball} for further details) which we know has a diameter close to 2. Now, if we run Algorithm \ref{alg:diameter approx} for each $a\in\A$, we 
+A caveat to this approach is that it the value of $M$ will change depending on the initial random point chosen, and can vary significantly. To demonstrate this, we generate a standard normal data set $\A$ with $n=1000$, $d=10$ (see Section \ref{uniform ball} for further details), and by runing Algorithm \ref{alg:diameter approx} for each $a\in\A$ we construct a distribution of approximate diameters. From \texttt{src/diameter approx analysis.py} we find an average diameter of $8.939$ with variance $0.170$ and a density plot is shown in Figure \ref{fig:diameter approx density}.
 
 \begin{figure}
     \centering
     \includegraphics[width=0.5\textwidth]{pw M density.png}
     \caption{Density Plot of $M$ Values From Pointwise Calculation}
-    \label{fig:my_label}
+    \label{fig:diameter approx density}
 \end{figure}
 
+For more robust benchmarking, we would prefer a method which always returns the same $M$ value for a given data set, so this
 \subsubsection{Quality of $\xi_i$ Solutions in the QP Relaxation}
 Another concern regarding the value of $M$ is the effect on the optimal solutions for the relaxed $\xi_i$ variables in the QP relaxation. This is important as good quality relaxed solutions are essential to Algorithm \ref{relaxation heuristic}.
 
