@@ -159,7 +159,9 @@ Here come your acknowledgments ...
 % =============================================================================
 \chapter{Problem Definition and Literature Review}\label{exact}
 \section{Preliminaries}
-In this paper we shall denote our data set of finite vectors as $\mathcal{A} = \left\{a^1,\ldots,a^n\right\}\subseteq\mathbb{R}^d$ for $n,d\in\mathbb{N}$. The center of a ball is represented by a vector $c\in\mathbb{R}^d$, the radius a scalar $r\in\mathbb{R}$, and the squared radius $\gamma=r^2$. We denote the percentage of inliers for a minimum enclosing ball with outliers by $\eta\in(0,1]$, i.e. if $\eta=0.9$ then we seek a ball which covers $90\%$ of our data.
+In this paper we shall denote our data set of finite vectors as $\mathcal{A} = \left\{a^1,\ldots,a^n\right\}\subseteq\mathbb{R}^d$ for $n,d\in\mathbb{N}$. The center of a ball is represented by a vector $c\in\mathbb{R}^d$, the radius a scalar $r\in\mathbb{R}$, and the squared radius $\gamma=r^2$. We denote the percentage of inliers for a minimum enclosing ball with outliers (MEBwO) by $\eta\in(0,1]$, i.e. if $\eta=0.9$ then we seek a ball which covers $90\%$ of our data. While it may be easier for us to think practically of the MEBwO as covering $\eta\%$ of our data, it is easier mathematically to consider a MEBwO which covers $n-k$ out of $n$ data points, where $k=\floor{n(1-\eta)}$ is the number of outliers.
+
+We would now like to make some formal definitions.
 
 \begin{definition}
     Let $c\in\mathbb{R}^n$ and $r\in\mathbb{R}$. Then the \textit{ball} with center $c$ and radius $r$ is the set
@@ -180,6 +182,7 @@ In this paper we shall denote our data set of finite vectors as $\mathcal{A} = \
     See \cite[page 5]{two-algorithms}.
 \end{proof}
 
+Now, we are interested in the idea that adding or removing data from a data set may have an effect on the radius of the MEB of that data set.
 \begin{proposition}\label{adding data}
     Let $a'\in\mathbb{R}^n$ where $a'\notin\A$. Suppose $B(c,r)=\MEB(\A)$ and $B(c',r')=\MEB(\A\cap\left\{a'\right\})$. Then $r\leq r'$.
 \end{proposition}
@@ -193,14 +196,17 @@ In this paper we shall denote our data set of finite vectors as $\mathcal{A} = \
 \begin{proof}
     Clearly we have $\A\setminus\left\{a'\right\}\subseteq\A$ then since $\A\setminus\left\{a'\right\}\subseteq B(c',r')$ and $\A\setminus\left\{a'\right\}\subseteq B(c,r)$ we have $r'\leq r$ since $B(c',r')$ is the MEB for $\A\setminus\left\{a'\right\}$, with equality only if $\MEB(\A\setminus\left\{a'\right\} = \MEB(\A)$ by uniqueness.
 \end{proof}
-\begin{remark}
-    The prior two propositions tell us that when we add data to a set, the resulting MEB is either unchanged or bigger. Conversely, when we remove data from a set, the resulting MEB is either unchanged or smaller.
-\end{remark}
+These two propositions tell us that when we add data to a set, the resulting MEB is either unchanged or bigger. Conversely, when we remove data from a set, the resulting MEB is either unchanged or smaller.
 
+In the interest of contextualizing Algorithm \ref{core-set algorithm}, we define the $(1+\epsilon)$-approximation to an MEB and core-sets.
 \begin{definition}[{{\cite[page 2]{core-sets}}}]
-    Let $r^*$ be the radius of $\MEB(\A)$. A ball $B(c;(1+\epsilon)r)$ is a \textit{$(1+\epsilon)$-approximation} of $\MEB(\A)$ if $r\leq r^*$ and $\mathcal{A}\subseteq B(c,(1+\epsilon)r)$.
+    Let $\epsilon>0$. Let $r^*$ be the radius of $\MEB(\A)$. A ball $B(c;(1+\epsilon)r)$ is a \textit{$(1+\epsilon)$-approximation} of $\MEB(\A)$ if $r\leq r^*$ and $\mathcal{A}\subseteq B(c,(1+\epsilon)r)$.
 \end{definition}
 
+\begin{definition}[{{\cite[page 2]{core-sets}}}]
+    Let $\epsilon>0$. A subset $X\subseteq\A$ is a \textit{$\epsilon$-core-set} (typically just referred to as a \textit{core-set}) of $\A$ if $\A\subset B(c,(1+\epsilon)r)$.
+\end{definition}
+Finally, the following two definitions allow us to formally define the MEBwO.
 \begin{definition}
     For a set $\A$, the set of $k$-subsets of $\A$ is the set $\mathfrak{K}=\left\{\K\in\mathscr{P}(\A): |\K|=k\right\}$ where $\mathcal{P}:\textbf{Set}\to\textbf{Set}$ is the usual power set functor.
 \end{definition}
@@ -326,12 +332,15 @@ This model gives us a way to solve the MEBwO problem optimally for a given data 
 
 \subsection{On the Big M Parameter}
 The ``big $M$ constraint" in Definition \ref{mebwo} is a commonly known technique within Operational Research and an important question is that of what $M$ do we choose? A sufficiently large $M$ is required such that when the corresponding binary variable is equal to $1$, the constraint is effectively nullified. But, as we will see within this section, a value of $M$ which is too large will lead to a less effective model.
-
-\subsubsection{An Upper Bound on $M$}
-Finding a suitable value of $M$ depends heavily on the nature of the problem the constraint is being applied to. For the minimum enclosing ball with outliers problem, where we are concerned with the distances $\norm{c-a^i}$ being less than the radius $r$, we look to add a value to $r$ such that for any reasonable $c$, this constraint is always satisfied. Thus, a candidate upper bound for $M$ may be found by calculating each pairwise distance within the data and recording the largest distance. Formally, this may be written as $M:= \max\left\{\norm{a^i-a^j}: i,j = 1,\ldots,n, i\neq j\right\}$.
 \subsubsection{Solution Times}
 One concern with our choice of $M$ is the effect on the solution time of the solver.
 
+\subsubsection{An Upper Bound on $M$}
+Finding a suitable value of $M$ depends heavily on the nature of the problem the constraint is being applied to. For the minimum enclosing ball with outliers problem, where we are concerned with the distances $\norm{c-a^i}$ being less than the radius $r$, we look to add a value to $r$ such that for any reasonable $c$, this constraint is always satisfied. Thus, a candidate upper bound for $M$ may be found by calculating each pairwise distance within the data and recording the largest distance. Formally, this may be written as $M:= \max\left\{\norm{a^i-a^j}: i,j = 1,\ldots,n, i\neq j\right\}$.
+
+An immediately apparent issue with this approach is that computing $M$ in this way will run in $O(n^2d)$ time. For smaller data sets this is manageable, but for any significantly sized data sets the time taken to compute $M$ is often longer than the time taken to solve the MEBwO problem on the same data. 
+
+We can look to \cite[Page 4]{core-sets} for a $1/\sqrt{3}$-approximation to the diameter of $\A$ which runs in $O(nd)$ time, by picking a random point $p\in\A$, then computing $q=\arg\max_{a\in\A}\norm{p-a}$ and $q'=\arg\max_{a\in\A}\norm{q-a}$, i.e. $q$ the furthest point from $p$ and then $q'$ the furthest point from $q$. Then we set $D:=\norm{q-q'}$ which is our $1/\sqrt{3}$-approximation to the diameter of $\A$. 
 \subsubsection{Quality of $\xi_i$ Solutions in the QP Relaxation}
 Another concern regarding the value of $M$ is the effect on the optimal solutions for the relaxed $\xi_i$ variables in the QP relaxation. This is important as good quality relaxed solutions are essential to Algorithm \ref{relaxation heuristic}.
 
