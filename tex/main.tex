@@ -36,6 +36,8 @@
 \tikzset{cross/.style={cross out, draw=black, minimum size=2*(#1-\pgflinewidth), inner sep=0pt, outer sep=0pt},
 %default radius will be 1pt. 
 cross/.default={2pt}}
+
+\graphicspath{{images/}}
 % ==== Mine^
 
 \geometry{a4paper,left=2cm,right=2.0cm, top=2cm, bottom=2.0cm}
@@ -338,9 +340,28 @@ One concern with our choice of $M$ is the effect on the solution time of the sol
 \subsubsection{An Upper Bound on $M$}
 Finding a suitable value of $M$ depends heavily on the nature of the problem the constraint is being applied to. For the minimum enclosing ball with outliers problem, where we are concerned with the distances $\norm{c-a^i}$ being less than the radius $r$, we look to add a value to $r$ such that for any reasonable $c$, this constraint is always satisfied. Thus, a candidate upper bound for $M$ may be found by calculating each pairwise distance within the data and recording the largest distance. Formally, this may be written as $M:= \max\left\{\norm{a^i-a^j}: i,j = 1,\ldots,n, i\neq j\right\}$.
 
-An immediately apparent issue with this approach is that computing $M$ in this way will run in $O(n^2d)$ time. For smaller data sets this is manageable, but for any significantly sized data sets the time taken to compute $M$ is often longer than the time taken to solve the MEBwO problem on the same data. 
+An immediately apparent issue with this approach is that computing $M$ in this way will run in $O(n^2d)$ time. For smaller data sets this is manageable, but for any significantly sized data sets the time taken to compute $M$ is often longer than the time taken to solve the MEBwO problem on the same data.
 
-We can look to \cite[Page 4]{core-sets} for a $1/\sqrt{3}$-approximation to the diameter of $\A$ which runs in $O(nd)$ time, by picking a random point $p\in\A$, then computing $q=\arg\max_{a\in\A}\norm{p-a}$ and $q'=\arg\max_{a\in\A}\norm{q-a}$, i.e. $q$ the furthest point from $p$ and then $q'$ the furthest point from $q$. Then we set $D:=\norm{q-q'}$ which is our $1/\sqrt{3}$-approximation to the diameter of $\A$. 
+We can look to \cite[Lemma 1]{core-sets} for a $1/\sqrt{3}$-approximation to the diameter of $\A$ which runs in $O(nd)$ time, by picking a random point $p\in\A$, finding $q$ the furthest point in $\A$ from $p$, finding $q'$ the furthest point in $\A$ from $q$, then setting $D:=\norm{q-q'}$ which is our $1/\sqrt{3}$-approximation to the diameter of $\A$.
+\begin{algorithm}[H]\label{alg:diameter approx}
+    \KwIn{Data set $\A$, point $p\in\A$}
+    \KwOut{Approximate diameter $D\in\mathbb{R}$}
+    $q:=\arg\max_{a\in\A}\norm{p-a}$\;
+    $q':=\arg\max_{a\in\A}\norm{q-a}$\;
+    $D:=\norm{q-q'}$\;
+    \KwRet{D}\;
+    
+    \caption{Diameter Approximation Algorithm \cite[Lemma 1]{core-sets}}
+\end{algorithm}
+A caveat to this approach is that it the value of $M$ will change depending on the initial random point chosen, and can vary significantly. To demonstrate this, we generate a uniform ball data set $\A$ with $n=1000$, $d=10$, $r=1$ (see Section \ref{uniform ball} for further details) which we know has a diameter close to 2. Now, if we run Algorithm \ref{alg:diameter approx} for each $a\in\A$, we 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{pw M density.png}
+    \caption{Density Plot of $M$ Values From Pointwise Calculation}
+    \label{fig:my_label}
+\end{figure}
+
 \subsubsection{Quality of $\xi_i$ Solutions in the QP Relaxation}
 Another concern regarding the value of $M$ is the effect on the optimal solutions for the relaxed $\xi_i$ variables in the QP relaxation. This is important as good quality relaxed solutions are essential to Algorithm \ref{relaxation heuristic}.
 
@@ -609,7 +630,12 @@ This model has $n+1$ constraints and most crucially, 2 decision variables. This 
 % =============================================================================
 \chapter{Implementation and Experiments}\label{implementation}
 \section{Code Implementation}
-\subsection{Data}
+\section{Data}\label{data}
+\subsection{Normal}
+\subsection{Uniform Ball}\label{uniform ball}
+\subsection{Hyperspherical Shell}
+\subsection{Uniform Ball with Outliers}
+\subsection{MNIST}
 
 \section{Experiments}
 \subsection{Methodology}
