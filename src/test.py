@@ -4,14 +4,15 @@ import timeit
 import data.generation, data.loading
 from meb import geometry, meb_algorithms
 from meb.ball import Ball, MEBwO
+import timeit
 
 n = 10000
 d = 30
 
-data_ = data.generation.uniform_ball_with_ouliters(n, d, 0.5, 1, 2, 3)
+data_ = data.generation.normal(0, 1, n, d)
 
-ball = MEBwO(center=[0]*d, radius=1.5)
-ball.calc_pct(data_)
-print(data_.shape)
-print(ball.pct_containment)
-ball.plot(data_, alpha=0.25)
+start = timeit.default_timer()
+M = geometry.M_estimate(data_)
+elapsed = timeit.default_timer() - start
+
+print(elapsed)
