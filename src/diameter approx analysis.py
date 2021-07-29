@@ -9,7 +9,7 @@ n = 1000
 d = 10
 
 np.random.seed(1234)
-data = data.generation.uniform_ball(n,d,1)
+data = data.generation.normal(0,1,n,d)
 
 D_list = [None]*n
 for i in range(n):
@@ -24,4 +24,5 @@ print(np.var(D_list))
 sns.set_theme()
 sns.displot(x=D_list, kind="kde")
 plt.xlabel("M")
+plt.savefig(r"images/pw M density.png")
 plt.show()
