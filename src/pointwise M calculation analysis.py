@@ -18,7 +18,10 @@ for i in range(n):
     _, _, D = meb.geometry.diameter_approx(data[i], data, return_diameter=True)
     D_list[i] = D
 
+print(np.mean(D_list))
+print(np.var(D_list))
 
 sns.set_theme()
 sns.displot(x=D_list, kind="kde")
+plt.xlabel("M")
 plt.show()
