@@ -1,6 +1,8 @@
 import numpy as np
 import timeit
 
+from meb.meb_algorithms import alg__socp_heuristic
+
 from . import utils
 import meb
 import data
@@ -103,7 +105,8 @@ def run_trials_alg(func, n, d, eta, num_trials, data_type, log_file=None, **kwar
 
             # only need to calculate M when data is normal
             if data_type == "normal" and func == meb.mebwo_algorithms.alg__relaxation_heuristic:
-                _, _, kwargs["M"] = meb.geometry.diameter_approx(data_[0], data_, return_diameter=True)
+                _, r, _ = alg__socp_heuristic(data_, eps=1e-4)
+                kwargs["M"] = 2*r
 
             start = timeit.default_timer()
             c, r, _ = func(data_, eta_, **kwargs)
