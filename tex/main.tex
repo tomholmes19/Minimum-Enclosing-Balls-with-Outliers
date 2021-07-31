@@ -365,7 +365,7 @@ A caveat to this approach is that it the value of $M$ will change depending on t
 
 For more robust benchmarking, we would prefer a method which always returns the same $M$ value for a given data set, so this method is unsuitable for our purposes. This is because, as seen in the previous section, a higher value of $M$ has a negative effect on the run time of the solver so we would prefer to minimize the effect of randomness on our benchmarks.
 
-TODO: talk about using MEB to find M
+Our chosen method, which gives reliable estimates for $M$ in a reasonable time is to simply solve the $MEB$ problem for $\A$ and set $M:=2r$ for $B(c,r)=\MEB(\A)$. We know from Theorem \ref{thm:unique} that an MEB always exists and is unique for a given data set, so can always expect to receive the same $M$ value from this method. Using a heuristic approach such as Algorithm \ref{core-set algorithm} gives us a $(1+\epsilon)$-approximation to $\MEB(\A)$, so we will receive an $M$ value that is slightly larger than needed, but the effect on run time is insignificant and given that the returned $M$ value is consistent we do not introduce unneeded randomness into our methodology that is not already inherently present due to using randomly generated data.
 
 \subsubsection{Quality of $\xi_i$ Solutions in the QP Relaxation}
 Another concern regarding the value of $M$ is the effect on the optimal solutions for the relaxed $\xi_i$ variables in the QP relaxation. This is important as good quality relaxed solutions are essential to Algorithm \ref{relaxation heuristic}.
