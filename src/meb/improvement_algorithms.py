@@ -7,7 +7,7 @@ Improvement heuristics for MEB
 All functions should start with 'alg__' to be captured in algorithms dictionary (see bottom of algorithms.py)
 """
 
-def alg__dc_meb(data, c, a=None, time_limit=None, log_file=""):
+def alg__dcmeb(data, c, a=None, time_limit=None, log_file=""):
     """
     Direction-constrained MEB improvement heuristic
 
@@ -28,7 +28,7 @@ def alg__dc_meb(data, c, a=None, time_limit=None, log_file=""):
 
     return new_c, r
 
-def alg__min_parallel_dist(data, c, gamma, a=None, s=2):
+def alg__dcssh(data, c, gamma, a=None, s=2):
     """
     Moves c in the direction c->a by 1/s times the minimum distance from 
     each point in data in the direction a->c to the surface of the ball
