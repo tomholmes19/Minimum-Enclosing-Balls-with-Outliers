@@ -2,7 +2,7 @@ import benchmarking.utils
 import data.loading
 from meb import geometry
 
-n = [1000+3000*i for i in range(10) if 1000+3000*i < 25000]
+n = [1000+3000*i for i in range(10)]
 d = 30
 eta = 0.9
 
