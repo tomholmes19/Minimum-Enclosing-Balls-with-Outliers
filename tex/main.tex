@@ -343,6 +343,7 @@ Finding a suitable value of $M$ depends heavily on the nature of the problem the
 An immediately apparent issue with this approach is that computing $M$ in this way will run in $O(n^2d)$ time. For smaller data sets this is manageable, but for any significantly sized data sets the time taken to compute $M$ is often longer than the time taken to solve the MEBwO problem on the same data.
 
 We can look to \cite[Lemma 1]{core-sets} for a $1/\sqrt{3}$-approximation to the diameter of $\A$ which runs in $O(nd)$ time, by picking a random point $p\in\A$, finding $q$ the furthest point in $\A$ from $p$, finding $q'$ the furthest point in $\A$ from $q$, then setting $D:=\norm{q-q'}$ which is our $1/\sqrt{3}$-approximation to the diameter of $\A$. For a candidate $M$ value we can simply set $M:=\sqrt{3}D$.
+
 \begin{algorithm}[H]\label{alg:diameter approx}
     \KwIn{Data set $\A$, point $p\in\A$}
     \KwOut{Approximate diameter $D\in\mathbb{R}$}
@@ -358,7 +359,7 @@ A caveat to this approach is that it the value of $M$ will change depending on t
 \begin{figure}
     \centering
     \includegraphics[width=0.5\textwidth]{pw M density.png}
-    \caption{Density Plot of $M$ Values From Pointwise Calculation}
+    \caption{Density Plot of Approximate Diameters from Algorithm \ref{alg:diameter approx}}
     \label{fig:diameter approx density}
 \end{figure}
 
