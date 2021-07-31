@@ -14,7 +14,7 @@ eta = 0.9
 M_UB = M_estimate(data)
 
 num_trials = 50
-M_list = [M_UB*k/2 for k in range(1,num_trials+1)]
+M_list = [M_UB*(1+k/2) for k in range(num_trials)]
 
 variances = {M: None for M in M_list}
 
