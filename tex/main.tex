@@ -354,11 +354,11 @@ We can look to \cite[Lemma 1]{core-sets} for a $1/\sqrt{3}$-approximation to the
     
     \caption{Diameter Approximation Algorithm \cite[Lemma 1]{core-sets}}
 \end{algorithm}
-A caveat to this approach is that it the value of $M$ will change depending on the initial random point chosen, and can vary significantly. To demonstrate this, we generate a standard normal data set $\A$ with $n=1000$, $d=10$ (see Section \ref{uniform ball} for further details), and by running Algorithm \ref{alg:diameter approx} for each $a\in\A$ we construct a distribution of approximate diameters. From \texttt{src/diameter\_approx\_analysis.py} we find an average diameter of $8.939$ with variance $0.170$ and a density plot is shown in Figure \ref{fig:diameter approx density}.
+A caveat to this approach is that it the value of $M$ will change depending on the initial random point chosen, and can vary significantly. To demonstrate this, we generate a standard normal data set $\A$ with $n=1000$, $d=10$ (see Section \ref{data}), and by running Algorithm \ref{alg:diameter approx} for each $a\in\A$ we construct a distribution of approximate diameters. From \texttt{src/diameter\_approx\_analysis.py} we find an average diameter of $8.939$ with variance $0.170$ and a density plot is shown in Figure \ref{fig:diameter approx density}.
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.5\textwidth]{pw M density.png}
+    \includegraphics[width=0.5\textwidth]{pw_M_density.png}
     \caption{Density Plot of Approximate Diameters from Algorithm \ref{alg:diameter approx}}
     \label{fig:diameter approx density}
 \end{figure}
@@ -368,7 +368,18 @@ For more robust benchmarking, we would prefer a method which always returns the 
 Our chosen method, which gives reliable estimates for $M$ in a reasonable time is to simply solve the $MEB$ problem for $\A$ and set $M:=2r$ for $B(c,r)=\MEB(\A)$. We know from Theorem \ref{thm:unique} that an MEB always exists and is unique for a given data set, so can always expect to receive the same $M$ value from this method. Using a heuristic approach such as Algorithm \ref{core-set algorithm} gives us a $(1+\epsilon)$-approximation to $\MEB(\A)$, so we will receive an $M$ value that is slightly larger than needed, but the effect on run time is insignificant and given that the returned $M$ value is consistent we do not introduce unneeded randomness into our methodology that is not already inherently present due to using randomly generated data.
 
 \subsubsection{Quality of $\xi_i$ Solutions in the QP Relaxation}
-Another concern regarding the value of $M$ is the effect on the optimal solutions for the relaxed $\xi_i$ variables in the QP relaxation. This is important as good quality relaxed solutions are essential to Algorithm \ref{relaxation heuristic}.
+Another concern regarding the value of $M$ for the exat model is the effect on the optimal solutions for the relaxed $\xi_i$ variables in the QP relaxation. This is important as good quality relaxed solutions are essential to Algorithm \ref{relaxation heuristic}, which uses high-valued $xi_i$ as a proxy for how far a data point lies from the optimal center, and so for how much of an outlier that point is.
+
+We can evaluate the quality and diversity of relaxed solutions by solving the relaxed model on the same data set with different values of $M$. We generate a standard normal data set (see Section \ref{data}) with $n=300$, $d=10$, calculate a lower bound for $M^*$ using Algorithm \ref{alg:diameter approx}, then solve the model for a sequence of multiples of $M^*$ and record the variance of the list of relaxed solutions. We choose to test 50 different values of $M$ in the sequence $\langle\ M^*(1+k/2)\rangle _{k=1,\ldots,50}$. The implementation can be found in \texttt{src/xi\_analysis.py} and a plot of the variances can be seen in Figure \ref{fig:xi analysis}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{xi_analysis.png}
+    \caption{Variance of Relaxed $\xi_i$ Variables for a Sequence of $M$ Values.}
+    \label{fig:xi analysis}
+\end{figure}
+
+We can see in Figure \ref{fig:xi analysis} that the variance of the relaxed solutions for $xi_i$ decreases sharply as $M$ increases
 
 \section{Literature Review}\label{lit review}
 
