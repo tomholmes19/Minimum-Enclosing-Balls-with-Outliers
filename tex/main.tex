@@ -370,7 +370,7 @@ Our chosen method, which gives reliable estimates for $M$ in a reasonable time i
 \subsubsection{Quality of $\xi_i$ Solutions in the QP Relaxation}
 Another concern regarding the value of $M$ for the exat model is the effect on the optimal solutions for the relaxed $\xi_i$ variables in the QP relaxation. This is important as good quality relaxed solutions are essential to Algorithm \ref{relaxation heuristic}, which uses high-valued $xi_i$ as a proxy for how far a data point lies from the optimal center, and so for how much of an outlier that point is.
 
-We can evaluate the quality and diversity of relaxed solutions by solving the relaxed model on the same data set with different values of $M$. We generate a standard normal data set (see Section \ref{data}) with $n=300$, $d=10$, calculate a lower bound for $M^*$ using Algorithm \ref{alg:diameter approx}, then solve the model for a sequence of multiples of $M^*$ and record the variance of the list of relaxed solutions. We choose to test 50 different values of $M$ in the sequence $\langle\ M^*(1+k/2)\rangle _{k=1,\ldots,50}$. The implementation can be found in \texttt{src/xi\_analysis.py} and a plot of the variances can be seen in Figure \ref{fig:xi analysis}.
+We can evaluate the quality and diversity of relaxed solutions by solving the relaxed model on the same data set with different values of $M$. We generate random data sets (see Section \ref{data}) with $n=300$, $d=10$, and the standard parameters described in Section \ref{data}, then calculate a lower bound for $M^*$ using Algorithm \ref{alg:diameter approx} for each data set, then solve the model for a sequence of multiples of $M^*$ and record the variance of the list of relaxed solutions. We choose to test 50 different values of $M$ in the sequence $\langle\ M^*(1+k/2)\rangle _{k=1,\ldots,50}$. The implementation can be found in \texttt{src/xi\_analysis.py} and a plot of the variances can be seen in Figure \ref{fig:xi analysis}.
 
 \begin{figure}
     \centering
@@ -379,7 +379,7 @@ We can evaluate the quality and diversity of relaxed solutions by solving the re
     \label{fig:xi analysis}
 \end{figure}
 
-We can see in Figure \ref{fig:xi analysis} that the variance of the relaxed solutions for $xi_i$ decreases sharply as $M$ increases
+We can see in Figure \ref{fig:xi analysis} that, for each data set, the variance of the relaxed solutions for $xi_i$ decreases sharply as $M$ increases and tends to zero.
 
 \section{Literature Review}\label{lit review}
 
