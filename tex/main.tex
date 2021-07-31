@@ -217,7 +217,7 @@ Finally, the following two definitions allow us to formally define the MEBwO.
     For some $\eta\in[0,1]$, let $k=\floor{n(1-\eta)}$ be the number of outliers in $\A$. Then the \textit{minimum enclosing ball with outliers} of $\A$, denoted by $\MEBwO(\A,\eta)$, which covers $\eta\%$ of $\A$, is the ball $B(c^*,r^*)=\MEB(\K^*)$ for $\K^*\in\mathfrak{K}$ a $k$-subset of $\A$ where for all other $k$-subsets $\K\in\mathfrak{K}$, $\K\neq\K^*$, if $B(c,r)=\MEB(\K)$ then $r^*\leq r$.
 \end{definition}
 
-We may deduce that for a given data set $\A$, an MEBwO exists since an MEBwO is simply the MEB of some $k$-subset of $\A$, which by Theorem \ref{thm:unique} exists and is unique for that $k$-subset. However, MEBwO's are not unique. 
+We may deduce that for a given data set $\A$, an MEBwO exists since an MEBwO is simply the MEB of some $k$-subset of $\A$, which by Theorem \ref{thm:unique} exists and is unique for that $k$-subset. However, MEBwO's are not unique, as we can have two distinct $k$-subsets of $\A$ which have MEB's of the same radius.
 
 For a simple example, consider the data set $\A=\left\{(-2,-1),(2,-1),(2,1),(-2,1)\right\}$ with $\eta=\frac{1}{2}$. Then $B((-2,0),1)$ and $B((2,0),1)$ are both MEBwO's for $\A$, and MEB's for the $2$-subsets $\left\{(-2,-1), (-2,1)\right\}$, $\left\{(2,-1), (2,1)\right\}$ of $\A$ respectively. See Figure \ref{fig:mebwo non-unique} for a visualisation of this example.
 
@@ -258,7 +258,12 @@ For a simple example, consider the data set $\A=\left\{(-2,-1),(2,-1),(2,1),(-2,
     \end{center}
     where $c\in\mathbb{R}^d$ and $r\in\mathbb{R}$ are the decision variables corresponding to the center and radius of the ball respectively.
     
-    As detailed in \cite{two-algorithms}, the MEB problem can be transformed to a convex quadratic problem (QP) by squaring the constraints and defining a new decision variable $\gamma=r^2$:
+    We can formulate the MEB problem as a second-order cone program (SOCP) by considering the constraints as second-order cone constraints, i.e.
+    \begin{equation*}
+        C_i = \left\{(r, c-a^i)\in\mathbb{R}^{d+1}: \norm{c-a^i}\leq r\right\}
+    \end{equation*}
+    
+    As detailed in \cite{two-algorithms}, the MEB problem can be transformed to a convex quadratically constrained program (QCQP) by squaring the constraints and defining a new decision variable $\gamma=r^2$:
     
     \begin{center}
         \begin{tabular}{CLC}
@@ -267,7 +272,7 @@ For a simple example, consider the data set $\A=\left\{(-2,-1),(2,-1),(2,1),(-2,
         \end{tabular}
     \end{center}
 \end{definition}
-This problem has $d+1$ variables and $n$ constraints, which can make it slow to find an optimal solution by using a solver such as Xpress or Gurobi, but many alternative approaches are present in the literature which offer very fast solutions within a guaranteed accuracy (\cite{core-sets}, \cite{two-algorithms}).
+Since this problem can be modelled as a SOCP we know it may be solved by interior-point methods \cite{socp_ipm}. This problem has $d+1$ variables and $n$ constraints, so it quickly become slow to find an optimal solution for large $n$ and $d$ when using a solver such as Xpress or Gurobi, but many alternative approaches are present in the literature which offer very fast solutions within a guaranteed accuracy (\cite{core-sets}, \cite{two-algorithms}).
 
 We will discuss here one such algorithm to solve the MEB problem from \cite{core-sets} that will be used in algorithms in Chapter \ref{algorithms}. The central idea is that of the \textit{core-set} \cite{agarwal2005geometric}, which is a small set of points that approximate the shape of a larger set of points. For example, a circle can be represented by a core-set of three points which lie on the boundary of the circle.
 
@@ -315,7 +320,7 @@ Algorithm \ref{core-set algorithm} runs in $O\left(\frac{nd}{\epsilon}+\frac{d^2
     
     where $\xi_i$ are binary variables corresponding to the distance constraint on each variable, with $M\in\mathbb{R}$ a sufficiently large scalar. One can interpret this as, if $\xi_i=1$ for some $i\in\left\{1,\ldots,n\right\}$, then $a_i$ does not need to be inside the ball. The constraint $\sum_{i=1}^n\xi_i\leq k$ where $k=\floor{n(1-\eta)}$ ensures that $\eta\%$ of the data is covered.
     
-    We can instead extend the quadratic program in Definition \ref{meb} to get the following mixed integer quadratic program formulation:
+    We can instead extend the QCQP in Definition \ref{meb} to get the following mixed integer QCQP (MIQCQP) formulation:
     \begin{center}
         \begin{tabular}{CLC}
             \displaystyle\min_{c,\gamma, \xi} & \gamma \\
@@ -326,16 +331,14 @@ Algorithm \ref{core-set algorithm} runs in $O\left(\frac{nd}{\epsilon}+\frac{d^2
     \end{center}
 \end{definition}
 \begin{remark}
-    One may note that when we relax $\xi_i$ to be continuous variables, i.e. $0\leq\xi_i\leq1$ for $i=1,\ldots,n$, we have again a convex quadratic program since we have then added only continuous variables and linear constraints to the base quadratic program.
+    One may note that when we relax $\xi_i$ to be continuous variables, i.e. $0\leq\xi_i\leq1$ for $i=1,\ldots,n$, we have again a convex QCQP since we have then added only continuous variables and linear constraints to the base QCQP.
 \end{remark}
 
 This model gives us a way to solve the MEBwO problem optimally for a given data set. However, by examining the structure of this model we can expect the solution times to be unreasonable for any meaningfully large instance. Note that, of $n$ many binary variables $\xi_i$, we can choose up to $k\leq n$ many of them to have a value of 1, though by Proposition \ref{removing data} we know that removing data gives us an MEB with potentially lower radius, meaning we will always pick the highest possible number of points ($k$ many) to be excluded. Thus, by a total brute force search we may expect to explore $\binom{n}{k}$ many individual MEB problems. Modern optimization solvers will work more efficiently than this, utilizing techniques such as branch-and-bound (first proposed by \cite{bnb}). Regardless, we expect a very large solution space which leads to exponentially larger solution times as we will see in Section \ref{exact benchmarks}.
 
 
 \subsection{On the Big M Parameter}
-The ``big $M$ constraint" in Definition \ref{mebwo} is a commonly known technique within Operational Research and an important question is that of what $M$ do we choose? A sufficiently large $M$ is required such that when the corresponding binary variable is equal to $1$, the constraint is effectively nullified. But, as we will see within this section, a value of $M$ which is too large will lead to a less effective model.
-\subsubsection{Solution Times}
-One concern with our choice of $M$ is the effect on the solution time of the solver.
+The ``big $M$ constraint" in Definition \ref{mebwo} is a commonly known technique within Operational Research and an important question is that of what $M$ do we choose? A sufficiently large $M$ is required such that when the corresponding binary variable is equal to $1$, the constraint is effectively nullified. But, as we will see within this section, a value of $M$ which is too large will lead to a longer solution time with worse solutions.
 
 \subsubsection{An Upper Bound on $M$}
 Finding a suitable value of $M$ depends heavily on the nature of the problem the constraint is being applied to. For the minimum enclosing ball with outliers problem, where we are concerned with the distances $\norm{c-a^i}$ being less than the radius $r$, we look to add a value to $r$ such that for any reasonable $c$, this constraint is always satisfied. Thus, a candidate upper bound for $M$ may be found by calculating each pairwise distance within the data and recording the largest distance. Formally, this may be written as $M:= \max\left\{\norm{a^i-a^j}: i,j = 1,\ldots,n, i\neq j\right\}$.
@@ -367,19 +370,22 @@ For more robust benchmarking, we would prefer a method which always returns the 
 
 Our chosen method, which gives reliable estimates for $M$ in a reasonable time is to simply solve the $MEB$ problem for $\A$ and set $M:=2r$ for $B(c,r)=\MEB(\A)$. We know from Theorem \ref{thm:unique} that an MEB always exists and is unique for a given data set, so can always expect to receive the same $M$ value from this method. Using a heuristic approach such as Algorithm \ref{core-set algorithm} gives us a $(1+\epsilon)$-approximation to $\MEB(\A)$, so we will receive an $M$ value that is slightly larger than needed, but the effect on run time is insignificant and given that the returned $M$ value is consistent we do not introduce unneeded randomness into our methodology that is not already inherently present due to using randomly generated data.
 
-\subsubsection{Quality of $\xi_i$ Solutions in the QP Relaxation}
-Another concern regarding the value of $M$ for the exat model is the effect on the optimal solutions for the relaxed $\xi_i$ variables in the QP relaxation. This is important as good quality relaxed solutions are essential to Algorithm \ref{relaxation heuristic}, which uses high-valued $xi_i$ as a proxy for how far a data point lies from the optimal center, and so for how much of an outlier that point is.
+\subsubsection{Solution Times} %TODO
+One concern with our choice of $M$ is the effect on the solution time of the solver.
 
-We can evaluate the quality and diversity of relaxed solutions by solving the relaxed model on the same data set with different values of $M$. We generate random data sets (see Section \ref{data}) with $n=300$, $d=10$, and the standard parameters described in Section \ref{data}, then calculate a lower bound for $M^*$ using Algorithm \ref{alg:diameter approx} for each data set, then solve the model for a sequence of multiples of $M^*$ and record the variance of the list of relaxed solutions. We choose to test 50 different values of $M$ in the sequence $\langle\ M^*(1+k/2)\rangle _{k=1,\ldots,50}$. The implementation can be found in \texttt{src/xi\_analysis.py} and a plot of the variances can be seen in Figure \ref{fig:xi analysis}.
+\subsubsection{Quality of $\xi_i$ Solutions in the QP Relaxation}
+Another concern regarding the value of $M$ for the exat model is the effect on the optimal solutions for the relaxed $\xi_i$ variables in the QP relaxation. This is important as good quality relaxed solutions are essential to Algorithm \ref{relaxation heuristic}, which uses high-valued $\xi_i$ as a proxy for how far a data point lies from the optimal center, and so for how much of an outlier that point is.
+
+We can evaluate the quality and diversity of relaxed solutions by solving the relaxed model on the same data set with different values of $M$. We generate random data sets (see Section \ref{data}) with $n=1000$, $d=10$, and the standard parameters described in Section \ref{data}, then calculate a lower bound for $M^*$ using Algorithm \ref{alg:diameter approx} for each data set, then solve the model for a sequence of multiples of $M^*$ and record the variance of the list of relaxed solutions. We choose to test 50 different values of $M$ in the sequence $\langle M^*(1+k/2)\rangle _{k=1,\ldots,50}$. The implementation can be found in \texttt{src/xi\_analysis.py} and a plot of the variances can be seen in Figure \ref{fig:xi analysis}.
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.5\textwidth]{xi_analysis.png}
+    \includegraphics[width=0.75\textwidth]{xi_analysis.png}
     \caption{Variance of Relaxed $\xi_i$ Variables for a Sequence of $M$ Values.}
     \label{fig:xi analysis}
 \end{figure}
 
-We can see in Figure \ref{fig:xi analysis} that, for each data set, the variance of the relaxed solutions for $xi_i$ decreases sharply as $M$ increases and tends to zero.
+We can see in Figure \ref{fig:xi analysis} that, for each data set, the variance of the relaxed solutions for $xi_i$ decreases sharply as $M$ increases and tends to zero. Interestingly there is actually a slight increase in variance at first for the normal data, but like the rest this does still tend to zero.
 
 \section{Literature Review}\label{lit review}
 
@@ -409,45 +415,7 @@ This method will always return a feasible solution that covers $\eta\%$ of the d
      
     \caption{Relaxation-Based Heuristic}
 \end{algorithm}
-\subsection{Shrinking Heuristics}
-These heuristics work by computing a candidate centre for the ball, then computing the $k$ closest points and returning the ball $B(c,r)$ where $r$ is the maximum distance from $c$ to each of the $k$ closest points.
 
-\subsubsection{MEB Shrinking Heuristic}
-Our first shrinking heuristic finds a candidate centre by first computing $\MEB(\A)=B(c,r')$, then finding the $k$ closest points and returning the ball $B(c,r)$ as described above.
-
-\begin{algorithm}[H]\label{meb shrink}
-    \SetAlgoLined
-    \KwIn{Data set $\A$, $\eta\in[0,1]$, $\epsilon>0$}
-    \KwOut{Ball $B(c,r)$}
-    $k:=\floor{n(1-\eta)}$\;
-    Let $c$ be the center of the MEB returned by a heuristic for $\MEB(\A)$\;
-    $D:=\left\{\norm{c-x}: x\in\A\right\}$\;
-    Let $D'$ be $D$ sorted in ascending order\;
-    Let $\delta$ be the $(k-1)$th element of $D'$ (indexing from 0)\;
-    $\A' = \left\{a^i\in\A: D[i] \leq \delta, i=1,\ldots,n\right\}$\;
-    $r = \max_{a\in\A'}\norm{c-a}$\;
-    \KwRet $B(c,r)$\;
-    
-    \caption{MEB Shrinking Heuristic}
-\end{algorithm}
-
-\subsubsection{Average Point Shrinking Heuristic}
-Our second heuristic finds a candidate centre by simply finding the average point, i.e. $c=\frac{1}{n}\sum_{i=1}^n a^i$, then finding the $k$ closest points and returning the ball $B(c,r)$ as described above.
-
-\begin{algorithm}[H]\label{avg point shrink}
-    \SetAlgoLined
-    \KwIn{Data set $\A$, $\eta\in[0,1]$}
-    \KwOut{Ball $B(c,r)$}
-    $k:=\floor{n(1-\eta)}$
-    $c:=\frac{1}{n}\sum_{i=1}^na^i$\;
-    $D:=\left\{\norm{c-x}: x\in\A\right\}$\;
-    Let $D'$ be $D$ sorted in ascending order\;
-    Let $\delta$ be the $(k-1)$th element of $D'$ (indexing from 0)\;
-    $r = \max_{a\in\A'}\norm{c-a}$\;
-    \KwRet{$B(c,r)$}
-    
-    \caption{Average Point Shrinking Heuristic}
-\end{algorithm}
 \subsection{Shenmaier's Approximation}
 \subsubsection{Statement}
 This approximation scheme developed by Vladimir Shenmaier in \cite[Algorithm 1]{SHENMAIER201581} is a brute-force algorithm to solving the MEBwO problem with $O(n^2d)$ time complexity. It works by considering each point in the input set, finding the $k$-closest points to that point, then returning the point-distance pair such that the maximum distance from each point to each other point in its $k$-closest points is minimised. See Algorithm \ref{shenmaier} for a detailed outline of this algorithm.
@@ -474,6 +442,53 @@ This approximation scheme developed by Vladimir Shenmaier in \cite[Algorithm 1]{
 Referring to Algorithm \ref{shenmaier}, on line 1 we have an assignment which runs in $O(1)$ time. On lines 2 through 5 we have a \texttt{for} loop which runs $n$ many times, and on line 3 we compute a list of $n$ many distances, which for $d$-dimensional vectors runs in $O(nd)$ time. Line 4 involves sorting the aforementioned list, so the time complexity depends on the sorting algorithm used. It is well known within computer science that algorithms are often subject to a time-memory trade off, meaning that it is possible to design algorithms that run faster as a result of using less memory, and vice-versa. We can then assume that a sensible implementation of Algorithm \ref{shenmaier} would use the fastest available sorting algorithm given that the size of our data sets are small enough that we do not run into memory constraints, so the recommended sorting algorithm is Quicksort \cite{hoare1962quicksort} which runs on average in $O(n\log n)$ time. Line 5 simply accesses the $(k-1)$th element of the sorted list and so runs in $O(1)$ time.
 
 Line 6 finds the minimum element from a set of values and runs in $O(n)$ time. Lines 7 and 8 are simple assignments and run in $O(1)$ time. Finally, our overall time complexity is then $O(n^2(d+\log n))$. This will usually reduce to $O(n^2d)$ as typically $d>\log n$, though for particularly large $n$ and very small $d$ the alternative reduction of $O(n^2\log n)$ is of course possible.
+
+\subsection{MEB Shrinking Heuristic}
+\subsubsection{Statement}
+The MEB Shrinking Heuristic works by computing $\MEB(\A) = B(c,r)$, then simply shrinking the radius until $\eta\%$ of points are covered. This is done by calculating the $n-k$ closest points to $c$ and returning the ball $B(c,r')$ where $r'$ is the greatest distance from $c$ to each of the $n-k$ points.
+
+\begin{algorithm}[H]\label{meb shrink}
+    \SetAlgoLined
+    \KwIn{Data set $\A$, $\eta\in[0,1]$, $\epsilon>0$}
+    \KwOut{Ball $B(c,r)$}
+    $k:=\floor{n(1-\eta)}$\;
+    Let $c$ be the center of the MEB returned by a heuristic for $\MEB(\A)$\;
+    $D:=\left\{\norm{c-x}: x\in\A\right\}$\;
+    Let $D'$ be $D$ sorted in ascending order\;
+    Let $\delta$ be the $(k-1)$th element of $D'$ (indexing from 0)\;
+    $\A' = \left\{a^i\in\A: D[i] \leq \delta, i=1,\ldots,n\right\}$\;
+    $r = \max_{a\in\A'}\norm{c-a}$\;
+    \KwRet $B(c,r)$\;
+    
+    \caption{MEB Shrinking Heuristic}
+\end{algorithm}
+
+\subsubsection{Complexity}
+The complexity of this heuristic mostly depends on the choice of heuristic for solving the MEB problem on $\A$. The dominant term in lines 3 though 7 is on average $O(n\log n)$ from sorting the list of distances, so the overall complexity is the greater out of this and the complexity of the heuristic. Our implementation uses Algorithm \ref{core-set algorithm}, which in this case is $O\left(\frac{nd}{\epsilon}+\frac{d^2}{\epsilon^{3/2}}\left(\frac{1}{\epsilon}+d\right)\log\frac{1}{\epsilon}\right)$ \cite[Page 6]{core-sets}.
+\subsection{Average Point Heuristic}
+\subsubsection{Statement}
+The Average Point Heuristic works by finding the average point, i.e. $c=\frac{1}{n}\sum_{i=1}^n a^i$, then finding the $n-k$ closest points and returning the ball $B(c,r)$ where $r$ is the greatest distance from $c$ to each of the $n-k$ points.
+
+\begin{algorithm}[H]\label{avg point shrink}
+    \SetAlgoLined
+    \KwIn{Data set $\A$, $\eta\in[0,1]$}
+    \KwOut{Ball $B(c,r)$}
+    $k:=\floor{n(1-\eta)}$\;
+    $c:=\frac{1}{n}\sum_{i=1}^na^i$\;
+    $D:=\left\{\norm{c-x}: x\in\A\right\}$\;
+    Let $D'$ be $D$ sorted in ascending order\;
+    Let $\delta$ be the $(k-1)$th element of $D'$ (indexing from 0)\;
+    $r = \max_{a\in\A'}\norm{c-a}$\;
+    \KwRet{$B(c,r)$}
+    
+    \caption{Average Point Shrinking Heuristic}
+\end{algorithm}
+
+\subsubsection{Complexity}
+This algorithm runs extremely quickly, with the dominating term in the time complexity being $O(n\log n)$ on average as a result of sorting the list of distances on line 4. This is far faster than any other construction method and is more resistant to outliers than the MEB shrinking heuristic.
+
+
+
 \section{Improvement Heuristics}
 We now consider some improvement heuristics. The two heuristics described here are, strictly speaking, designed to improve an existing MEB rather than an MEBwO. However, quick and effective methods exist for solving the MEB problem and so improvement heuristics have not been needed, while heuristics which solve the MEBwO problem may return a solution which has considerable space for improvement.
 
@@ -591,9 +606,10 @@ since $\norm{a^i-a^i_\beta}\geq0$. Hence $\norm{c-a^i}\leq r$ for $i=1,\ldots,n$
 
 The complexity of the DCSSH is easy to determine. Referring to Algorithm \ref{fig:dcssh}, on line 1 we have a loop over each data point which runs in $O(n)$ time. On lines 4 through 6 we have a \texttt{for} loop which runs $n$ many times, with the operations on lines 5 and 6 both being $O(d)$ as they are each single operations on $d$-dimensional vectors, so overall this loop runs in $O(nd)$ time. On lines 7 and 8 we find the minimum and maximum of two lists respectively, again $O(n)$. Finally, on line 8, a single operation on $d$-dimensional vectors runs in $O(d)$ time. Our dominating term is then $O(nd)$.
 \subsection{Direction-Constrained MEB Heuristic}
+\subsubsection{Derivation}
 For a visual aid to this derivation please refer to Figure \ref{fig:dcmeb}. Consider $B(\hat{c},\hat{r})$. Similarly to the DCSSH, for an improving direction we choose the furthest point in $\A$ from $\hat{c}$, $\hat{a}=\arg\max_{a\in\A}\norm{\hat{c}-a}$, and let $\beta=\hat{a}-\hat{c}$ be this direction. Note that this is the negative of $\beta$ used in the derivation of the DCSSH, as we are now considering the direction $\hat{c}\to\hat{a}$. Now, instead of calculating distances between each point in data and the surface of the ball to find a feasible step length from $\hat{c}$ towards $\hat{a}$, we formulate an optimization model to find an optimal step length such that the new ball still contains all data, but has a smaller radius.
 
-We modify the optimization model for the MEB problem, adding the constraint that $c$ must lie on the direction $\beta$ from $\hat{c}$. It is possible to formulate this exactly using the constraint $c=x(\hat{c}+\beta)$, however a better formulation is to consider a variable $x\in\mathbb{R}^{\geq0}$, then write $c=\hat{c}+\beta x$. Obviously $\hat{c}$ is a constant vector so this reduces the problem of finding the new $c$ to that of finding the optimal solution to one variable $x$, as opposed to $d$ many decision variables for each element of the vector $c$. The optimization model for the DBMEB problem is as follows:
+We modify the optimization model for the MEB problem, adding the constraint that $c$ must lie on the direction $\beta$ from $\hat{c}$. It is possible to formulate this exactly using the constraint $c=x(\hat{c}+\beta)$, however a better formulation is to consider a variable $x\in\mathbb{R}^{\geq0}$, then write $c=\hat{c}+\beta x$. Obviously $\hat{c}$ is a constant vector so this reduces the problem of finding the new $c$ to that of finding the optimal solution to one variable $x$, as opposed to $d$ many decision variables for each element of the vector $c$. The optimization model for the DCMEB problem is as follows:
 \begin{center}
     \begin{tabular}{CCC}
         \displaystyle\min_{x,r} & r \\
@@ -602,7 +618,7 @@ We modify the optimization model for the MEB problem, adding the constraint that
     \end{tabular}
 \end{center}
 
-By setting $\gamma=r^2$, $\alpha^i=\hat{c}-a^i$ for $i=1,\ldots,n$, and squaring the norm constraints, we get the following quadratic model:
+By setting $\gamma=r^2$, $\alpha^i=\hat{c}-a^i$ for $i=1,\ldots,n$, and squaring the norm constraints, we get the following QCQP:
 \begin{center}
     \begin{tabular}{CCC}
         \displaystyle\min_{x,\gamma} & \gamma \\
@@ -611,9 +627,13 @@ By setting $\gamma=r^2$, $\alpha^i=\hat{c}-a^i$ for $i=1,\ldots,n$, and squaring
     \end{tabular}
 \end{center}
 
-This model has $n+1$ constraints and most crucially, 2 decision variables. This makes the model extremely computationally easy to solve by modern solvers such as Gurobi. The DCMEB heuristic is then to simply solve the DCMEB, given a data set $\A$ and initial ball $B(\hat{c},\hat{r}$, using the solutions of the solved DCMEB problem for the new ball.
+This model has $n+1$ constraints and most crucially, 2 decision variables. This makes the model extremely computationally easy to solve by modern solvers such as Gurobi. In fact, like the original MEB problem, we may formulate the DCMEB problem as as a SOCP by considering the cones
+\begin{equation*}
+    C_i = \left\{(r,\beta x+\hat{c}-a^i) \in \mathbb{R}^{d+1}: \norm{\beta x +\hat{c}-a^i}\leq\gamma\right\}.
+\end{equation*}
+and as such the DCMEB problem may be solved by interior-point methods \cite{socp_ipm}. The DCMEB heuristic is then to simply solve the DCMEB, given a data set $\A$ and initial ball $B(\hat{c},\hat{r}$, using the solutions of the solved DCMEB problem for the new ball.
 
-\begin{algorithm}
+\begin{algorithm}[H]
     \KwIn{Data set $\A$, Ball $B(\hat{c},\hat{r}$)}
     \KwOut{Ball $B(c,r)$}
     $\hat{a}:=\arg\max_{a\in\A}\norm{\hat{c}-a}$\;
@@ -638,9 +658,13 @@ This model has $n+1$ constraints and most crucially, 2 decision variables. This 
         % ball
         \draw (0,0) circle (3);
     \end{tikzpicture}
-    \caption{Visual Aid for Direction-Constrained MEB}
+    \caption{Visual Aid for Derivation of the Direction-Constrained MEB}
     \label{fig:dcmeb}
 \end{figure}
+
+\subsubsection{Complexity}
+
+The operations in this heuristic are simply finding a maximally distant point which runs in $O(n)$ time, solving the DCMEB problem, and an assignment which runs in $O(1)$ time. So, the interest is in the time complexity of the method used to solve the DCMEB problem. As this problem is a SOCP it makes sense to apply interior-point methods which may then solve it in polynomial time (TODO: NEEDS CITATION).
 % =============================================================================
 % Chapter 4
 % =============================================================================
