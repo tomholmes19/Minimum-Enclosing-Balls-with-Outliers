@@ -196,6 +196,9 @@ class MEB(Ball):
         """
         self.check_params()
 
+        if "c" not in kwargs:
+            kwargs["c"] = self.center
+
         algorithm = improvement_algorithms.algorithms.get("alg__{}".format(method)) # returns None if 'alg_method' not in algorithms dict
         if algorithm is None:
             raise NotImplementedError("Method '{}' not implemented".format(method))
