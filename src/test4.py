@@ -9,11 +9,11 @@ np.random.seed(1234)
 d = 1000
 data = generation.uniform_ball_with_ouliters(
     n=10000,
-    d=d,
+    d=10,
     eta=0.9,
-    r1=10,
-    r2=20,
-    sep=5
+    r=1,
+    r1=2,
+    r2=3
 )
 
 inliers = [x for x in data if np.linalg.norm(x) <= 11]

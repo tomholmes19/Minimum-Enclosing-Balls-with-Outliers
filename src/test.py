@@ -1,18 +1,16 @@
+import meb.gurobi_solvers
+import data.generation
+
+from meb.ball import MEBwO
+
 import numpy as np
-import timeit
 
-import data.generation, data.loading
-from meb import geometry, meb_algorithms
-from meb.ball import Ball, MEBwO
-import timeit
+n = 1000
+d = 2
 
-n = 10000
-d = 30
+np.random.seed(1234)
+data = data.generation.normal(0,1,n,d)
 
-data_ = data.generation.normal(0, 1, n, d)
-
-start = timeit.default_timer()
-M = geometry.M_estimate(data_)
-elapsed = timeit.default_timer() - start
-
-print(elapsed)
+ball = MEBwO(center=[0]*d, radius=1)
+ball.improve(data, method="dcmeb", )
+ball.plot(data)
