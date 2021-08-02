@@ -124,8 +124,6 @@ def dc_meb(data, c, a, time_limit=None, log_file=""):
         x_soln (float): proportion along direction c->a to move c
         r_soln (float): new radius
     """
-    n = len(data) # number of points
-
     m = gp.Model("MEBwO")
 
     if log_file != "":
