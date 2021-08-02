@@ -11,10 +11,8 @@ d = 100
 np.random.seed(3412)
 data = data.generation.normal(0,1,n,d)
 
-c = np.array([0]*d)
-
 ball = MEBwO().fit(data, method="shenmaier", eta=0.9)
-inliers = [x for x in data if np.linalg.norm(x-c) <= ball.radius]
+inliers = [x for x in data if np.linalg.norm(x-ball.center) <= ball.radius]
 r = [ball.radius]
 
 for _ in range(100):
