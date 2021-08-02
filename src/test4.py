@@ -9,7 +9,7 @@ np.random.seed(1234)
 d = 1000
 data = generation.uniform_ball_with_ouliters(
     n=10000,
-    d=10,
+    d=d,
     eta=0.9,
     r=1,
     r1=2,
