@@ -274,9 +274,7 @@ For a simple example, consider the data set $\A=\left\{(-2,-1),(2,-1),(2,1),(-2,
 \end{definition}
 Since this problem can be modelled as a SOCP we know it may be solved by interior-point methods \cite{socp_ipm}. This problem has $d+1$ variables and $n$ constraints, so it quickly become slow to find an optimal solution for large $n$ and $d$ when using a solver such as Xpress or Gurobi, but many alternative approaches are present in the literature which offer very fast solutions within a guaranteed accuracy (\cite{core-sets}, \cite{two-algorithms}).
 
-We will discuss here one such algorithm to solve the MEB problem from \cite{core-sets} that will be used in algorithms in Chapter \ref{algorithms}. The central idea is that of the \textit{core-set} \cite{badoiu}, which is a small set of points that approximate the shape of a larger set of points. For example, a circle in two dimensions can be represented by a core-set of three points which lie on the boundary of the circle.
-
-%TODO: image of 2d circle with core-set here
+We will discuss here one such algorithm to solve the MEB problem from \cite{core-sets} that will be used in algorithms in Chapter \ref{algorithms}. The central idea is that of the \textit{core-set} \cite{badoiu}, which is a small set of points that approximate the shape of a larger set of points. For example, a circle in two dimensions can be represented by a core-set of three points which lie on the boundary of the circle (see Figure \ref{fig:core set example}).
 
 The idea of the algorithm is to create a candidate core-set, check if the MEB of this core-set contains all of the input data, and if so return the MEB, if not grow the core-set by adding the furthest point from the center of the candidate MEB. For further details please see \cite{core-sets}.
 
@@ -304,6 +302,13 @@ The idea of the algorithm is to create a candidate core-set, check if the MEB of
 \end{algorithm}
 
 Algorithm \ref{core-set algorithm} runs in $O\left(\frac{nd}{\epsilon}+\frac{d^2}{\epsilon^{3/2}}\left(\frac{1}{\epsilon}+d\right)\log\frac{1}{\epsilon}\right)$ time \cite[Page 6]{core-sets}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{core_set_example.png}
+    \caption{Example of a Core-Set for an MEB}
+    \label{fig:core set example}
+\end{figure}
 
 \section{Minimum Enclosing Ball with Outliers}
 \subsection{Formulation}
