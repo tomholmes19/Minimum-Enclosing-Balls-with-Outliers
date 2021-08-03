@@ -58,7 +58,7 @@ cross/.default={2pt}}
 
 \begin{document}
 \pagestyle{empty}
-
+\bibliographystyle{abbrv}
 % =============================================================================
 % Title page
 % =============================================================================
@@ -143,7 +143,6 @@ Here come your acknowledgments ...
 \setcounter{page}{1}
 
 \nocite{*}
-\bibliographystyle{abbrv}
 \clearpage
 % =============================================================================
 % Main body
@@ -394,6 +393,12 @@ We can see in Figure \ref{fig:xi analysis} that, for each data set, the variance
 
 \section{Literature Review}\label{lit review}
 We will now conduct a review of the current literature on the MEBwO problem.
+
+Early approaches were developed specifically for the $d=2$ case of finding the minimum enclosing circle with outliers. One such paper is \cite{AGGARWAL199138} which discusses computing Voronoi cells and then performing a search of the resulting Voronoi cells. \cite{efrat} makes use of a parametric search technique proposed by \cite{megiddo}, and \cite{MATOUSEK1995217} uses a randomized search algorithm. These papers all gave exact solutions to the MEBwO problem in the two-dimensional case, while \cite{harpeled} presents some approximate algorithms.
+
+Some more recent approaches are as follows. \cite{SHENMAIER201581} proves the NP-hardness of the MEBwO problem in Euclidean space (Theorem 1) and also that no fully polynomial time approximation scheme exists for the MEBwO problem unless $P=NP$ (Theorem 3). Shenmaier's paper also proposes two algorithms for solving the MEBwO problem in $\mathbb{R}^d$ which both have an approximation guarantee. We implement and benchmark Algorithm 1 in this paper which Shenmaier proves to give 2-approximate solutions, meaning we may get a lower bound on the optimal value of the MEBwO problem for a given data set. This algorithm works by computing the $k$-nearest points to each point in the data set and returning the smallest ball found. The second algorithm, not implemented in this paper, is an extension of the prior algorithm where a grid of candidate centres is constructed in a local neighbourhood of each point. This algorithm provides a tighter approximation guarantee but has significantly worse time complexity. Shenmaier also discusses the dual of the MEBwO problem, and the hardness of this dual is an interesting area of further research.
+
+
 
 
 
