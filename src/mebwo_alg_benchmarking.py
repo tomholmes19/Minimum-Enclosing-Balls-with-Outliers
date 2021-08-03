@@ -47,7 +47,7 @@ if msg == "y":
     for func_name in confirmed_funcs:
         for data_type in confirmed_data:
             if param_types["n"]:
-                n = [1000 + 3000*i for i in range(10) if 1000+3000*i > 25000]
+                n = [1000 + 3000*i for i in range(10)]
                 d = 30
                 eta = 0.9
 
@@ -82,7 +82,7 @@ if msg == "y":
             
             if param_types["d"]:
                 n = 10000
-                d = [10 + 10*i for i in range(10) if 10+10*i > 60]
+                d = [10 + 10*i for i in range(10)]
                 eta = 0.9
 
                 if func_name == "relaxation_heuristic":
