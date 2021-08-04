@@ -14,6 +14,9 @@
 \usepackage{tikz}
 \usepackage{mathrsfs} %% mathscr for powerset
 
+\usepackage{caption}
+\usepackage{subcaption}
+
 %TC:ignore
 \newcolumntype{C}{>{$}c<{$}}    % math-mode version of "l" column type
 \newcolumntype{L}{>{$}l<{$}} 
@@ -23,6 +26,24 @@
 \newcommand{\K}{\mathcal{K}}
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert} % norm
 \newcommand{\binary}{\left\{0,1\right\}} % lazy
+
+\newcommand{\datafigure}[4]{
+    \begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.3333\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{#1}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3333\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{#2}
+    \end{subfigure}
+    \hfill
+    \caption{#3}
+    \label{#4}
+\end{figure}
+}
+
 
 \DeclareMathOperator{\MEB}{MEB}
 \DeclareMathOperator{\MEBwO}{MEBwO}
@@ -439,7 +460,7 @@ This method will always return a feasible solution that covers $\eta\%$ of the d
 \subsection{Shenmaier's Approximation}
 \subsubsection{Statement}
 This approximation scheme developed by Vladimir Shenmaier in \cite[Algorithm 1]{SHENMAIER201581} is a brute-force algorithm to solving the MEBwO problem with $O(n^2d)$ time complexity. It works by considering each point in the input set, finding the $k$-closest points to that point, then returning the point-distance pair such that the maximum distance from each point to each other point in its $k$-closest points is minimised. See Algorithm \ref{shenmaier} for a detailed outline of this algorithm.
-\begin{algorithm}\label{shenmaier}
+\begin{algorithm}
     \KwIn{Data set $\A$, $\eta\in[0,1]$}
     \KwOut{Ball $B(c,r)$}
     $k=\floor{n(1-\eta)}$\;
@@ -454,6 +475,7 @@ This approximation scheme developed by Vladimir Shenmaier in \cite[Algorithm 1]{
     \KwRet{$B(c,r)$}\;
     
     \caption{Shenmaier's Approximation \cite[Algorithm 1]{SHENMAIER201581}}
+    \label{shenmaier}
 \end{algorithm}
 \subsubsection{Approximation Guarantee}
  From \cite[Theorem 4]{SHENMAIER201581} we know that Algorithm \ref{shenmaier} returns a 2-approximation solution to the MEBwO problem. What this means is that if we have a minimum radius of $r$ returned by Algorithm \ref{shenmaier} for a data set $\A$, then the true optimal value to the MEBwO problem on that data is no less than $r/2$. This is useful for assessing how close a heuristic is to an optimal solution in the worst case when we have a solution via Algorithm \ref{shenmaier}, but not an optimal solution via solving the exact model.
@@ -691,13 +713,83 @@ The operations in this heuristic are simply finding a maximally distant point wh
 \chapter{Implementation and Experiments}\label{implementation}
 \section{Code Implementation}
 \section{Data}\label{data}
-In this section we present and discuss the types of data we will use for benchmarking our algorithms for solving the MEBwO problem.
+In this section we present and discuss the types of data we will use for bench-marking our algorithms for solving the MEBwO problem. Functions written and used for this project can be found in the script \texttt{src/data/generation.py}.
 
 \subsection{Normal}
+Our first data set is constructed by generating standard normal variates, that is random numbers from the normal distribution $X\sim N(0,1)$ with mean $0$ and variance $1$. Many examples of real-life data have been shown to be normally distributed and the normal distribution is symmetric around its mean in each dimension, so it is an obvious choice to be fit with an MEBwO.
 
+This can be easily generated using NumPy \cite{numpy} by calling the function \texttt{np.random.normal(0, 1, (n,d))} to generate $n$ many $d$-dimensional standard normal vectors. See Figure \ref{fig:normal} for an example.
+
+\datafigure{normal_2d.png}{normal_3d.png}{Example of Standard Normal Data}{fig:normal}
 
 \subsection{Uniform Ball}\label{uniform ball}
+Our next data type consists of points sampled uniformly from a hypersphere of dimension $d$, and in this paper we will specifically choose to uniformly sample points within the unit ball centered on the zero vector, $B(\mathbf{0},1)\subseteq\mathbb{R}^d$. See Figure \ref{fig:unifball} for an example. Like with the choice of normal data, spherical data such as that of a uniform ball is a reasonable choice for the MEBwO problem.
+
+\datafigure{uniform_ball_2d.png}{uniform_ball_3d.png}{Example of a Uniform Ball}{fig:unifball}
+
+To generate points uniformly within a unit ball, we must first generate points uniformly on the unit hypersphere. \cite{hyperspheresurface} provides a fast and easy to implement method of doing this, by first generating the standard normal vector $\mathbf{x}=(x_1,\ldots,x_d)$ where $x_i\sim N(0,1)$ for $i=1,\ldots,d$, and then the distribution of the normalized vectors $\mathbf{x}/\norm{\mathbf{x}}$ is uniform over the hypersphere of dimension $d$.
+
+A naive approach would then be to multiply the point on the surface of the hypersphere by a uniform random variate $U\sim U(0,1)$ to obtain a point inside the unit ball, and indeed this does generate points within the unit ball, but they will not be uniformly distributed and points will be more densely located near the centre of the ball. Instead, from \cite{eldredge} we find that we can instead multiply our point on the surface of the hypersphere by $U^{1/d}$ to have our points be uniformly distributed within the hypersphere. More generally, multiplying our point on the surface by $r\cdot U^{1/d}$ for some radius $r>0$ gives us a point within the hypersphere of radius $r$. See Algorithm \ref{alg:unitball} for a detailed outline of this method.
+
+\begin{algorithm}[H]
+    \KwIn{Dimension $d\in\mathbb{N}$, radius $r\in\mathbb{R}^{\geq0}$, centre $c\in\mathbb{R}^d$}
+    \KwOut{Point $x\in\mathbb{R}^d$}
+    Generate $x:=(x_1,\ldots,x_d)$ where $x_i\sim N(0,1)$\;
+    $x:=x/\norm{x}$\;
+    Generate $U\sim U(0,1)$\;
+    $x:=r\cdot x\cdot \left(U^{1/d}\right)$\;
+    $x:= x+c$\;
+    \KwRet{x}
+    
+    \caption{Algorithm for Generating Points in a Hypersphere of Radius $r$}
+    \label{alg:unitball}
+\end{algorithm}
+
+One benefit of using this data is that when we are bench-marking the Relaxation-Based Heuristic, we do not need to spend time calculating a lower bound for $M$. Since we know our data set is contained within a unit ball, our diameter can be at most 2. The true diameter of any given uniform ball data set will be some value marginally close to 2, but crucially, less than 2. This means an $M$ value of 2 will ensure that our big $M$ constraints work correctly, and the closeness of the true diameter to 2 means that the increase in solution time for the exact model is negligible.
+
 \subsection{Hyperspherical Shell}
+Now we will discuss the data type we call the Hyperspherical Shell. This consists of points sampled uniformly between the surfaces of two concentric hyperspheres with the same centres where one is strictly contained within the other. We may explicitly define this region as
+\begin{equation*}
+    H(c,r_1,r_2) = \left\{x\in\mathbb{R}^d: r_1 \leq \norm{x-c} \leq r_2\right\}
+\end{equation*}
+
+In this paper we choose the zero vector as our center, an inner radius of $1$, and an outer radius of $2$. See Figure \ref{fig:hypshell} for an example. In two dimensions the shape approximated by this data is known as an annulus, and in three dimensions a spherical shell, so for the general $d$-dimensional case we opt to call it a hyperspherical shell.
+
+\datafigure{hyperspherical_shell_2d.png}{hyperspherical_shell_3d.png}{Example of a Hyperspherical Shell}{fig:hypshell}
+
+This data type is chosen as the optimal centre of the MEBwO on any sufficiently large data set is guaranteed to be ``far" away from any point in the data set. This poses issues for Shenmaier's Approximation which always returns a centre which is a point within the data set.
+
+To generate points within this set, we can make use of Algorithm \ref{alg:unitball} to generate points uniformly in a hypersphere whose radius is our chosen outer radius, then use an acceptance-rejection method to reject points whose distance from our chosen centre is less than our chosen inner radius. A common drawback of acceptance-rejection methods is that of efficiency, i.e. of the space in which we are generating points, what percentage of this space is our acceptance region. Depending on the amount of points desired, a low efficiency can result in very long computation times due to the number of points being rejected.
+
+Acceptance-rejection methods are usually unsuitable for generating high-dimensional data, as a result of the ``curse of dimensionality". For example, if we wanted to generate points within a unit ball using an acceptance-rejection method, the ratio of the volume of a hypersphere inscribed within a hypercube to the volume of that hypercube tends to $0$ as $d\to\infty$ \cite{curse}.
+
+Fortunately, in our case, the ratio of the acceptance region to the total volume of the hypersphere tends to $1$ as $d\to\infty$. To see this, note that the volume of a $d$-dimensional hypersphere with radius $r$ is
+\begin{equation*}
+    V_d(r) = \frac{S_d r^d}{d}
+\end{equation*}
+where $S_d$ is the hyper-surface area of the unit hypersphere in $d$ dimensions \cite{hypersphere}. Now, for inner radius $r_1$ and outer radius $r_2$ where $r_2>r_1$, we have
+\begin{align*}
+    \frac{V_d(r_1)}{V_d(r_2)} &= \frac{\left(\frac{S_dr_1^d}{d}\right)}{\left(\frac{S_dr_2^d}{d}\right)} \\
+    &= \frac{r_1^d}{r_2^d} \\
+    &= \left(\frac{r_1}{r_2}\right)^d
+\end{align*}
+which tends to $0$ as $d\to\infty$ since $r_2>r_1$. So, for sufficiently large $d$, the efficiency of this acceptance-rejection method is close to $1$. We outline our acceptance-rejection method in Algorithm \ref{alg:shell}
+
+\begin{algorithm}
+    \KwIn{Dimension $d\in\mathbb{N}$, inner radius $r_1\in\mathbb{R}^{\geq0}$, outer radius $r_2\in\mathbb{R}^{\geq0}$, center $c\in\mathbb{R}^d$}
+    \KwOut{Point $x\in\mathbb{R}^d$}
+    
+    \While{True}{
+        Generate $x$ from Algorithm \ref{alg:unitball} with $r=r_2$\;
+        \uIf{$\norm{x-c}>r_1$}{
+            break\;
+        }
+    }
+    \KwRet{x}\;
+    
+    \caption{Acceptance-Rejection Method for Generating Points in a Hyperspherical Shell}
+    \label{alg:shell}
+\end{algorithm}
 \subsection{Uniform Ball with Outliers}
 \subsection{MNIST}
 
