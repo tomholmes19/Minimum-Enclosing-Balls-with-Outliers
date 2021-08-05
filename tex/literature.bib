@@ -405,3 +405,117 @@ numpages = {2}
     url      = {\url{https://mathworld.wolfram.com/Hypersphere.html}},
     note     = {Accessed 2021/08/04}
 }
+
+@misc{kernighan2006c,
+  title={The C programming language},
+  author={Kernighan, Brian W and Ritchie, Dennis M},
+  year={2006}
+}
+
+@article{scikit-learn,
+ title={Scikit-learn: Machine Learning in {P}ython},
+ author={Pedregosa, F. and Varoquaux, G. and Gramfort, A. and Michel, V.
+         and Thirion, B. and Grisel, O. and Blondel, M. and Prettenhofer, P.
+         and Weiss, R. and Dubourg, V. and Vanderplas, J. and Passos, A. and
+         Cournapeau, D. and Brucher, M. and Perrot, M. and Duchesnay, E.},
+ journal={Journal of Machine Learning Research},
+ volume={12},
+ pages={2825--2830},
+ year={2011}
+}
+
+@article{bezanson2017julia,
+  title={Julia: A fresh approach to numerical computing},
+  author={Bezanson, Jeff and Edelman, Alan and Karpinski, Stefan and Shah, Viral B},
+  journal={SIAM review},
+  volume={59},
+  number={1},
+  pages={65--98},
+  year={2017},
+  publisher={SIAM},
+  url={https://doi.org/10.1137/141000671}
+}
+
+@article{jump,
+author = {Iain Dunning and Joey Huchette and Miles Lubin},
+title = {JuMP: A Modeling Language for Mathematical Optimization},
+journal = {SIAM Review},
+volume = {59},
+number = {2},
+pages = {295-320},
+year = {2017},
+doi = {10.1137/15M1020575},
+}
+
+@article{lcg1,
+    author = {Thomson, W. E.},
+    title = "{A Modified Congruence Method of Generating Pseudo-random Numbers}",
+    journal = {The Computer Journal},
+    volume = {1},
+    number = {2},
+    pages = {83-83},
+    year = {1958},
+    month = {01},
+    issn = {0010-4620},
+    doi = {10.1093/comjnl/1.2.83},
+    url = {https://doi.org/10.1093/comjnl/1.2.83},
+    eprint = {https://academic.oup.com/comjnl/article-pdf/1/2/83/1175362/010083.pdf},
+}
+
+@article{lcg2,
+author = {Rotenberg, A.},
+title = {A New Pseudo-Random Number Generator},
+year = {1960},
+issue_date = {Jan. 1960},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {7},
+number = {1},
+issn = {0004-5411},
+url = {https://doi.org/10.1145/321008.321019},
+doi = {10.1145/321008.321019},
+abstract = {Although the multiplicative congruential method for generating pseudo-random numbers
+is widely used and has passed a number of tests of randomness [1, 2], attempts have
+been made to find an additive congruential method since it could be expected to be
+faster. Tests on a Fibonacci sequence [1] have shown it to be unsatisfactory. The
+sequence xi+1 = (2a + 1) xi + c (mod 235) (1) has been tested on the IBM 704. In appendix
+I it is shown that the sequence generates the full period of 235 numbers for a ≧ 2
+and c odd. Similar results obtain for decimal machines. Since multiplication by a
+power of the base can be accomplished by shifting, which is comparable in speed to
+addition, this scheme requires essentially three additions. It takes 14 machine cycles
+on the IBM 704, compared to 28 for the multiplicative method, so that the saving is
+168 μs/random number. The scheme has the further advantage that it does not destroy
+the multiplier-quotient register.Some tests have been made on the randomness of this
+sequence for a = 7 and c = 1, and a summary of the results is given in appendix II,
+where now the random numbers are considered to lie in the interval (0, 1).The serial
+correlation coefficient between one member of this sequence and the next is shown
+by Coveyou [3] to be approximately 0.8 per cent. By taking a = 9 this correlation
+coefficient can be reduced to approximately 0.2 per cent without increasing the time.
+Taking a = 21 would make this correlation very small but would require one more machine
+cycle on the IBM 704. Another way to reduce the correlation is to choose c such that
+the numerator in Coveyou's expression for the correlation coefficient is zero. This
+cannot be done exactly since it requires that c = (.5 ± √3/6)2P where P is the number
+of binary digits (excluding sign) in a machine word. However, a machine representation
+close to either of these numbers should be satisfactory. Some correlations with c
+= (.788+)235 and a = 7 were obtained and did not differ significantly from those given
+for c = 1 in the first section of appendix II.The author wishes to thank R. R. Coveyou
+for communicating his results in advance of publication and Elizabeth Wetherell for
+carrying out the calculations.},
+journal = {J. ACM},
+month = jan,
+pages = {75–77},
+numpages = {3}
+}
+
+@article{boxmuller,
+author = {G. E. P. Box and Mervin E. Muller},
+title = {{A Note on the Generation of Random Normal Deviates}},
+volume = {29},
+journal = {The Annals of Mathematical Statistics},
+number = {2},
+publisher = {Institute of Mathematical Statistics},
+pages = {610 -- 611},
+year = {1958},
+doi = {10.1214/aoms/1177706645},
+URL = {https://doi.org/10.1214/aoms/1177706645}
+}

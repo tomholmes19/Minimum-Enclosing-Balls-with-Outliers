@@ -713,7 +713,7 @@ The operations in this heuristic are simply finding a maximally distant point wh
 % =============================================================================
 \chapter{Implementation and Experiments}\label{implementation}
 \section{Code Implementation}
-We implement our algorithms and data generation using Python 3.8 \cite{python}. Python is a high-level procedural programming language which is commonly used in data science and mathematics for its low barrier to entry, wide-scale adoption, and rich package ecosystem. One drawback of using Python is that it is known to be slow compared to other languages. An implementation of our work in a faster programming language such as C (TODO: CITE C) will almost certainly result in faster run times --- in fact many Python packages such as sk-learn (TODO: CITE SOURCE and find another package which uses C) utilize C to run the more time-consuming processes, and the Gurobi \cite{gurobi} solver is written in C while Python and other languages with Gurobi support are merely interfaces to this solver. A new up-and-coming programming language is Julia (TODO: CITE JULIA) which promises similar run times to C (TODO: CITE) and has a mature library for interfacing with optimization solvers known as JuMP (TODO: CITE). Due to the time constraints on this paper, we make use of the author's prior knowledge in Python for the implementation as previously mentioned but again acknowledge that there are indeed potentially superior choices for this type of work.
+We implement our algorithms and data generation using Python 3.8 \cite{python}. Python is a high-level procedural programming language which is commonly used in data science and mathematics for its low barrier to entry, wide-scale adoption, and rich package ecosystem. One drawback of using Python is that it is known to be slow compared to other languages. An implementation of our work in a faster programming language such as C \cite{kernighan2006c} will almost certainly result in faster run times --- in fact many Python packages such as scikit-learn \cite{scikit-learn} and NumPy \cite{numpy} utilize C to run the more time-consuming processes, and the Gurobi \cite{gurobi} solver is written in C while Python and other languages with Gurobi support are merely interfaces to this solver. A new up-and-coming programming language is Julia \cite{bezanson2017julia} which promises similar run times to C and has a mature library for interfacing with optimization solvers known as JuMP \cite{jump}. Due to the time constraints on this paper, we make use of the author's prior knowledge in Python for the implementation as previously mentioned but again acknowledge that there are indeed potentially superior choices for this type of work.
 
 Packages within Python we make use of in the implementation are NumPy \cite{numpy} for numerical computation and linear algebra, pandas \cite{pandasjeff_reback_2021_5060318}{pandasmckinney-proc-scipy-2010} for data manipulation, MatPlotLib \cite{matplotlib} and Seaborn \cite{seaborn} for visualisation and plotting, and finally TensorFlow Datasets \cite{TFDS} to access the MNIST \cite{lecun2010mnist} data set. (TODO: CHECK SPELLING AND GRAMMAR)
 
@@ -723,9 +723,9 @@ TODO: talk about choice of solver (Gurobi)
 In this section we present and discuss the types of data we will use for bench-marking our algorithms for solving the MEBwO problem. Functions written and used for this project can be found in the script \texttt{src/data/generation.py}.
 
 \subsubsection{On Random Number Generation}
-In order to generate our data, we must have some method of creating random numbers. To generate uniform random variates from the distribution $U(0,1)$, the method of linear congruential generators (TODO: CITE) is well known within the literature, and provide us a computationally trivial way of generating pseudo-random uniform numbers.
+In order to generate our data, we must have some method of creating random numbers. To generate uniform random variates from the distribution $U(0,1)$, the method of linear congruential generators \cite{lcg1,lcg2} is well known within the literature, and provide us a computationally trivial way of generating pseudo-random uniform numbers.
 
-With a source of pseudo-random uniform numbers, it is then possible to create a wide variety of different random variates from various distributions. For example, to sample a random variate from the distribution $U(a,b)$ where $a>b$, one must simply generate a random variate $U$, from the distribution $U(0,1)$, then $U(b-a)+a$ follows the distribution $U(a,b)$. To generate standard normal random variates, from (CITE: GENERATING NORMAL RANDOM VARIABLES) we can first generate $U_1$, $U_2$ then
+With a source of pseudo-random uniform numbers, it is then possible to create a wide variety of different random variates from various distributions. For example, to sample a random variate from the distribution $U(a,b)$ where $a>b$, one must simply generate a random variate $U$, from the distribution $U(0,1)$, then $U(b-a)+a$ follows the distribution $U(a,b)$. To generate standard normal random variates from uniform random variates, one can use methods such as the Box-Muller transform \cite{boxmuller}.
 
 Using linear congruential generators and then applying transformations to obtain other random variates allows the user direct control over the randomness in their computations, allowing for very easy reproducability. In our implementation, we instead use the \texttt{random} package from NumPy \cite{numpy}. This allows us to generate uniform random numbers using \texttt{np.random.uniform} and \texttt{np.random.normal} easily, and we may set a seed for the pseudo-random generator using \texttt{np.random.seed} for reproducability.
 
@@ -808,9 +808,25 @@ which tends to $0$ as $d\to\infty$ since $r_2>r_1$. So, for sufficiently large $
 \subsection{Uniform Ball with Outliers}
 Our final randomly generated data set is the Uniform Ball with Outliers. This data type consists of a uniform ball with a set amount of ``outliers" which we generate ourselves. The main benefit of using this data type to benchmark our algorithms is that since we can choose the exact number of points outside the uniform ball, if we set $\eta\%$ of our $n$ points to be outside of the ball with radius $r$ then $\MEBwO(\A,\eta)$ will have a radius close to $r$.
 
-To generate this data, we simply use Algorithm \ref{alg:unitball} to generate a uniform unit ball with radius $1$ which contains $\eta\%$ of our data, and then use Algorithm \ref{alg:shell} with inner radius $2$ and outer radius $3$ which contains $(1-\eta)\%$ of our data. We choose an inner radius of $2$ so that there is a distinct gap between the two parts of the data in the interest of having a clear inner ball.
+To generate this data, we simply use Algorithm \ref{alg:unitball} to generate a uniform unit ball with radius $1$ which contains $\eta\%$ of our data, and then use Algorithm \ref{alg:shell} with inner radius $2$ and outer radius $3$ which contains $(1-\eta)\%$ of our data. We choose an inner radius of $2$ so that there is a distinct gap between the two parts of the data in the interest of having a clear inner ball. See Figure \ref{fig:unifballoutliers} for an example.
 
-% TODO: write algorithm for unif ball w outliers
+\begin{algorithm}
+    \KwIn{Number of points $n\in\mathbb{N}$, dimension $d\in\mathbb{N}$, percentage of inliers $\eta\in\left[0,1\right]$, radius of ball $r\in\mathbb{R}^{\geq0}$, inner radius of shell $r_1\in\mathbb{R}^{\geq0}$, outer radius of shell $r_2\in\mathbb{R}^{\geq0}$}
+    \KwOut{Data set $\A\subseteq\mathbb{R}^d$}
+    
+    $n_1:=\floor{\eta\cdot n}$\;
+    $n_2:=\floor{(1-\eta)n}$\;
+    Let $\A_1$ be the data set generated by running Algorithm \ref{alg:unitball} $n_1$ many times for $r=r$\;
+    Let $\A_2$ be the data set generated by running Algorithm \ref{alg:shell} $n_2$ many times for $r_1=r_1$, $r_2=r_2$\;
+    $\A=\A_1\cup\A_2$\;
+    \KwRet{$\A$}
+    
+    \caption{Algorithm for Generating a Uniform Ball with Outliers}
+    \label{alg:unifballoutliers}
+\end{algorithm}
+
+\datafigure{uniform_ball_with_outliers_2d.png}{uniform_ball_with_outliers_3d.png}{Example of a Uniform Ball with Outliers}{fig:unifballoutliers}
+
 \subsection{MNIST}
 
 \section{Experiments}
