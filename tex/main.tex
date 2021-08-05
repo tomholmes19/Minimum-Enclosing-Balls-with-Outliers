@@ -158,6 +158,7 @@ Here come your acknowledgments ...
 \clearpage
 \listoftables
 \listoffigures
+\listofalgorithms
 \cleardoublepage
 
 \pagenumbering{arabic}
@@ -395,7 +396,7 @@ For more robust benchmarking, we would prefer a method which always returns the 
 
 Our chosen method, which gives reliable estimates for $M$ in a reasonable time is to simply solve the $MEB$ problem for $\A$ and set $M:=2r$ for $B(c,r)=\MEB(\A)$. We know from Theorem \ref{thm:unique} that an MEB always exists and is unique for a given data set, so can always expect to receive the same $M$ value from this method. Using a heuristic approach such as Algorithm \ref{core-set algorithm} gives us a $(1+\epsilon)$-approximation to $\MEB(\A)$, so we will receive an $M$ value that is slightly larger than needed, but the effect on run time is insignificant and given that the returned $M$ value is consistent we do not introduce unneeded randomness into our methodology that is not already inherently present due to using randomly generated data.
 
-\subsubsection{Solution Times} %TODO
+\subsubsection{Solution Times}
 One concern with our choice of $M$ is the effect on the solution time of the solver.
 
 \subsubsection{Quality of $\xi_i$ Solutions in the QP Relaxation}
