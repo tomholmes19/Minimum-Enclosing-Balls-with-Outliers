@@ -47,7 +47,7 @@ if msg == "y":
     for func_name in confirmed_funcs:
         for data_type in confirmed_data:
             if param_types["n"]:
-                n = [1000 + 3000*i for i in range(10)]
+                n = [1000 + 3000*i for i in range(8)]
                 d = 30
                 eta = 0.9
 
