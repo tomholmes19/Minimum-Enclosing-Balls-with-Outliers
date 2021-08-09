@@ -38,6 +38,8 @@ for name, data in datas.items():
 
     plt.plot(range(num_iter+1), r1, label="DCMEB")
     plt.plot(range(num_iter+1), r2, label="DCSSH")
+    plt.xlabel("Iterations")
+    plt.ylabel("Radius")
     plt.legend()
     plt.savefig(r"images/improvement_example/improvement_example_{}".format(name), bbox_inches="tight")
     plt.clf()

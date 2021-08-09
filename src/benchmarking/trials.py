@@ -1,7 +1,12 @@
 import numpy as np
 import timeit
+import pandas as pd
+
+from meb.geometry import find_furthest, k_closest
+from meb.improvement_algorithms import alg__dcmeb, alg__dcssh
 
 from meb.meb_algorithms import alg__socp_heuristic
+from meb.mebwo_algorithms import alg__shrink_avg
 
 from . import utils
 import meb
@@ -125,3 +130,53 @@ def run_trials_alg(func, n, d, eta, num_trials, data_type, log_file=None, **kwar
     avg_times = utils.calc_avg_times(times)
 
     return avg_times
+
+def run_trials_improvement(heuristic, n, d, num_trials, num_iter, data_type, log_file=None, **kwargs):
+    params = {"n": n, "d": d}
+
+    trial_param, trial_param_vals = utils.find_trial_param(params)
+
+    utils.check_log(log_file)
+
+    results = []
+
+    for x in trial_param_vals:
+        params[trial_param] = x
+
+        n_ = params["n"]
+        d_ = params["d"]
+    
+        result = [x]
+
+        for i in range(num_trials):
+            utils.progress_report(x, trial_param, i)
+
+            # load data
+            filename = r"datasets/{0}/{1}_n{2}_d{3}".format(data_type, data_type, n_, d_)
+            if data_type == "uniform_ball_with_outliers":
+                filename += r"_eta{}".format(utils.format_eta(0.9))
+            filename += r"_{}.csv".format(i)
+            data_ = data.loading.from_csv(filename)
+
+            k = int(np.floor(0.9*n_))
+            # solve avg heuristic for center
+            c, _, _ = alg__shrink_avg(data_, eta=0.9)
+
+            # find closest point to c
+            c = find_furthest(c, data_, find_closest=True)
+            data_, r = k_closest(data_, c, k)
+            result.append(r)
+
+            for _ in range(num_iter):
+                if heuristic == "dcmeb":
+                    c, r = alg__dcmeb(data_, c)
+                
+                elif heuristic == "dcssh":
+                    c, r = alg__dcssh(data_, c, r**2)
+
+            result.append(r)
+        
+        results.append(result)
+    
+    results = pd.DataFrame(results)
+    return results

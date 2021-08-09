@@ -146,11 +146,13 @@ def Q(c, beta, point, gamma) -> float:
         x (float): multiplier for direction to get from point a to the surface of the ball
     """
     alpha = point - c
+    
+    beta_beta = np.dot(beta, beta)
+    alpha_beta = np.dot(alpha, beta)
 
-    beta_beta = beta @ beta
-    alpha_beta = alpha @ beta
+    temp = alpha_beta**2 - beta_beta*(alpha@alpha - gamma)
 
-    discriminant = np.sqrt(alpha_beta**2 - beta_beta*(alpha@alpha - gamma))
+    discriminant = np.sqrt(temp)
 
     x = (-alpha_beta + discriminant)/beta_beta
 

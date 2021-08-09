@@ -48,7 +48,7 @@ def alg__dcssh(data, c, gamma, a=None, s=2):
         a = geometry.find_furthest(c, data)
     
     beta = c - a
-    x = min([geometry.Q(c, beta, point, gamma) for point in data])
+    x = min([geometry.Q(c=c, beta=beta, point=point, gamma=gamma) for point in data])
 
     new_c = c - (c-a)*x/2
     new_r = max([np.linalg.norm(new_c - point) for point in data])
