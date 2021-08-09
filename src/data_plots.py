@@ -33,5 +33,5 @@ for name, data in datas.items():
 
         ax.scatter(data[:,0], data[:,1], data[:,2], alpha=0.5)
     
-    plt.savefig(r"images/{0}".format(name), bbox_inches='tight')
+    plt.savefig(r"images/data_plots/{0}".format(name), bbox_inches='tight')
     plt.clf()
