@@ -1,6 +1,7 @@
 # ignore all datasets
 datasets/*.csv
 datasets/*/*.csv
+datasets/improvement_datasets/*/*.csv
 
 # so no one can scrape github for url's and spam me with notifications
 src/notify.sh
