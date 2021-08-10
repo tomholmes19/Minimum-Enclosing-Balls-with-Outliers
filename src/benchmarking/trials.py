@@ -2,8 +2,10 @@ import numpy as np
 import timeit
 import pandas as pd
 from meb import mebwo_algorithms
+from meb import geometry
 
 from meb.geometry import find_furthest, k_closest
+from meb.gurobi_solvers import dc_meb
 from meb.improvement_algorithms import alg__dcmeb, alg__dcssh
 
 from meb.meb_algorithms import alg__socp_heuristic
@@ -199,5 +201,48 @@ def run_trials_improvement_r(heuristic, n, d, num_trials, num_iter, data_type, l
     results_df["avg%"] = pcts
     return results_df
 
-def run_trials_improvement_time():
-    pass
+def run_trials_improvement_time(n, d, num_trials, data_type, log_file=None, **kwargs):
+    params = {"n": n, "d": d}
+    eta = 0.9
+
+    trial_param, trial_param_vals = utils.find_trial_param(params)
+
+    utils.check_log(log_file)
+
+    times = []
+
+    for x in trial_param_vals:
+        params[trial_param] = x
+
+        n_ = params["n"]
+        d_ = params["d"]
+    
+        trials = [0]*num_trials
+
+        for i in range(num_trials):
+            utils.progress_report(x, trial_param, i)
+
+            # load data
+            filename = r"datasets/improvement_datasets/{0}/{1}_n{2}_d{3}".format(data_type, data_type, n_, d_)
+            if data_type == "uniform_ball_with_outliers":
+                filename += r"_eta{}".format(utils.format_eta(eta))
+            filename += r"_{}.csv".format(i)
+            data_ = data.loading.from_csv(filename)
+
+            # solve shenmaier
+            c, r, _ = mebwo_algorithms.alg__shenmaier(data_, eta)
+
+            # get inliers
+            inliers = [x for x in data_ if np.linalg.norm(c-x) <= r]
+            a = geometry.find_furthest(c, inliers)
+
+            c, r, trials[i] = dc_meb(data_, c, a, log_file=log_file, outputflag=1)
+
+            if log_file is not None:
+                utils.benchmark_logger(filepath=log_file, elapsed=trials[i], n=n_, d=d_, eta=None, M=None, r=r, c=c, trial_number=i, num_trials=num_trials, data_filepath=filename)
+
+        times.append(trials)
+
+    avg_times = utils.calc_avg_times(times)
+        
+    return avg_times
