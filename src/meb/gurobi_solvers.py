@@ -109,7 +109,7 @@ def mebwo(data, eta, M, relax=False, time_limit=None, log_file="", outputflag=0)
 
     return c_soln, r_soln, xi_soln, runtime
 
-def dc_meb(data, c, a, time_limit=None, log_file=""):
+def dc_meb(data, c, a, time_limit=None, log_file="", outputflag=0):
     """
     Solves the direction-constrained MEB problem
 
@@ -124,34 +124,37 @@ def dc_meb(data, c, a, time_limit=None, log_file=""):
         x_soln (float): proportion along direction c->a to move c
         r_soln (float): new radius
     """
-    m = gp.Model("MEBwO")
+    with gp.Env(empty=True) as env:
+        env.setParam('OutputFlag', outputflag)
+        env.start()
+        with gp.Model(env=env) as m:
+            if log_file != "":
+                m.setParam(GRB.Param.LogFile, log_file)
 
-    if log_file != "":
-        m.setParam(GRB.Param.LogFile, log_file)
+            if time_limit is not None:
+                m.setParam(GRB.Param.TimeLimit, time_limit)
 
-    if time_limit is not None:
-        m.setParam(GRB.Param.TimeLimit, time_limit)
+            x = m.addVar()
+            gamma = m.addVar()
 
-    x = m.addVar()
-    gamma = m.addVar()
+            m.setObjective(gamma, GRB.MINIMIZE)
 
-    m.setObjective(gamma, GRB.MINIMIZE)
+            alphas = [c-point for point in data]
+            beta = a-c
 
-    alphas = [c-point for point in data]
-    beta = a-c
+            beta_beta = beta@beta
 
-    beta_beta = beta@beta
+            for alpha in alphas:
+                m.addQConstr(
+                    lhs=beta_beta*(x*x) + 2*x*(alpha@beta) + (alpha@alpha),
+                    sense=GRB.LESS_EQUAL,
+                    rhs=gamma
+                )
 
-    for alpha in alphas:
-        m.addQConstr(
-            lhs=beta_beta*(x*x) + 2*x*(alpha@beta) + (alpha@alpha),
-            sense=GRB.LESS_EQUAL,
-            rhs=gamma
-        )
+            m.optimize()
 
-    m.optimize()
+            x_soln = x.x
+            r_soln = np.sqrt(gamma.x)
+            runtime = m.Runtime
 
-    x_soln = x.x
-    r_soln = np.sqrt(gamma.x)
-
-    return x_soln, r_soln
+    return x_soln, r_soln, runtime
