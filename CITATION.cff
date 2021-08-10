@@ -1,5 +1,3 @@
-# YAML 1.2
----
 authors: 
   -
     family-names: Holmes
@@ -9,4 +7,3 @@ date-released: 2021
 message: "If you use this software, please cite it using these metadata."
 repository-code: "https://github.com/tomholmes19/Minimum-Enclosing-Balls-with-Outliers"
 title: "Minimum Enclosing Balls with Outliers"
-...
