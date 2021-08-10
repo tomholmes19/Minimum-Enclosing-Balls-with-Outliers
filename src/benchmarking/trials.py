@@ -1,6 +1,7 @@
 import numpy as np
 import timeit
 import pandas as pd
+from meb import mebwo_algorithms
 
 from meb.geometry import find_furthest, k_closest
 from meb.improvement_algorithms import alg__dcmeb, alg__dcssh
@@ -11,6 +12,8 @@ from meb.mebwo_algorithms import alg__shrink_avg
 from . import utils
 import meb
 import data
+
+# this file is a mess dont look at it
 
 def run_trials_exact(n, d, eta, num_trials, data_, log_file=None, data_file=None):
     """
@@ -131,8 +134,9 @@ def run_trials_alg(func, n, d, eta, num_trials, data_type, log_file=None, **kwar
 
     return avg_times
 
-def run_trials_improvement(heuristic, n, d, num_trials, num_iter, data_type, log_file=None, **kwargs):
+def run_trials_improvement_r(heuristic, n, d, num_trials, num_iter, data_type, log_file=None, **kwargs):
     params = {"n": n, "d": d}
+    eta = 0.9
 
     trial_param, trial_param_vals = utils.find_trial_param(params)
 
@@ -152,31 +156,48 @@ def run_trials_improvement(heuristic, n, d, num_trials, num_iter, data_type, log
             utils.progress_report(x, trial_param, i)
 
             # load data
-            filename = r"datasets/{0}/{1}_n{2}_d{3}".format(data_type, data_type, n_, d_)
+            filename = r"datasets/improvement_datasets/{0}/{1}_n{2}_d{3}".format(data_type, data_type, n_, d_)
             if data_type == "uniform_ball_with_outliers":
-                filename += r"_eta{}".format(utils.format_eta(0.9))
+                filename += r"_eta{}".format(utils.format_eta(eta))
             filename += r"_{}.csv".format(i)
             data_ = data.loading.from_csv(filename)
 
-            k = int(np.floor(0.9*n_))
-            # solve avg heuristic for center
-            c, _, _ = alg__shrink_avg(data_, eta=0.9)
-
-            # find closest point to c
-            c = find_furthest(c, data_, find_closest=True)
-            data_, r = k_closest(data_, c, k)
+            # solve shenmaier
+            c, r, _ = mebwo_algorithms.alg__shenmaier(data_, eta)
             result.append(r)
 
+            # get inliers
+            data_ = [x for x in data_ if np.linalg.norm(c-x) <= r]
+
+            # improvement heuristic
             for _ in range(num_iter):
                 if heuristic == "dcmeb":
                     c, r = alg__dcmeb(data_, c)
                 
                 elif heuristic == "dcssh":
                     c, r = alg__dcssh(data_, c, r**2)
-
             result.append(r)
         
         results.append(result)
     
-    results = pd.DataFrame(results)
-    return results
+    # format dataframe
+    columns = [trial_param]
+    for i in range(num_trials):
+        columns.append("r{}".format(i+1))
+        columns.append("r{}^".format(i+1))
+    
+    results_df = pd.DataFrame(results, columns=columns)
+
+    pcts = []
+    for index, row in results_df.iterrows():
+        pct_list = [0]*num_trials
+        for i in range(num_trials):
+            pct_list[i] = (1 - (row["r{}^".format(i+1)]/row["r{}".format(i+1)]))*100
+        pct = np.mean(pct_list)
+        pcts.append(pct)
+    
+    results_df["avg%"] = pcts
+    return results_df
+
+def run_trials_improvement_time():
+    pass
