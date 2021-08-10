@@ -259,7 +259,8 @@ def get_title(func_name, n, d, eta):
         "relaxation_heuristic": "Relaxation-Based Heuristic",
         "shrink": "Shrink Heuristic",
         "shrink_avg": "Shrink (avg) Heuristic",
-        "shenmaier": "Shenmaier's Approximation"
+        "shenmaier": "Shenmaier's Approximation",
+        "dcmeb": "DCMEB"
     }
 
     # first part of title
