@@ -32,11 +32,11 @@
     \centering
     \begin{subfigure}[b]{0.3333\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{#1}
+        \includegraphics[width=\textwidth]{data_plots/#1}
     \end{subfigure}
     \begin{subfigure}[b]{0.3333\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{#2}
+        \includegraphics[width=\textwidth]{data_plots/#2}
     \end{subfigure}
     \hfill
     \caption{#3}
@@ -397,7 +397,7 @@ For more robust benchmarking, we would prefer a method which always returns the 
 Our chosen method, which gives reliable estimates for $M$ in a reasonable time is to simply solve the $MEB$ problem for $\A$ and set $M:=2r$ for $B(c,r)=\MEB(\A)$. We know from Theorem \ref{thm:unique} that an MEB always exists and is unique for a given data set, so can always expect to receive the same $M$ value from this method. Using a heuristic approach such as Algorithm \ref{core-set algorithm} gives us a $(1+\epsilon)$-approximation to $\MEB(\A)$, so we will receive an $M$ value that is slightly larger than needed, but the effect on run time is insignificant and given that the returned $M$ value is consistent we do not introduce unneeded randomness into our methodology that is not already inherently present due to using randomly generated data.
 
 \subsubsection{Solution Times}
-One concern with our choice of $M$ is the effect on the solution time of the solver.
+One concern with our choice of $M$ is the effect on the solution time of the solver. Typically a larger than necessary value of $M$ will result in longer solution times, and so this is a concern given that our heuristics are intended to return a feasible solution to the MEBwO problem in reasonably fast time. In our benchmarking of solving the exact model we observe a significant increase in solution time as the value of $M$ increases when solving the exact model on the same data set (Figure TODO: ref this later). 
 
 \subsubsection{Quality of $\xi_i$ Solutions in the QP Relaxation}
 Another concern regarding the value of $M$ for the exat model is the effect on the optimal solutions for the relaxed $\xi_i$ variables in the QP relaxation. This is important as good quality relaxed solutions are essential to Algorithm \ref{relaxation heuristic}, which uses high-valued $\xi_i$ as a proxy for how far a data point lies from the optimal center, and so for how much of an outlier that point is.
@@ -841,6 +841,18 @@ To generate this data, we simply use Algorithm \ref{alg:unitball} to generate a 
 
 \subsection{Improvement Heuristics}
 \subsubsection{Direction-Constrained Single Step Heuristic}
+
+\begin{table}
+    \centering
+    \begin{tabular}{|c|cc|cc|cc|cc|cc|c|} \hline
+        $n$ & $\hat{r}_1$ & $r_1$ & $\hat{r}_2$ & $r_2$ & $\hat{r}_3$ & $r_3$ & $\hat{r}_4$ & $r_4$ & $\hat{r}_5$ & $r_5$ & Avg. Improvement \\ \hline 
+        1000 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 50\% \\
+        4000 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 50\%
+        \\ \hline
+    \end{tabular}
+    \caption{Caption}
+    \label{tab:my_label}
+\end{table}
 \subsubsection{Direction-Constrained MEB}
 
 \section{Discussion}
