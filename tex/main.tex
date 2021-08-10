@@ -13,6 +13,7 @@
 \usepackage{mathtools}
 \usepackage{tikz}
 \usepackage{mathrsfs} %% mathscr for powerset
+\usepackage{tikz-qtree} % tree
 
 \usepackage{caption}
 \usepackage{subcaption}
@@ -718,6 +719,27 @@ We implement our algorithms and data generation using Python 3.8 \cite{python}. 
 An implementation of our work in a faster programming language such as C \cite{kernighan2006c} will almost certainly result in faster run times --- in fact many Python packages such as scikit-learn \cite{scikit-learn} and NumPy \cite{numpy} utilize C to run the more time-consuming processes, and the Gurobi \cite{gurobi} solver is written in C while Python and other languages with Gurobi support are merely interfaces to this solver. A new up-and-coming programming language is Julia \cite{bezanson2017julia} which promises similar run times to C and has a mature library for interfacing with optimization solvers known as JuMP \cite{jump}. Due to the time constraints on this paper, we make use of the author's prior knowledge in Python for the implementation as previously mentioned but again acknowledge that there are indeed potentially superior choices for this type of work.
 
 Packages within Python we make use of in the implementation are NumPy \cite{numpy} for numerical computation and linear algebra, pandas \cite{pandasjeff_reback_2021_5060318}{pandasmckinney-proc-scipy-2010} for data manipulation, Matplotlib \cite{matplotlib} and Seaborn \cite{seaborn} for visualisation and plotting, and finally TensorFlow Datasets \cite{TFDS} to access the MNIST \cite{lecun2010mnist} data set.
+
+Our implementation can be found on Github \footnote{\url{https://github.com/tomholmes19/Minimum-Enclosing-Balls-with-Outliers}} within the \texttt{src} folder. All scripts used to run benchmarks and create figures are contained within this folder, and we have also written three packages contained therein. The \texttt{meb} package contains an object-oriented framework for MEB objects, defining \texttt{Ball}, \texttt{MEB}, and \texttt{MEBwO} objects within \texttt{ball.py} with a simple class hierarchy as seen in Figure \ref{fig:hierarchy}. 
+
+These objects have attributes such as a centre and radius and allow us to define an MEB or MEBwO as a single variable as an instance of their corresponding object, which allows for more streamlined implementation, as opposed to tracking values such as the center and radius within seperate, unrelated variables. These objects also implement methods such as \texttt{.fit()} which, given a data input and a chosen method and relevant parameters, will solve the MEB or MEBwO problem on that data set. Other methods are implemented and the reader may refer to the aforementioned \texttt{ball.py} module for a comprehensive guide. All other modules within this package are used by \texttt{ball.py} and are simply used to abstract features out of this module so as to adhere to the design principles of modular programming.
+
+The \texttt{data} package contains modules regarding the data used in this paper. The \texttt{generation.py} module contains functions which generate each type of data set described in Section \ref{data}, as well as some others which were used in the testing and development of our methods but are not mentioned further within this paper. \texttt{loading.py} contains a few utility functions regarding loading and saving data in a consistent way for ease of implementation. \texttt{benchmarking_data.py} can be run to generate the data used in our benchmarking, and must be run if the reader wishes to obtain our data as the data sets generated are cumulatively too large to reasonably be uploaded to Github. 
+
+\begin{figure}
+    \centering
+    \begin{tikzpicture}
+        \Tree [
+            .\node[draw]{Ball}; [
+                .\node[draw]{MEB}; [
+                    .\node[draw]{MEBwO};
+                ]
+            ]
+        ]
+    \end{tikzpicture}
+    \caption{Class Hierarchy}
+    \label{fig:hierarchy}
+\end{figure}
 
 TODO: talk about choice of solver (Gurobi)
 
