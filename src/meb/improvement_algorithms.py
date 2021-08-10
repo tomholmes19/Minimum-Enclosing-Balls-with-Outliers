@@ -22,7 +22,7 @@ def alg__dcmeb(data, c, a=None, time_limit=None, log_file=""):
     if a is None:
         a = geometry.find_furthest(c, data)
     
-    x, r = gurobi_solvers.dc_meb(data, c, a, time_limit, log_file)
+    x, r, _ = gurobi_solvers.dc_meb(data, c, a, time_limit, log_file)
 
     new_c = c + x*(a-c)
 
