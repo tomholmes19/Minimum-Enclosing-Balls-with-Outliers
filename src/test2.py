@@ -2,16 +2,18 @@ import data.loading, data.generation
 from meb.ball import Ball, MEB, MEBwO
 import numpy as np
 
-import timeit
+import benchmarking.trials, benchmarking.utils
 
-eta = 0.55
+df = benchmarking.trials.run_trials_improvement_r("dcssh", [500, 1000], 100, 2, 10, "normal")
+print(df)
 
-test_data = data.generation.normal(0,1,100,2)
+benchmarking.utils.plot_times(
+    x_axis=[500, 1000],
+    times=df["avg%"],
+    xlabel="n",
+    ylabel="avg%",
+    title="aaa",
+    plot=True
+)
 
-start = timeit.default_timer()
-ball = MEBwO().fit(calc_pct=True, data=test_data, method="exact", eta=eta)
-elapsed = timeit.default_timer() - start
-
-print("Total time:\t", elapsed)
-print(ball)
-ball.plot(data=test_data)
+df.to_csv(r"src/test.csv", index=False)
