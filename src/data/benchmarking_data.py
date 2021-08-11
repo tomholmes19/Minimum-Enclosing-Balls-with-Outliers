@@ -172,7 +172,7 @@ if False:
 # Improvement data
 
 n_list = [500+500*i for i in range(10)]
-d_list = [50+10*i for i in range(10)]
+d_list = [10+10*i for i in range(15)]
 
 if True:
     np.random.seed(5000)

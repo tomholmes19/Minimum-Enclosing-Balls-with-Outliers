@@ -136,7 +136,7 @@ def run_trials_alg(func, n, d, eta, num_trials, data_type, log_file=None, **kwar
 
     return avg_times
 
-def run_trials_improvement_r(heuristic, n, d, num_trials, num_iter, data_type, log_file=None, **kwargs):
+def run_trials_improvement_r(n, d, num_trials, num_iter, data_type, log_file=None, **kwargs):
     params = {"n": n, "d": d}
     eta = 0.9
 
@@ -144,7 +144,8 @@ def run_trials_improvement_r(heuristic, n, d, num_trials, num_iter, data_type, l
 
     utils.check_log(log_file)
 
-    results = []
+    results_dcmeb = []
+    results_dcssh = []
 
     for x in trial_param_vals:
         params[trial_param] = x
@@ -152,7 +153,8 @@ def run_trials_improvement_r(heuristic, n, d, num_trials, num_iter, data_type, l
         n_ = params["n"]
         d_ = params["d"]
     
-        result = [x]
+        result_dcmeb = [x]
+        result_dcssh = [x]
 
         for i in range(num_trials):
             utils.progress_report(x, trial_param, i)
@@ -166,21 +168,23 @@ def run_trials_improvement_r(heuristic, n, d, num_trials, num_iter, data_type, l
 
             # solve shenmaier
             c, r, _ = mebwo_algorithms.alg__shenmaier(data_, eta)
-            result.append(r)
+            result_dcmeb.append(r)
+            result_dcssh.append(r)
 
             # get inliers
             data_ = [x for x in data_ if np.linalg.norm(c-x) <= r]
 
             # improvement heuristic
             for _ in range(num_iter):
-                if heuristic == "dcmeb":
-                    c, r = alg__dcmeb(data_, c)
+                c_dcmeb, r_dcmeb = alg__dcmeb(data_, c)
                 
-                elif heuristic == "dcssh":
-                    c, r = alg__dcssh(data_, c, r**2)
-            result.append(r)
+                c_dcssh, r_dcssh = alg__dcssh(data_, c, r**2)
+
+            result_dcmeb.append(r_dcmeb)
+            result_dcssh.append(r_dcssh)
         
-        results.append(result)
+        results_dcmeb.append(result_dcmeb)
+        results_dcssh.append(result_dcssh)
     
     # format dataframe
     columns = [trial_param]
@@ -188,18 +192,21 @@ def run_trials_improvement_r(heuristic, n, d, num_trials, num_iter, data_type, l
         columns.append("r{}".format(i+1))
         columns.append("r{}^".format(i+1))
     
-    results_df = pd.DataFrame(results, columns=columns)
+    results_dcmeb_df = pd.DataFrame(results_dcmeb, columns=columns)
+    results_dcssh_df = pd.DataFrame(results_dcssh, columns=columns)
 
-    pcts = []
-    for index, row in results_df.iterrows():
-        pct_list = [0]*num_trials
-        for i in range(num_trials):
-            pct_list[i] = (1 - (row["r{}^".format(i+1)]/row["r{}".format(i+1)]))*100
-        pct = np.mean(pct_list)
-        pcts.append(pct)
+    for results_df in [results_dcmeb_df, results_dcssh_df]:
+        pcts = []
+        for index, row in results_df.iterrows():
+            pct_list = [0]*num_trials
+            for i in range(num_trials):
+                pct_list[i] = (1 - (row["r{}^".format(i+1)]/row["r{}".format(i+1)]))*100
+            pct = np.mean(pct_list)
+            pcts.append(pct)
     
-    results_df["avg%"] = pcts
-    return results_df
+        results_df["avg%"] = pcts
+        
+    return results_dcmeb_df, results_dcssh_df
 
 def run_trials_improvement_time(n, d, num_trials, data_type, log_file=None, **kwargs):
     params = {"n": n, "d": d}
