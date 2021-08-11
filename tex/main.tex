@@ -176,7 +176,24 @@ Here come your acknowledgments ...
 % =============================================================================
 \chapter{Introduction}
 \section{Motivation}
+
+% PLAN:
+%
+%   Introduce the problem in plain words:
+%       Discuss MEB
+%       Simple extension to MEBwO, robustness of solution and resistance to outliers
+%   NP-Hardness
+%   Computational Geometry
+%
+%   Big Data
+%   Discuss applications:
+%       Classification Algorithm
+%       Clustering
+%   
+%   Draw parallels and comparisons to Support Vector Machines
 \section{Outline}
+
+% Detail each chapter
 
 % =============================================================================
 % Chapter 2
@@ -538,7 +555,7 @@ We now consider some improvement heuristics. The two heuristics described here a
 
 The two improvement heuristics work in a similar way, by considering an improving direction in which moving the centre of the MEB in that direction while keeping the same radius retains a feasible solution, then shrinking the radius to the furthest point from the new centre. The Direction-Constrained Single Step Heuristic (DCSSH) works by pure geometric reasoning to find a new centre, while the Direction-Constrained MEB (DCMEB) uses an optimization solver such as Gurobi to find an optimal step in the improving direction to minimize the radius of the new ball.
 
-The inspiration for these heuristics comes from Shenmaier's Approximation, which returns a ball with some centre $c\in\A$. Our assumption is that a better solution exists in a local neighbourhood around $c$, i.e. we find a new centre that does not have to lie on a point in $\A$. Both heuristics consider only a single step, but as they are quick to run we may run each heuristic in succession to build a sequence of steps that lead to an improved solution.
+The inspiration for these heuristics comes from Shenmaier's Approximation, which returns a ball with some centre $c\in\A$. Our assumption is that a better solution exists in a local neighbourhood around $c$, i.e. we find a new centre that does not have to lie on a point in $\A$. Both heuristics consider only a single step, but as they are quick to run we may run each heuristic in succession to build a sequence of steps that lead to an improved solution. For an example of this refer to Figure \ref{fig:riterations} which shows the new radius after each iteration of each improvement heuristic on each data set for $n=1000$, $d=100$, and the standard parameters for each data type (see Section \ref{data}). These examples were run on one data set each rather than averaged over multiple data sets and so should not be used to draw any conclusions.
 
 \subsection{Direction-Constrained Single Step Heuristic}
 \subsubsection{Derivation}
@@ -709,6 +726,36 @@ and as such the DCMEB problem may be solved by interior-point methods \cite{socp
 \subsubsection{Complexity}
 
 The operations in this heuristic are simply finding a maximally distant point which runs in $O(n)$ time, solving the DCMEB problem, and an assignment which runs in $O(1)$ time. So, the interest is in the time complexity of the method used to solve the DCMEB problem. As this problem is a SOCP it makes sense to apply interior-point methods which may then solve it in polynomial time (TODO: NEEDS CITATION).
+
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.475\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{improvement_example/improvement_example_normal.png}
+        \caption{Normal}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.475\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{improvement_example/improvement_example_hyperspherical_shell.png}
+        \caption{Hyperspherical Shell}
+    \end{subfigure}
+    \vskip\baselineskip
+    \begin{subfigure}[b]{0.475\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{improvement_example/improvement_example_uniform_ball.png}
+        \caption{Uniform Ball}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.475\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{improvement_example/improvement_example_uniform_ball_with_outliers.png}
+        \caption{Uniform Ball with Outliers}
+    \end{subfigure}
+    \caption{Reduction of Radius by each Iteration of Improvement Heuristics}
+    \label{fig:riterations}
+\end{figure}
 % =============================================================================
 % Chapter 4
 % =============================================================================
@@ -870,7 +917,7 @@ To generate this data, we simply use Algorithm \ref{alg:unitball} to generate a 
 
 \begin{table}
     \centering
-    \begin{tabular}{|c|cc|cc|cc|cc|cc|c|} \hline
+    \begin{tabular}{|c||cc||cc||cc||cc||cc||c|} \hline
         $n$ & $\hat{r}_1$ & $r_1$ & $\hat{r}_2$ & $r_2$ & $\hat{r}_3$ & $r_3$ & $\hat{r}_4$ & $r_4$ & $\hat{r}_5$ & $r_5$ & Avg. Improvement \\ \hline 
         1000 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 50\% \\
         4000 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 1.11 & 50\%
