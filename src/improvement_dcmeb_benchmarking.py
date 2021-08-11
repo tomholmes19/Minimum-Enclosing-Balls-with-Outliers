@@ -3,6 +3,7 @@ import numpy as np
 import benchmarking.trials, benchmarking.utils
 import data.loading
 from meb import mebwo_algorithms
+import plot_settings
 
 num_trials = 5
 
