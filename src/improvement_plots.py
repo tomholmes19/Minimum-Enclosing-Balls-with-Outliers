@@ -19,13 +19,9 @@ fixed_params = {"n": "d100", "d": "n1000"}
 for data_type in data_types:
     for param in params:
         # load dataframes
-        dfs = {heuristic: None for heuristic in heuristics}
-        for heuristic in heuristics:
-            # construct filename
-            filename = "avg_pct_func_{0}_{1}_eta0p9_{2}".format(param, fixed_params[param], data_type)
-
-            # load from csv
-            dfs[heuristic] = pd.read_csv(r"benchmarks/{0}/{1}/{2}.csv".format(heuristic, data_type, filename))
+        filename = "avg_pct_func_{0}_{1}_eta0p9_{2}".format(param, fixed_params[param], data_type)
+        dfs = {heuristic: pd.read_csv(r"benchmarks/{0}/{1}/{2}.csv".format(heuristic, data_type, filename)) for heuristic in heuristics}
+        
 
         # get avg% lists
         pct_lists = {heuristic: df["avg%"] for heuristic, df in dfs.items()}
@@ -41,6 +37,5 @@ for data_type in data_types:
             plt.plot(axes[param], pct_list, marker=marker, linestyle=":", color=colour, label=heuristic.upper())
 
         plt.legend()
-        
         plt.savefig(r"images/improvement_r_benchmarks/{}".format(filename), bbox_inches="tight")
 
