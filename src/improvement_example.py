@@ -36,8 +36,8 @@ for name, data in datas.items():
         ball2.improve(inliers, method="dcssh", gamma=ball2.radius**2)
         r2.append(ball2.radius)
 
-    plt.plot(range(num_iter+1), r1, label="DCMEB")
-    plt.plot(range(num_iter+1), r2, label="DCSSH")
+    plt.plot(range(num_iter+1), r1, color="r", label="DCMEB")
+    plt.plot(range(num_iter+1), r2, color="b", label="DCSSH")
     plt.xlabel("Iterations")
     plt.ylabel("Radius")
     plt.legend()
