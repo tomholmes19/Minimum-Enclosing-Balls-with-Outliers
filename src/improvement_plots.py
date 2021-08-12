@@ -1,3 +1,7 @@
+"""
+Constructs plots of improvement heuristic performance benchmarks from logs
+"""
+
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -9,6 +13,8 @@ params = ["n", "d"]
 
 colours = {"dcmeb": "r", "dcssh": "b"}
 markers = {"dcmeb": "o", "dcssh": "^"}
+axes = {"n": [500+500*i for i in range(10)], "d": [10+10*i for i in range(15)]}
+fixed_params = {"n": "d100", "d": "n1000"}
 
 for data_type in data_types:
     for param in params:
@@ -16,12 +22,7 @@ for data_type in data_types:
         dfs = {heuristic: None for heuristic in heuristics}
         for heuristic in heuristics:
             # construct filename
-            filename = "avg_pct_func_{}".format(param)
-            if param == "n":
-                filename += "_d100"
-            else:
-                filename += "_n1000"
-            filename += "_eta0p9_{}".format(data_type)
+            filename = "avg_pct_func_{0}_{1}_eta0p9_{2}".format(param, fixed_params[param], data_type)
 
             # load from csv
             dfs[heuristic] = pd.read_csv(r"benchmarks/{0}/{1}/{2}.csv".format(heuristic, data_type, filename))
@@ -32,17 +33,12 @@ for data_type in data_types:
         plt.figure()
         plt.xlabel(param)
         plt.ylabel("avg%")
-            
-        if param == "n":
-            x_axis = [500+500*i for i in range(10)]
-        else:
-            x_axis = [10+10*i for i in range(15)]
         
         for heuristic, pct_list in pct_lists.items():
             marker = markers[heuristic]
             colour = colours[heuristic]
             
-            plt.plot(x_axis, pct_list, marker=marker, linestyle=":", color=colour, label=heuristic.upper())
+            plt.plot(axes[param], pct_list, marker=marker, linestyle=":", color=colour, label=heuristic.upper())
 
         plt.legend()
         

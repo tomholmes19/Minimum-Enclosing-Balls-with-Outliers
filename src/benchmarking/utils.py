@@ -158,6 +158,28 @@ def get_times_from_log(filepath, calc_avg=True) -> list:
     
     return times
 
+def get_M_from_log(filepath):
+    """
+    Scans given log file and returns list of M parameters used
+
+    Input:
+        filepath (str): filepath of the log file to be scanned
+    
+    Return:
+        M_list (list): list of M values found
+    """
+    M_list = []
+    with open(filepath, "r") as f:
+        for line in f:
+            line_split = line.split(sep=", ")
+            if "Finished trial" in line_split[0]: # indicator that this is a log written by benchmark_logger
+                M_part = line_split[5]
+                M_val = float(M_part.split("=")[-1])
+                if M_val not in M_list:
+                    M_list.append(M_val)
+
+    return M_list
+
 def timeout(log_Path, time_limit=20):
     print("Received no input within {} seconds. Continuing.".format(time_limit))
     log_Path.unlink()
