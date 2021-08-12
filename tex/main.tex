@@ -28,23 +28,30 @@
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert} % norm
 \newcommand{\binary}{\left\{0,1\right\}} % lazy
 
-\newcommand{\datafigure}[4]{
+\newcommand{\pairfigure}[4]{
     \begin{figure}
     \centering
-    \begin{subfigure}[b]{0.3333\textwidth}
+    \begin{subfigure}[b]{0.475\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{data_plots/#1}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.3333\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{data_plots/#2}
+        \includegraphics[width=\textwidth]{#1}
     \end{subfigure}
     \hfill
+    \begin{subfigure}[b]{0.475\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{#2}
+    \end{subfigure}
     \caption{#3}
     \label{#4}
 \end{figure}
 }
 
+\newcommand{\datafigure}[3]{
+    \pairfigure{data_plots/#1_2d.png}{data_plots/#1_3d.png}{#2}{#3}
+}
+
+\newcommand{\imprfigure}[3]{
+    \pairfigure{improvement_r_benchmarks/avg_pct_func_n_d100_eta0p9_#1.png}{improvement_r_benchmarks/avg_pct_func_d_n1000_eta0p9_#1.png}{#2}{#3}
+}
 
 \DeclareMathOperator{\MEB}{MEB}
 \DeclareMathOperator{\MEBwO}{MEBwO}
@@ -810,12 +817,12 @@ Our first data set is constructed by generating standard normal variates, that i
 
 This can be easily generated using NumPy \cite{numpy} by calling the function \texttt{np.random.normal(0, 1, (n,d))} to generate $n$ many $d$-dimensional standard normal vectors. See Figure \ref{fig:normal} for an example.
 
-\datafigure{normal_2d.png}{normal_3d.png}{Example of Standard Normal Data}{fig:normal}
+\datafigure{normal}{Example of Standard Normal Data}{fig:normal}
 
 \subsection{Uniform Ball}\label{uniform ball}
 Our next data type consists of points sampled uniformly from a hypersphere of dimension $d$, and in this paper we will specifically choose to uniformly sample points within the unit ball centered on the zero vector, $B(\mathbf{0},1)\subseteq\mathbb{R}^d$. See Figure \ref{fig:unifball} for an example. Like with the choice of normal data, spherical data such as that of a uniform ball is a reasonable choice for the MEBwO problem.
 
-\datafigure{uniform_ball_2d.png}{uniform_ball_3d.png}{Example of a Uniform Ball}{fig:unifball}
+\datafigure{uniform_ball}{Example of a Uniform Ball}{fig:unifball}
 
 To generate points uniformly within a unit ball, we must first generate points uniformly on the unit hypersphere. \cite{hyperspheresurface} provides a fast and easy to implement method of doing this, by first generating the standard normal vector $\mathbf{x}=(x_1,\ldots,x_d)$ where $x_i\sim N(0,1)$ for $i=1,\ldots,d$, and then the distribution of the normalized vectors $\mathbf{x}/\norm{\mathbf{x}}$ is uniform over the hypersphere of dimension $d$.
 
@@ -845,7 +852,7 @@ Now we will discuss the data type we call the Hyperspherical Shell. This consist
 
 In this paper we choose the zero vector as our center, an inner radius of $1$, and an outer radius of $2$. See Figure \ref{fig:hypshell} for an example. In two dimensions the shape approximated by this data is known as an annulus, and in three dimensions a spherical shell, so for the general $d$-dimensional case we opt to call it a hyperspherical shell.
 
-\datafigure{hyperspherical_shell_2d.png}{hyperspherical_shell_3d.png}{Example of a Hyperspherical Shell}{fig:hypshell}
+\datafigure{hyperspherical_shell}{Example of a Hyperspherical Shell}{fig:hypshell}
 
 This data type is chosen as the optimal centre of the MEBwO on any sufficiently large data set is guaranteed to be ``far" away from any point in the data set. This poses issues for Shenmaier's Approximation which always returns a centre which is a point within the data set.
 
@@ -900,7 +907,7 @@ To generate this data, we simply use Algorithm \ref{alg:unitball} to generate a 
     \label{alg:unifballoutliers}
 \end{algorithm}
 
-\datafigure{uniform_ball_with_outliers_2d.png}{uniform_ball_with_outliers_3d.png}{Example of a Uniform Ball with Outliers}{fig:unifballoutliers}
+\datafigure{uniform_ball_with_outliers}{Example of a Uniform Ball with Outliers}{fig:unifballoutliers}
 
 \subsection{MNIST}
 
@@ -908,12 +915,23 @@ To generate this data, we simply use Algorithm \ref{alg:unitball} to generate a 
 \subsection{Methodology}
 \subsection{Exact Model}\label{exact benchmarks}
 \subsection{Construction Methods}
-\subsubsection{Relaxation-based Heuristic}
-\subsubsection{Shrinking Heuristic}
-\subsubsection{Shenmaier's Approximation}
+\subsubsection{Normal}
+\subsubsection{Uniform Ball}
+\subsubsection{Hyperspherical Shell}
+\subsubsection{Uniform Ball with Outliers}
 
 \subsection{Improvement Heuristics}
-\subsubsection{Direction-Constrained Single Step Heuristic}
+\subsubsection{Normal}
+\imprfigure{normal}{Average Improvement Performance on Normal Data as a Function of $n$ and $d$}{fig:improvement_normal}
+
+\subsubsection{Uniform Ball}
+\imprfigure{uniform_ball}{Average Improvement Performance on Uniform Ball Data as a Function of $n$ and $d$}{fig:improvement_unifball}
+
+\subsubsection{Hyperspherical Shell}
+\imprfigure{hyperspherical_shell}{Average Improvement Performance on Hyperspherical Shell Data as a Function of $n$ and $d$}{fig:improvement_hypshell}
+
+\subsubsection{Uniform Ball with Outliers}
+\imprfigure{uniform_ball_with_outliers}{Average Improvement Performance on Uniform Ball with Outliers Data as a Function of $n$ and $d$}{fig:improvement_unifballwoutliers}
 
 \begin{table}
     \centering
@@ -926,7 +944,6 @@ To generate this data, we simply use Algorithm \ref{alg:unitball} to generate a 
     \caption{Caption}
     \label{tab:my_label}
 \end{table}
-\subsubsection{Direction-Constrained MEB}
 
 \section{Discussion}
 
