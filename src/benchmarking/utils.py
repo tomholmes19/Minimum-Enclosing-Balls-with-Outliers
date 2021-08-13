@@ -73,6 +73,18 @@ def progress_report(x, param_name, i) -> None:
 
     return None
 
+def reset_log(filepath):
+    fileh = logging.FileHandler(filepath, "a")
+    formatter = logging.Formatter('%(asctime)s %(message)s')
+    fileh.setFormatter(formatter)
+    
+    log = logging.getLogger()
+    for handler in log.handlers[:]:
+        log.removeHandler(handler)
+    log.addHandler(fileh)
+    log.setLevel("INFO")
+    return None
+
 def benchmark_logger(filepath, elapsed, n, d, eta, M, r, c, trial_number, num_trials, data_filepath, rows=None, columns=None):
     """
     After a trial has been completed, logs details to the specified file
@@ -95,15 +107,7 @@ def benchmark_logger(filepath, elapsed, n, d, eta, M, r, c, trial_number, num_tr
     Return:
         None
     """
-    fileh = logging.FileHandler(filepath, "a")
-    formatter = logging.Formatter('%(asctime)s %(message)s')
-    fileh.setFormatter(formatter)
-    
-    log = logging.getLogger()
-    for handler in log.handlers[:]:
-        log.removeHandler(handler)
-    log.addHandler(fileh)
-    log.setLevel("INFO")
+    reset_log(filepath)
     
     msg1 = (
         "Finished trial {0}/{1}, ".format(trial_number+1, num_trials) +
@@ -119,6 +123,28 @@ def benchmark_logger(filepath, elapsed, n, d, eta, M, r, c, trial_number, num_tr
     
     logging.info(msg)
     print(msg1)
+    print("Recorded log to {}".format(filepath))
+    return None
+
+def mnist_logger(filepath, num, eta, F1, elapsed):
+    """
+    After a trial has been completed, logs details to the specified file
+
+    Input:
+        filepath (str): log file
+        num (int): which number of MNIST has been benchmarked
+        eta (float): % inliers
+        F1 (float): F1 score
+        elapsed (float): elapsed time
+
+    Return:
+        None
+    """
+    reset_log(filepath)
+
+    msg = "num={0}, eta={1}, F1={2}, elapsed={3}".format(num, eta, F1, elapsed)
+    logging.info(msg)
+    print(msg)
     print("Recorded log to {}".format(filepath))
     return None
 

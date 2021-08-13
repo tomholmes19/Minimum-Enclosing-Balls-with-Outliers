@@ -2,7 +2,7 @@ import pandas as pd
 from meb.ball import MEB, MEBwO
 import timeit
 
-df = pd.read_csv("src\datasets\mnist\mnist_train.csv", header=None)
+df = pd.read_csv(r"datasets/mnist_train.csv", header=None)
 
 def load_number(data, number):
     """
@@ -45,15 +45,7 @@ zeros = load_number(data=df, number=0)
 
 print("Fit ball")
 start = timeit.default_timer()
-ball = MEB().fit(data=zeros, method="socp_heuristic", eps=1e-2)
+ball = MEBwO().fit(data=zeros, method="shenmaier", eta=0.9)
 elapsed = timeit.default_timer() - start
 
 print("Elapsed:\t{}\n".format(elapsed))
-
-numbers = range(1,9+1)
-
-numbers_data = [load_number(data=df, number=i) for i in numbers]
-
-accuracies = [test(data=data, ball=ball) for data in numbers_data]
-
-print(accuracies)

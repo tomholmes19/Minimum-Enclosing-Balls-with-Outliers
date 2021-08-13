@@ -9,11 +9,13 @@ from meb.gurobi_solvers import dc_meb
 from meb.improvement_algorithms import alg__dcmeb, alg__dcssh
 
 from meb.meb_algorithms import alg__socp_heuristic
-from meb.mebwo_algorithms import alg__shrink_avg
+from meb.mebwo_algorithms import alg__shenmaier, alg__shrink_avg
 
 from . import utils
 import meb
 import data
+
+import benchmarking
 
 # this file is a mess dont look at it
 
@@ -253,3 +255,59 @@ def run_trials_improvement_time(n, d, num_trials, data_type, log_file=None, **kw
     avg_times = utils.calc_avg_times(times)
         
     return avg_times
+
+def mnist_benchmark(df, func, number, eta, log_file=None):
+    """
+    Calculates F1 score and records runtime
+
+    Input:
+        df (pd.DataFrame): MNIST data
+        func (function): function for fitting MEBwO (shenmaier or shrink_avg)
+        number (int): which number to fit MEBwO to
+        eta (float): percentage of inliers
+        log_file (str): log file
+    """
+    # construct dataframes
+    df_inliers = df[df[0] == number]
+    df_outliers = df[df[0] != number]
+
+    # sample outliers
+    n = len(df_inliers)
+    k = int(np.floor((1-eta)*n))
+    outliers = df_outliers.sample(n=k)
+
+    # add outliers to inliers
+    df_all = pd.concat([df_inliers, outliers])
+    df_all = df_all.sample(frac=1) # shuffle
+    labels = df_all[0]
+
+    # convert data to array for fitting MEBwO
+    data = df_all.drop(labels=0, axis=1).to_numpy() # array
+
+    # fit and time MEBwO
+    start = timeit.default_timer()
+    c, r, _ = func(data, eta)
+    elapsed = timeit.default_timer() - start
+
+    # calculate F1 score
+    TP = 0
+    FP = 0
+    FN = 0
+    for label, x in zip(labels, data):
+        if np.linalg.norm(c-x) <= r: # inside ball
+            if label == number:
+                TP += 1
+            else:
+                FP += 1
+        else: # outside ball
+            if label == number:
+                FN += 1
+    
+    precision = TP/(TP+FP)
+    recall = TP/(TP+FN)
+    F1 = 2*(precision*recall)/(precision+recall)
+
+    if log_file is not None:
+        utils.mnist_logger(filepath=log_file, num=number, eta=eta, F1=F1, elapsed=elapsed)
+
+    return F1, elapsed
