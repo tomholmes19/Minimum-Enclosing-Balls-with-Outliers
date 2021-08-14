@@ -30,20 +30,10 @@ labels = {
     "shrink": "Shrink"
 }
 
-temp = {
+axes = {
     "n": [1000 + 3000*i for i in range(10)],
     "d": [10 + 10*i for i in range(10)],
     "eta": [0.5+0.1*i for i in range(5)]
-}
-
-axes = {
-    "relaxation_heuristic": temp,
-    "shenmaier": {
-        "n": [1000 + 3000*i for i in range(8)],
-        "d": temp["d"],
-        "eta": temp["eta"]
-    },
-    "shrink": temp
 }
 
 fixed_params = {
@@ -68,7 +58,18 @@ for data_type in data_types:
         plt.ylabel("Time (s)")
 
         for heuristic, times in times_dict.items():
-            plt.plot(axes[heuristic][param], times, marker=markers[heuristic], color=colours[heuristic], linestyle=":", label=labels[heuristic])
+            if heuristic == "shenmaier" and param == "n":
+                x_axis = [1000 + 3000*i for i in range(8)]
+            elif heuristic == "relaxation_heuristic" and data_type == "uniform_ball_with_outliers" and param == "d":
+                x_axis = [10 + 10*i for i in range(8)]
+            else:
+                x_axis = axes[param]
+
+            plt.plot(x_axis, times, marker=markers[heuristic], color=colours[heuristic], linestyle=":", label=labels[heuristic])
         
-        plt.legend()
-        plt.show()
+        if data_type == "normal" and param == "eta":
+            plt.legend(loc="best", bbox_to_anchor=(0.5,0.,0.5,0.5))
+        else:
+            plt.legend()
+
+        plt.savefig("images/alg_benchmarks/{}".format(filename), bbox_inches="tight")
