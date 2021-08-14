@@ -53,6 +53,27 @@
     \pairfigure{improvement_r_benchmarks/avg_pct_func_n_d100_eta0p9_#1.png}{improvement_r_benchmarks/avg_pct_func_d_n1000_eta0p9_#1.png}{#2}{#3}
 }
 
+\newcommand{\benchmarkfigure}[3]{
+    \begin{figure}
+        \centering
+        \begin{subfigure}[b]{0.475\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{alg_benchmarks/func_n_d30_eta0p9_#1.png}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}[b]{0.475\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{alg_benchmarks/func_d_n10000_eta0p9_#1.png}
+        \end{subfigure}
+        
+        \begin{subfigure}[b]{0.475\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{alg_benchmarks/func_eta_n10000_d30_#1.png}
+        \end{subfigure}
+        \caption{#2}
+        \label{#3}
+    \end{figure}
+}
 \DeclareMathOperator{\MEB}{MEB}
 \DeclareMathOperator{\MEBwO}{MEBwO}
 
@@ -768,7 +789,7 @@ The operations in this heuristic are simply finding a maximally distant point wh
 % =============================================================================
 \chapter{Implementation and Experiments}\label{implementation}
 \section{Code}
-\subsection{Software Used}
+\subsection{Software}
 We implement our algorithms and data generation using Python 3.8 \cite{python}. Python is a high-level procedural programming language which is commonly used in data science and mathematics for its low barrier to entry, wide-scale adoption, and rich package ecosystem. One drawback of using Python is that it is known to be slow compared to other languages.
 
 An implementation of our work in a faster programming language such as C \cite{kernighan2006c} will almost certainly result in faster run times --- in fact many Python packages such as scikit-learn \cite{scikit-learn} and NumPy \cite{numpy} utilize C to run the more time-consuming processes, and the Gurobi \cite{gurobi} solver is written in C while Python and other languages with Gurobi support are merely interfaces to this solver. A new up-and-coming programming language is Julia \cite{bezanson2017julia} which promises similar run times to C and has a mature library for interfacing with optimization solvers known as JuMP \cite{jump}. Due to the time constraints on this paper, we make use of the author's prior knowledge in Python for the implementation as previously mentioned but again acknowledge that there are indeed potentially superior choices for this type of work.
@@ -911,33 +932,63 @@ To generate this data, we simply use Algorithm \ref{alg:unitball} to generate a 
 
 \subsection{MNIST}
 
+In the interest of easy reproducability and an example of a real-life application, we would like to test our construction methods on the MNIST data set \cite{lecun2010mnist}. This data set consists of hand-written digits from 0--9 which are size-normalized and centered in $28\times28$ pixel greyscale images, and examples can be seen in Figure \ref{fig:mnist_example}. MNIST is a popular data set for testing digit recognition models, a specific application of the broader class of image recognition models within computer vision. We may fit an MEBwO to the subset of data for a specific digit and this ball may then be used for outlier detection or as a more robust binary classification model than if one were to use an MEB. Further to this, seperate balls may be fit to each digit and used to make multi-class classifications, either in a voting-based ensemble model or as part of a decision tree. In Section (TODO: REF OUTLIER RECOGNITION) we will apply two of our algorithms as an outlier detection method.
+
 \begin{figure}
     \centering
-    \includegraphics{mnist_exa}
-    \caption{Caption}
+    \includegraphics[width=0.5\textwidth]{mnist_example.png}
+    \caption{Example of MNIST Data}
+    \label{fig:mnist_example}
+\end{figure}
+
+In order to make this data usable by our algorithms, we would like to express each image as a vector. To do this we may simply transform each pixel value (an integer in the range 0--255) to an element of a $784$-dimensional array, and this is easily achieved using the \texttt{np.ndarray.flatten} method from NumPy.
+
+\section{Experiments}
+In this section we present our experimental results from applying our algorithms to different types of data. To begin with we will discuss the methodology used to create these results.
+\subsection{Methodology}
+\subsubsection{Exact Model}
+\subsection{Exact Model}\label{exact benchmarks}
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.475\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{exact_benchmarks/func_n_d10_eta0p9_normal.png}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.475\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{exact_benchmarks/func_d_n300_eta0p9_normal.png}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.475\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{exact_benchmarks/func_eta_n300_d10_normal.png}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.475\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{exact_benchmarks/func_M_n300_d10_eta0p9_normal.png}
+    \end{subfigure}
+    \caption{Runtimes for the Exact Model on Normal Data}
     \label{fig:my_label}
 \end{figure}
-\section{Experiments}
-\subsection{Methodology}
-\subsection{Exact Model}\label{exact benchmarks}
 \subsection{Construction Methods}
+
 \subsubsection{Normal}
+\benchmarkfigure{normal}{Runtimes for each Algorithm on Normal Data}{fig:normal_benchmarks}
+
 \subsubsection{Uniform Ball}
+\benchmarkfigure{uniform_ball}{Runtimes for each Algorithm on Uniform Ball Data}{fig:uniform_ball_benchmarks}
+
 \subsubsection{Hyperspherical Shell}
+\benchmarkfigure{hyperspherical_shell}{Runtimes for each Algorithm on Hyperspherical Shell Data}{fig:hyp_shell_benchmarks}
+
 \subsubsection{Uniform Ball with Outliers}
+\benchmarkfigure{uniform_ball_with_outliers}{Runtimes for each Algorithm on Uniform Ball with Outiers Data}{fig:unifballwoutliers_benchmarks}
 
 \subsection{Improvement Heuristics}
 \subsubsection{Normal}
 \imprfigure{normal}{Average Improvement Performance on Normal Data as a Function of $n$ and $d$}{fig:improvement_normal}
-
-\subsubsection{Uniform Ball}
-\imprfigure{uniform_ball}{Average Improvement Performance on Uniform Ball Data as a Function of $n$ and $d$}{fig:improvement_unifball}
-
-\subsubsection{Hyperspherical Shell}
-\imprfigure{hyperspherical_shell}{Average Improvement Performance on Hyperspherical Shell Data as a Function of $n$ and $d$}{fig:improvement_hypshell}
-
-\subsubsection{Uniform Ball with Outliers}
-\imprfigure{uniform_ball_with_outliers}{Average Improvement Performance on Uniform Ball with Outliers Data as a Function of $n$ and $d$}{fig:improvement_unifballwoutliers}
 
 \begin{table}
     \centering
@@ -950,6 +1001,18 @@ To generate this data, we simply use Algorithm \ref{alg:unitball} to generate a 
     \caption{Caption}
     \label{tab:my_label}
 \end{table}
+
+\subsubsection{Uniform Ball}
+\imprfigure{uniform_ball}{Average Improvement Performance on Uniform Ball Data as a Function of $n$ and $d$}{fig:improvement_unifball}
+
+\subsubsection{Hyperspherical Shell}
+\imprfigure{hyperspherical_shell}{Average Improvement Performance on Hyperspherical Shell Data as a Function of $n$ and $d$}{fig:improvement_hypshell}
+
+\subsubsection{Uniform Ball with Outliers}
+\imprfigure{uniform_ball_with_outliers}{Average Improvement Performance on Uniform Ball with Outliers Data as a Function of $n$ and $d$}{fig:improvement_unifballwoutliers}
+
+\subsection{Outlier Detection}
+
 
 \section{Discussion}
 
