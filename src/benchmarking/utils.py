@@ -206,6 +206,28 @@ def get_M_from_log(filepath):
 
     return M_list
 
+def get_r_from_log(filepath):
+    num_trials = 5
+    r_list = []
+    r_trials = []
+    with open(filepath, "r") as f:
+        for line in f:
+            line_split = line.split(sep=", ")
+            first_part = line_split[0]
+            if "Finished trial" in first_part: # indicator that this is a log written by benchmark_logger
+                r_part = line_split[6]
+                r_val = float(r_part.split("=")[-1])
+                r_trials.append(r_val)
+
+                trial_num = int(first_part.split()[-1].split("/")[0]) # which trial number we are on
+                if trial_num == num_trials: # i.e. if we are on trial 5/5
+                    r_avg = np.mean(r_trials)
+                    r_list.append(r_avg)
+                    r_trials = [] # reset
+
+    return r_list
+
+
 def timeout(log_Path, time_limit=20):
     print("Received no input within {} seconds. Continuing.".format(time_limit))
     log_Path.unlink()
