@@ -960,7 +960,7 @@ In the interest of easy reproducability and an example of a real-life applicatio
 In order to make this data usable by our algorithms, we would like to express each image as a vector. To do this we may simply transform each pixel value (an integer in the range 0--255) to an element of a $784$-dimensional array, and this is easily achieved using the \texttt{np.ndarray.flatten} method from NumPy.
 
 \chapter{Experiments}
-In this chapter we present our experimental results from applying our algorithms to different types of data.
+In this chapter we present our experimental results from applying our algorithms to different types of data. For each class of benchmarks we first discuss the methodology used to gain results and then present and discuss those results.
 
 As discussed in Section \ref{sec:software} we implement our algorithms in Python 3.8. Results were obtained on a HP ENVY x360-15-dr0005na\footnote{\url{https://support.hp.com/gb-en/document/c06378310}} laptop running Ubuntu 20.04.2 LTS, with an Intel(R) Core(TM) i7 8565U  processor and 16GB DDR4-2400 SDRAM.
 \section{Exact Model}\label{exact benchmarks}
@@ -1007,7 +1007,11 @@ We generate a large data set ($1000\times100000$) of random normal variates, fro
 \end{figure}
 In Figure \ref{fig:exact_benchmarks_n} and Figure \ref{fig:exact_benchmarks_d} we observe gradual increases in runtime as each parameter increases, until we see a sharp increase in runtime. This is what we expected due to the highly combinatorial nature of this problem, though we did not expect such a large and sudden change. One potential explanation to this is optimizations made by the Gurobi solver which make smaller instances quicker to solve, but eventually lose effedctiveness as problem size increases. These optimizations are how Gurobi Optimization make their money and are not publicly known so we are not able to comment on exactly how they achieve this.
 
-Figure \ref{fig:exact_benchmarks_eta} also produces strange results,
+Figure \ref{fig:exact_benchmarks_eta} also produces strange results, as we would expect the maximum number of feasible solutions to be available when $\eta=0.5$, but the solver is actually able to solve these instances from 0.5 up to 0.7 extremely quickly. We observe spikes at $\eta=0.75$ and $\eta=0.9$, and again the exact behaviour we observe here is hard to explain due to the closed nature of the Gurobi solver.
+
+Figure \ref{fig:exact_benchmarks_M} shows exactly what we expect, which is increasing runtime as $M$ increases beyond what is necessary. This provides justification for some sort of optimized approach to calculating a lower bound as we have done in order to reduce run times as discussed in Section \ref{sec:M}.
+
+
 \section{Construction Methods}
 \subsection{Methodology}
 \subsection{Results}
