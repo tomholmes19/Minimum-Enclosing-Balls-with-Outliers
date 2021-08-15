@@ -18,6 +18,8 @@
 \usepackage{caption}
 \usepackage{subcaption}
 
+\usepackage[toc,page]{appendix}
+
 %TC:ignore
 \newcolumntype{C}{>{$}c<{$}}    % math-mode version of "l" column type
 \newcolumntype{L}{>{$}l<{$}} 
@@ -59,16 +61,22 @@
         \begin{subfigure}[b]{0.475\textwidth}
             \centering
             \includegraphics[width=\textwidth]{#1}
+            \caption{By $n$}
+            \label{#5_n}
         \end{subfigure}
         \hfill
         \begin{subfigure}[b]{0.475\textwidth}
             \centering
             \includegraphics[width=\textwidth]{#2}
+            \caption{By $d$}
+            \label{#5_d}
         \end{subfigure}
         
         \begin{subfigure}[b]{0.475\textwidth}
             \centering
             \includegraphics[width=\textwidth]{#3}
+            \caption{By $\eta$}
+            \label{#5_eta}
         \end{subfigure}
         \caption{#4}
         \label{#5}
@@ -417,7 +425,7 @@ Algorithm \ref{core-set algorithm} runs in $O\left(\frac{nd}{\epsilon}+\frac{d^2
 This model gives us a way to solve the MEBwO problem optimally for a given data set. However, by examining the structure of this model we can expect the solution times to be unreasonable for any meaningfully large instance. Note that, of $n$ many binary variables $\xi_i$, we can choose up to $k\leq n$ many of them to have a value of 1, though by Proposition \ref{removing data} we know that removing data gives us an MEB with potentially lower radius, meaning we will always pick the highest possible number of points ($k$ many) to be excluded. Thus, by a total brute force search we may expect to explore $\binom{n}{k}$ many individual MEB problems. Modern optimization solvers will work more efficiently than this, utilizing techniques such as branch-and-bound. Regardless, we expect a very large solution space which leads to exponentially larger solution times as we will see in Section \ref{exact benchmarks}.
 
 
-\subsection{On the Big M Parameter}
+\subsection{On the Big M Parameter}\label{sec:M}
 The ``big $M$ constraint" in Definition \ref{mebwo} is a commonly known technique within Operational Research and an important question is that of what $M$ do we choose? A sufficiently large $M$ is required such that when the corresponding binary variable is equal to $1$, the constraint is effectively nullified. But, as we will see within this section, a value of $M$ which is too large will lead to a longer solution time with worse solutions.
 
 \subsubsection{An Upper Bound on $M$}
@@ -451,7 +459,7 @@ For more robust benchmarking, we would prefer a method which always returns the 
 Our chosen method, which gives reliable estimates for $M$ in a reasonable time is to simply solve the $MEB$ problem for $\A$ and set $M:=2r$ for $B(c,r)=\MEB(\A)$. We know from Theorem \ref{thm:unique} that an MEB always exists and is unique for a given data set, so can always expect to receive the same $M$ value from this method. Using a heuristic approach such as Algorithm \ref{core-set algorithm} gives us a $(1+\epsilon)$-approximation to $\MEB(\A)$, so we will receive an $M$ value that is slightly larger than needed, but the effect on run time is insignificant and given that the returned $M$ value is consistent we do not introduce unneeded randomness into our methodology that is not already inherently present due to using randomly generated data.
 
 \subsubsection{Solution Times}
-One concern with our choice of $M$ is the effect on the solution time of the solver. Typically a larger than necessary value of $M$ will result in longer solution times, and so this is a concern given that our heuristics are intended to return a feasible solution to the MEBwO problem in reasonably fast time. In our benchmarking of solving the exact model we observe a significant increase in solution time as the value of $M$ increases when solving the exact model on the same data set (Figure TODO: ref this later). 
+One concern with our choice of $M$ is the effect on the solution time of the solver. Typically a larger than necessary value of $M$ will result in longer solution times, and so this is a concern given that our heuristics are intended to return a feasible solution to the MEBwO problem in reasonably fast time. In our benchmarking of solving the exact model we observe a significant increase in solution time as the value of $M$ increases when solving the exact model on the same data set (Figure \ref{fig:exact_benchmarks_M}). 
 
 \subsubsection{Quality of $\xi_i$ Solutions in the QP Relaxation}
 Another concern regarding the value of $M$ for the exat model is the effect on the optimal solutions for the relaxed $\xi_i$ variables in the QP relaxation. This is important as good quality relaxed solutions are essential to Algorithm \ref{relaxation heuristic}, which uses high-valued $\xi_i$ as a proxy for how far a data point lies from the optimal center, and so for how much of an outlier that point is.
@@ -795,9 +803,9 @@ The operations in this heuristic are simply finding a maximally distant point wh
 % =============================================================================
 % Chapter 4
 % =============================================================================
-\chapter{Implementation and Experiments}\label{implementation}
+\chapter{Implementation and Data}\label{implementation}
 \section{Code}
-\subsection{Software}
+\subsection{Software}\label{sec:software}
 We implement our algorithms and data generation using Python 3.8 \cite{python}. Python is a high-level procedural programming language which is commonly used in data science and mathematics for its low barrier to entry, wide-scale adoption, and rich package ecosystem. One drawback of using Python is that it is known to be slow compared to other languages.
 
 An implementation of our work in a faster programming language such as C \cite{kernighan2006c} will almost certainly result in faster run times --- in fact many Python packages such as scikit-learn \cite{scikit-learn} and NumPy \cite{numpy} utilize C to run the more time-consuming processes, and the Gurobi \cite{gurobi} solver is written in C while Python and other languages with Gurobi support are merely interfaces to this solver. A new up-and-coming programming language is Julia \cite{bezanson2017julia} which promises similar run times to C and has a mature library for interfacing with optimization solvers known as JuMP \cite{jump}. Due to the time constraints on this paper, we make use of the author's prior knowledge in Python for the implementation as previously mentioned but again acknowledge that there are indeed potentially superior choices for this type of work.
@@ -951,58 +959,60 @@ In the interest of easy reproducability and an example of a real-life applicatio
 
 In order to make this data usable by our algorithms, we would like to express each image as a vector. To do this we may simply transform each pixel value (an integer in the range 0--255) to an element of a $784$-dimensional array, and this is easily achieved using the \texttt{np.ndarray.flatten} method from NumPy.
 
-\section{Experiments}
-In this section we present our experimental results from applying our algorithms to different types of data. To begin with we will discuss the methodology used to create these results.
+\chapter{Experiments}
+In this chapter we present our experimental results from applying our algorithms to different types of data.
+
+As discussed in Section \ref{sec:software} we implement our algorithms in Python 3.8. Results were obtained on a HP ENVY x360-15-dr0005na\footnote{\url{https://support.hp.com/gb-en/document/c06378310}} laptop running Ubuntu 20.04.2 LTS, with an Intel(R) Core(TM) i7 8565U  processor and 16GB DDR4-2400 SDRAM.
+\section{Exact Model}\label{exact benchmarks}
 \subsection{Methodology}
-\subsubsection{Exact Model}
-\subsection{Exact Model}\label{exact benchmarks}
+Our interest in benchmarking the exact solver is simply to demonstrate the impracticality of using it to solve any reasonably sized problems, rather than an assessment of how this method is able to solve different types of problems. So, in order to save time, we benchmark the solver just on normal data.
+
+Parameters chosen for $n$ were $n=300$ to $n=750$ in steps of 50. For $d$ we choose $d=2$ to $d=20$ in steps of 2, and for $\eta$ we choose $\eta=0.5$ to $\eta=1$ in steps of 0.05. Note that the $\eta=1$ case reduces to the standard MEB problem.
+
+In Section \ref{sec:M} we discussed the effects of the big $M$ parameter on the solution time of the solver, and so we also benchmark the solutuon time when this parameter is varied. To calculate a lower bound on $M$ which ensures that our constraints work as intended, we use the maximum pairwise distance as discussed in the aforementioned section. This is a suitable choice as the size of data sets we use to benchmark the solver are relatively small and so calculating each pairwise distance does not take too much time. Then, we solve the model on the same data set while increasing $M$ in steps of $M/2$.
+
+We generate a large data set ($1000\times100000$) of random normal variates, from which we may sample $n$ many $d$-dimensional vectors to use as a data set. For each parameter, we solve 5 different models and record details such as the center and radius, elapsed time, and more to a log file. In presenting our results we give the average elapsed time, though exact times for each solved instance may be found in the log files in the \texttt{benchmarks} folder in the Github repository.
+\subsection{Results}
 \begin{figure}
     \centering
     \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \includegraphics[width=\textwidth]{exact_benchmarks/func_n_d10_eta0p9_normal.png}
+        \caption{By $n$}
+        \label{fig:exact_benchmarks_n}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \includegraphics[width=\textwidth]{exact_benchmarks/func_d_n300_eta0p9_normal.png}
+        \caption{By $d$}
+        \label{fig:exact_benchmarks_d}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \includegraphics[width=\textwidth]{exact_benchmarks/func_eta_n300_d10_normal.png}
+        \caption{By $\eta$}
+        \label{fig:exact_benchmarks_eta}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \includegraphics[width=\textwidth]{exact_benchmarks/func_M_n300_d10_eta0p9_normal.png}
+        \caption{By $M$}
+        \label{fig:exact_benchmarks_M}
     \end{subfigure}
     \caption{Runtimes for the Exact Model on Normal Data}
     \label{fig:exact_benchmarks}
 \end{figure}
-\subsection{Construction Methods}
+In Figure \ref{fig:exact_benchmarks_n} and Figure \ref{fig:exact_benchmarks_d} we observe gradual increases in runtime as each parameter increases, until we see a sharp increase in runtime. This is what we expected due to the highly combinatorial nature of this problem, though we did not expect such a large and sudden change. One potential explanation to this is optimizations made by the Gurobi solver which make smaller instances quicker to solve, but eventually lose effedctiveness as problem size increases. These optimizations are how Gurobi Optimization make their money and are not publicly known so we are not able to comment on exactly how they achieve this.
 
+Figure \ref{fig:exact_benchmarks_eta} also produces strange results,
+\section{Construction Methods}
+\subsection{Methodology}
+\subsection{Results}
 \subsubsection{By Data Type}
 \benchmarkfigurebydata{normal}{Runtimes for each Algorithm on Normal Data}{fig:normal_benchmarks}
-
-\begin{table}
-    \centering
-    \begin{tabular}{|c||c|c|c|c|}\hline
-        n&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
-        1000&6.3668&7.3439&6.5194&6.3244 \\
-        4000&6.5364&7.3344&6.5399&6.3456 \\
-        7000&6.746&7.2885&6.5689&6.3491 \\
-        10000&6.7353&7.1966&6.499&6.3405 \\
-        13000&6.8431&7.1874&6.5052&6.3485 \\
-        16000&6.8887&7.2076&6.4883&6.3444 \\
-        19000&6.8564&7.1804&6.501&6.3461 \\
-        22000&6.962&7.1195&6.4776&6.3416 \\
-        25000&6.9262&---&6.4696&6.3382 \\
-        28000&6.9413&---&6.4561&6.3463 \\ \hline
-    \end{tabular}
-    \caption{Results as a Function of $n$ for each Algorithm on Normal Data}
-    \label{tab:normal_table_n}
-\end{table}
 
 \benchmarkfigurebydata{uniform_ball}{Runtimes for each Algorithm on Uniform Ball Data}{fig:uniform_ball_benchmarks}
 
@@ -1018,7 +1028,9 @@ In this section we present our experimental results from applying our algorithms
 \benchmarkfigurebyfunc{shrink}{Runtimes for Shrink Heuristic on each Data Type}{fig:shrink_benchmarks}
 
 
-\subsection{Improvement Heuristics}
+\section{Improvement Heuristics}
+\subsection{Methodology}
+\subsection{Results}
 \subsubsection{Normal}
 \imprfigure{normal}{Average Improvement Performance on Normal Data as a Function of $n$ and $d$}{fig:improvement_normal}
 
@@ -1043,7 +1055,9 @@ In this section we present our experimental results from applying our algorithms
 \subsubsection{Uniform Ball with Outliers}
 \imprfigure{uniform_ball_with_outliers}{Average Improvement Performance on Uniform Ball with Outliers Data as a Function of $n$ and $d$}{fig:improvement_unifballwoutliers}
 
-\subsection{Outlier Detection}
+\section{Outlier Detection}
+\subsection{Methodology}
+\subsection{Results}
 
 
 \section{Discussion}
@@ -1058,19 +1072,240 @@ In this section we present our experimental results from applying our algorithms
 \bibliography{literature}
 \clearpage
 
-\appendix
-\section*{Appendices}
-\addcontentsline{toc}{section}{Appendices}
+\begin{appendices}
+    \section{Tables of Results} \label{app:tables}
+    Here we present all average results for each method, parameter, and data type in tabular form. For each individual result rather than averages, please refer to the \texttt{benchmarks} folder in the Github repository\footnote{\url{https://github.com/tomholmes19/Minimum-Enclosing-Balls-with-Outliers} \cite{Holmes_Minimum_Enclosing_Balls_2021}}.
+    
+    The tables are organised by data type, and each table contains results for a single varied parameter, with each column a different method.
+    
+    \subsection{Normal}
+    \begin{table}[ht]
+        \centering
+        \begin{tabular}{|c||c|c|c|c|}\hline
+            $n$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
+            1000&6.3668&7.3439&6.5194&6.3244 \\
+            4000&6.5364&7.3344&6.5399&6.3456 \\
+            7000&6.746&7.2885&6.5689&6.3491 \\
+            10000&6.7353&7.1966&6.499&6.3405 \\
+            13000&6.8431&7.1874&6.5052&6.3485 \\
+            16000&6.8887&7.2076&6.4883&6.3444 \\
+            19000&6.8564&7.1804&6.501&6.3461 \\
+            22000&6.962&7.1195&6.4776&6.3416 \\
+            25000&6.9262&---&6.4696&6.3382 \\
+            28000&6.9413&---&6.4561&6.3463 \\ \hline
+        \end{tabular}
+        \caption{Results as a Function of $n$ for each Algorithm on Normal Data}
+        \label{tab:normal_table_n}
+    \end{table}
+    
+    \begin{table}[ht]
+        \centering
+        \begin{tabular}{|c||c|c|c|c|} \hline
+            $d$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
+            10&4.585&4.1108&4.1228&3.9936 \\
+            20&5.788&5.8051&5.4767&5.3263 \\
+            30&6.7353&7.1966&6.499&6.3405 \\
+            40&7.5588&8.3004&7.3926&7.1958 \\
+            50&8.2076&9.4147&8.0895&7.9454 \\
+            60&8.8664&10.274&8.8096&8.6194 \\
+            70&9.4592&11.2226&9.4445&9.2551 \\
+            80&10.0398&11.986&10.0404&9.8288 \\
+            90&10.5103&12.7818&10.5329&10.3658 \\
+            100&11.079&13.4179&11.0663&10.8786 \\ \hline
+        \end{tabular}
+        \caption{Results as a Function of $d$ for each Algorithm on Normal Data}
+        \label{tab:normal_table_d}
+    \end{table}
+    
+    \begin{table}[ht]
+        \centering
+        \begin{tabular}{|c||c|c|c|c|} \hline
+            $\eta$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
+            0.5&7.0989&6.167&5.5507&5.4123 \\
+            0.6&6.8849&6.3643&5.736&5.5898 \\
+            0.7&6.6525&6.5807&5.9285&5.7836 \\
+            0.8&6.5215&6.8376&6.1598&6.0107 \\
+            0.9&6.7353&7.1966&6.499&6.3405 \\ \hline
+        \end{tabular}
+        \caption{Results as a Function of $\eta$ for each Algorithm on Normal Data}
+        \label{tab:normal_table_eta}
+    \end{table}
+    \clearpage
+    
+    
+    \subsection{Uniform Ball}
+    \begin{table}[ht]
+        \centering
+        \begin{tabular}{|c||c|c|c|c|}\hline
+            $n$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
+            1000&0.9952&1.3934&0.9962&0.9968 \\
+            4000&0.9961&1.3723&0.9963&0.9963 \\
+            7000&0.9963&1.3445&0.9965&0.9965 \\
+            10000&0.9963&1.3369&0.9964&0.9964 \\
+            13000&0.9962&1.3425&0.9964&0.9963 \\
+            16000&0.9964&1.3402&0.9965&0.9964 \\
+            19000&0.9964&1.3395&0.9965&0.9964 \\
+            22000&0.9964&1.3364&0.9965&0.9964 \\
+            25000&0.9964&---&0.9965&0.9964 \\
+            28000&0.9964&---&0.9965&0.9965 \\ \hline
+        \end{tabular}
+        \caption{Results as a Function of $n$ for each Algorithm on Uniform Ball Data}
+        \label{tab:uniform_ball_table_n}
+    \end{table}
+    
+    \begin{table}[ht]
+        \centering
+        \begin{tabular}{|c||c|c|c|c|} \hline
+            $d$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
+            10&0.9893&1.1355&0.9896&0.9895 \\
+            20&0.9946&1.2906&0.9947&0.9947 \\
+            30&0.9963&1.3369&0.9964&0.9964 \\
+            40&0.9972&1.3811&0.9973&0.9973 \\
+            50&0.9978&1.3925&0.9978&0.9978 \\
+            60&0.9982&1.405&0.9982&0.9982 \\
+            70&0.9985&1.4114&0.9985&0.9985 \\
+            80&0.9987&1.4238&0.9987&0.9987 \\
+            90&0.9989&1.4211&0.9988&0.9988 \\
+            100&0.9991&1.43&0.9989&0.9989 \\ \hline
+        \end{tabular}
+        \caption{Results as a Function of $d$ for each Algorithm on Uniform Ball Data}
+        \label{tab:uniform_ball_table_d}
+    \end{table}
+    
+    \begin{table}[ht]
+        \centering
+        \begin{tabular}{|c||c|c|c|c|} \hline
+            $\eta$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
+            0.5&0.9776&1.2042&0.9771&0.977 \\
+            0.6&0.9829&1.2324&0.9831&0.983 \\
+            0.7&0.988&1.2612&0.9882&0.9881 \\
+            0.8&0.9924&1.2944&0.9926&0.9925 \\
+            0.9&0.9963&1.3369&0.9964&0.9964 \\ \hline
+        \end{tabular}
+        \caption{Results as a Function of $\eta$ for each Algorithm on Uniform Ball Data}
+        \label{tab:uniform_ball_table_eta}
+    \end{table}
+    \clearpage
+    
+    
+    \subsection{Hyperspherical Shell}
+    \begin{table}[ht]
+        \centering
+        \begin{tabular}{|c||c|c|c|c|}\hline
+            $n$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
+            1000&1.9909&2.7798&1.9927&1.9936 \\
+            4000&1.9922&2.7317&1.9929&1.9927 \\
+            7000&1.9926&2.7088&1.9931&1.9929 \\
+            10000&1.9925&2.6711&1.993&1.9927 \\
+            13000&1.9928&2.6598&1.9931&1.9929 \\
+            16000&1.9928&2.6748&1.993&1.9929 \\
+            19000&1.9927&2.6666&1.9929&1.9928 \\
+            22000&1.9928&2.6682&1.993&1.9929 \\
+            25000&1.9928&---&1.993&1.993 \\
+            28000&1.9929&---&1.993&1.993 \\ \hline
+        \end{tabular}
+        \caption{Results as a Function of $n$ for each Algorithm on Hyperspherical Shell Data}
+        \label{tab:hyperspherical_shell_table_n}
+    \end{table}
+    
+    \begin{table}[ht]
+        \centering
+        \begin{tabular}{|c||c|c|c|c|} \hline
+            $d$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
+            10&1.9791&2.4619&1.9793&1.9792 \\
+            20&1.9892&2.5899&1.9895&1.9895 \\
+            30&1.9925&2.6711&1.993&1.9927 \\
+            40&1.9945&2.7608&1.9948&1.9946 \\
+            50&1.9955&2.7855&1.9958&1.9957 \\
+            60&1.9963&2.7982&1.9965&1.9964 \\
+            70&1.9969&2.8242&1.9971&1.997 \\
+            80&1.9972&2.8264&1.9974&1.9974 \\
+            90&1.9975&2.8465&1.9977&1.9976 \\
+            100&1.9978&2.8579&1.9979&1.9979 \\ \hline
+        \end{tabular}
+        \caption{Results as a Function of $d$ for each Algorithm on Hyperspherical Shell Data}
+        \label{tab:hyperspherical_shell_table_d}
+    \end{table}
+    
+    \begin{table}[ht]
+        \centering
+        \begin{tabular}{|c||c|c|c|c|} \hline
+            $\eta$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
+            0.5&1.9532&2.4014&1.9538&1.9535 \\
+            0.6&1.9658&2.4563&1.9661&1.966 \\
+            0.7&1.9759&2.5157&1.9762&1.9762 \\
+            0.8&1.9847&2.5802&1.9852&1.985 \\
+            0.9&1.9925&2.6711&1.993&1.9927 \\ \hline
+        \end{tabular}
+        \caption{Results as a Function of $\eta$ for each Algorithm on Hyperspherical Shell Data}
+        \label{tab:hyperspherical_shell_table_eta}
+    \end{table}
+    \clearpage
+    
+    
+    \subsection{Uniform Ball with Outliers}
+    \begin{table}[ht]
+        \centering
+        \begin{tabular}{|c||c|c|c|c|}\hline
+            $n$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
+            1000&0.999&1.5417&1.088&1.0167 \\
+            4000&0.9998&1.4973&1.0245&1.0078 \\
+            7000&0.9999&1.5615&1.0123&1.0076 \\
+            10000&0.9999&1.5324&1.0107&1.0062 \\
+            13000&0.9999&1.5395&1.007&1.0058 \\
+            16000&0.9999&1.5545&1.0044&1.0048 \\
+            19000&0.9999&1.5311&1.0061&1.0046 \\
+            22000&0.9999&1.5454&1.0046&1.0039 \\
+            25000&1.0&---&1.004&1.0044 \\
+            28000&0.9999&---&1.0036&1.0043 \\ \hline
+        \end{tabular}
+        \caption{Results as a Function of $n$ for each Algorithm on Uniform Ball with Outliers Data}
+        \label{tab:uniform_ball_with_outliers_table_n}
+    \end{table}
+    
+    \begin{table}[ht]
+        \centering
+        \begin{tabular}{|c||c|c|c|c|} \hline
+            $d$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
+            10&0.9999&1.3487&1.0101&1.0068 \\
+            20&0.9999&1.5107&1.0088&1.0083 \\
+            30&0.9999&1.5324&1.0107&1.0062 \\
+            40&0.9999&1.5778&1.0097&1.0057 \\
+            50&1.0&1.5776&1.012&1.0054 \\
+            60&1.0&1.5742&1.011&1.0044 \\
+            70&1.0&1.5756&1.0114&1.0041 \\
+            80&1.0001&1.5731&1.0111&1.0043 \\
+            90&---&1.5695&1.0107&1.0039 \\
+            100&---&1.5676&1.0109&1.0034 \\ \hline
+        \end{tabular}
+        \caption{Results as a Function of $d$ for each Algorithm on Uniform Ball with Outliers Data}
+        \label{tab:uniform_ball_with_outliers_table_d}
+    \end{table}
+    
+    \begin{table}[ht]
+        \centering
+        \begin{tabular}{|c||c|c|c|c|} \hline
+            $\eta$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
+            0.5&0.9998&1.5588&1.0016&1.009 \\
+            0.6&1.0902&1.5252&1.0021&1.0096 \\
+            0.7&0.9999&1.5343&1.0032&1.0083 \\
+            0.8&0.9999&1.5307&1.004&1.0074 \\
+            0.9&0.9999&1.5324&1.0107&1.0062 \\ \hline
+        \end{tabular}
+        \caption{Results as a Function of $\eta$ for each Algorithm on Uniform Ball with Outliers Data}
+        \label{tab:uniform_ball_with_outliers_table_eta}
+    \end{table}
+    
+    
+    
+    
+    \clearpage
+    
+    \section{Another Appendix}
+    \label{app:two}
+    
+    Some other stuff.
+\end{appendices}
 
-\section{An Appendix}
-\label{app:one}
-
-Some stuff.
-\clearpage
-
-\section{Another Appendix}
-\label{app:two}
-
-Some other stuff.
 
 \end{document}
