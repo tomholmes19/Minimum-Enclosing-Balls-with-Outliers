@@ -17,8 +17,8 @@ fixed_params = {
 }
 
 column_headers = [
-    "Relaxation-Based Heuristic",
-    "Shenmaier's Approximation",
+    "RBH",
+    "Shenmaier",
     "Shrink Heuristic",
     "Avg. Point Heuristic"
 ]
