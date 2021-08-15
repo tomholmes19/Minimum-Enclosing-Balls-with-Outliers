@@ -284,6 +284,12 @@ def mnist_benchmark(df, func, number, eta, log_file=None):
     # convert data to array for fitting MEBwO
     data = df_all.drop(labels=0, axis=1).to_numpy() # array
 
+    bar = "===================="
+    print(bar)
+    print("PROGRESS")
+    print("\tNumber:\t{}".format(number))
+    print("\teta:\t{}".format(eta))
+    print(bar)
     # fit and time MEBwO
     start = timeit.default_timer()
     c, r, _ = func(data, eta)
