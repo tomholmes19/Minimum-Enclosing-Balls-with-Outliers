@@ -53,26 +53,34 @@
     \pairfigure{improvement_r_benchmarks/avg_pct_func_n_d100_eta0p9_#1.png}{improvement_r_benchmarks/avg_pct_func_d_n1000_eta0p9_#1.png}{#2}{#3}
 }
 
-\newcommand{\benchmarkfigure}[3]{
+\newcommand{\benchmarkfigure}[5]{
     \begin{figure}
         \centering
         \begin{subfigure}[b]{0.475\textwidth}
             \centering
-            \includegraphics[width=\textwidth]{alg_benchmarks/func_n_d30_eta0p9_#1.png}
+            \includegraphics[width=\textwidth]{#1}
         \end{subfigure}
         \hfill
         \begin{subfigure}[b]{0.475\textwidth}
             \centering
-            \includegraphics[width=\textwidth]{alg_benchmarks/func_d_n10000_eta0p9_#1.png}
+            \includegraphics[width=\textwidth]{#2}
         \end{subfigure}
         
         \begin{subfigure}[b]{0.475\textwidth}
             \centering
-            \includegraphics[width=\textwidth]{alg_benchmarks/func_eta_n10000_d30_#1.png}
+            \includegraphics[width=\textwidth]{#3}
         \end{subfigure}
-        \caption{#2}
-        \label{#3}
+        \caption{#4}
+        \label{#5}
     \end{figure}
+}
+
+\newcommand{\benchmarkfigurebydata}[3]{
+    \benchmarkfigure{alg_benchmarks/by_data/func_n_d30_eta0p9_#1.png}{alg_benchmarks/by_data/func_d_n10000_eta0p9_#1.png}{alg_benchmarks/by_data/func_eta_n10000_d30_#1.png}{#2}{#3}
+}
+
+\newcommand{\benchmarkfigurebyfunc}[3]{
+    \benchmarkfigure{alg_benchmarks/by_func/#1_func_n_d30_eta0p9.png}{alg_benchmarks/by_func/#1_func_d_n10000_eta0p9.png}{alg_benchmarks/by_func/#1_func_eta_n10000_d30.png}{#2}{#3}
 }
 \DeclareMathOperator{\MEB}{MEB}
 \DeclareMathOperator{\MEBwO}{MEBwO}
@@ -970,21 +978,45 @@ In this section we present our experimental results from applying our algorithms
         \includegraphics[width=\textwidth]{exact_benchmarks/func_M_n300_d10_eta0p9_normal.png}
     \end{subfigure}
     \caption{Runtimes for the Exact Model on Normal Data}
-    \label{fig:my_label}
+    \label{fig:exact_benchmarks}
 \end{figure}
 \subsection{Construction Methods}
 
-\subsubsection{Normal}
-\benchmarkfigure{normal}{Runtimes for each Algorithm on Normal Data}{fig:normal_benchmarks}
+\subsubsection{By Data Type}
+\benchmarkfigurebydata{normal}{Runtimes for each Algorithm on Normal Data}{fig:normal_benchmarks}
 
-\subsubsection{Uniform Ball}
-\benchmarkfigure{uniform_ball}{Runtimes for each Algorithm on Uniform Ball Data}{fig:uniform_ball_benchmarks}
+\begin{table}
+    \centering
+    \begin{tabular}{|c||c|c|c|c|}\hline
+        n&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
+        1000&6.3668&7.3439&6.5194&6.3244 \\
+        4000&6.5364&7.3344&6.5399&6.3456 \\
+        7000&6.746&7.2885&6.5689&6.3491 \\
+        10000&6.7353&7.1966&6.499&6.3405 \\
+        13000&6.8431&7.1874&6.5052&6.3485 \\
+        16000&6.8887&7.2076&6.4883&6.3444 \\
+        19000&6.8564&7.1804&6.501&6.3461 \\
+        22000&6.962&7.1195&6.4776&6.3416 \\
+        25000&6.9262&---&6.4696&6.3382 \\
+        28000&6.9413&---&6.4561&6.3463 \\ \hline
+    \end{tabular}
+    \caption{Results as a Function of $n$ for each Algorithm on Normal Data}
+    \label{tab:normal_table_n}
+\end{table}
 
-\subsubsection{Hyperspherical Shell}
-\benchmarkfigure{hyperspherical_shell}{Runtimes for each Algorithm on Hyperspherical Shell Data}{fig:hyp_shell_benchmarks}
+\benchmarkfigurebydata{uniform_ball}{Runtimes for each Algorithm on Uniform Ball Data}{fig:uniform_ball_benchmarks}
 
-\subsubsection{Uniform Ball with Outliers}
-\benchmarkfigure{uniform_ball_with_outliers}{Runtimes for each Algorithm on Uniform Ball with Outiers Data}{fig:unifballwoutliers_benchmarks}
+\benchmarkfigurebydata{hyperspherical_shell}{Runtimes for each Algorithm on Hyperspherical Shell Data}{fig:hyp_shell_benchmarks}
+
+\benchmarkfigurebydata{uniform_ball_with_outliers}{Runtimes for each Algorithm on Uniform Ball with Outiers Data}{fig:unifballwoutliers_benchmarks}
+
+\subsubsection{By Algorithm}
+\benchmarkfigurebyfunc{relaxation_heuristic}{Runtimes for Relaxation-Based Heuristic on each Data Type}{fig:rbh_benchmarks}
+
+\benchmarkfigurebyfunc{shenmaier}{Runtimes for Shenmaier's Approximation on each Data Type}{fig:shenmaier_benchmarks}
+
+\benchmarkfigurebyfunc{shrink}{Runtimes for Shrink Heuristic on each Data Type}{fig:shrink_benchmarks}
+
 
 \subsection{Improvement Heuristics}
 \subsubsection{Normal}
