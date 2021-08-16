@@ -31,19 +31,19 @@
 \newcommand{\binary}{\left\{0,1\right\}} % lazy
 
 \newcommand{\pairfigure}[4]{
-    \begin{figure}
-    \centering
-    \begin{subfigure}[b]{0.475\textwidth}
+    \begin{figure}[ht]
         \centering
-        \includegraphics[width=\textwidth]{#1}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.475\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{#2}
-    \end{subfigure}
-    \caption{#3}
-    \label{#4}
+        \begin{subfigure}[b]{0.475\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{#1}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}[b]{0.475\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{#2}
+        \end{subfigure}
+        \caption{#3}
+        \label{#4}
 \end{figure}
 }
 
@@ -56,7 +56,7 @@
 }
 
 \newcommand{\benchmarkfigure}[5]{
-    \begin{figure}
+    \begin{figure}[ht]
         \centering
         \begin{subfigure}[b]{0.475\textwidth}
             \centering
@@ -456,7 +456,7 @@ A caveat to this approach is that it the value of $M$ will change depending on t
 
 For more robust benchmarking, we would prefer a method which always returns the same $M$ value for a given data set, so this method is unsuitable for our purposes. This is because, as seen in the previous section, a higher value of $M$ has a negative effect on the run time of the solver so we would prefer to minimize the effect of randomness on our benchmarks.
 
-Our chosen method, which gives reliable estimates for $M$ in a reasonable time is to simply solve the $MEB$ problem for $\A$ and set $M:=2r$ for $B(c,r)=\MEB(\A)$. We know from Theorem \ref{thm:unique} that an MEB always exists and is unique for a given data set, so can always expect to receive the same $M$ value from this method. Using a heuristic approach such as Algorithm \ref{core-set algorithm} gives us a $(1+\epsilon)$-approximation to $\MEB(\A)$, so we will receive an $M$ value that is slightly larger than needed, but the effect on run time is insignificant and given that the returned $M$ value is consistent we do not introduce unneeded randomness into our methodology that is not already inherently present due to using randomly generated data.
+Our chosen method, which gives reliable estimates for $M$ in a reasonable time is to simply solve the MEB problem for $\A$ and set $M:=2r$ for $B(c,r)=\MEB(\A)$. We know from Theorem \ref{thm:unique} that an MEB always exists and is unique for a given data set, so can always expect to receive the same $M$ value from this method. Using a heuristic approach such as Algorithm \ref{core-set algorithm} gives us a $(1+\epsilon)$-approximation to $\MEB(\A)$, so we will receive an $M$ value that is slightly larger than needed, but the effect on run time is insignificant and given that the returned $M$ value is consistent we do not introduce unneeded randomness into our methodology that is not already inherently present due to using randomly generated data.
 
 \subsubsection{Solution Times}
 One concern with our choice of $M$ is the effect on the solution time of the solver. Typically a larger than necessary value of $M$ will result in longer solution times, and so this is a concern given that our heuristics are intended to return a feasible solution to the MEBwO problem in reasonably fast time. In our benchmarking of solving the exact model we observe a significant increase in solution time as the value of $M$ increases when solving the exact model on the same data set (Figure \ref{fig:exact_benchmarks_M}). 
@@ -594,12 +594,14 @@ This algorithm runs extremely quickly, with the dominating term in the time comp
 
 
 
-\section{Improvement Heuristics}
+\section{Improvement Heuristics}\label{sec:improvement_heuristics}
 We now consider some improvement heuristics. The two heuristics described here are, strictly speaking, designed to improve an existing MEB rather than an MEBwO. However, quick and effective methods exist for solving the MEB problem and so improvement heuristics have not been needed, while heuristics which solve the MEBwO problem may return a solution which has considerable space for improvement.
 
 The two improvement heuristics work in a similar way, by considering an improving direction in which moving the centre of the MEB in that direction while keeping the same radius retains a feasible solution, then shrinking the radius to the furthest point from the new centre. The Direction-Constrained Single Step Heuristic (DCSSH) works by pure geometric reasoning to find a new centre, while the Direction-Constrained MEB (DCMEB) uses an optimization solver such as Gurobi to find an optimal step in the improving direction to minimize the radius of the new ball.
 
-The inspiration for these heuristics comes from Shenmaier's Approximation, which returns a ball with some centre $c\in\A$. Our assumption is that a better solution exists in a local neighbourhood around $c$, i.e. we find a new centre that does not have to lie on a point in $\A$. Both heuristics consider only a single step, but as they are quick to run we may run each heuristic in succession to build a sequence of steps that lead to an improved solution. For an example of this refer to Figure \ref{fig:riterations} which shows the new radius after each iteration of each improvement heuristic on each data set for $n=1000$, $d=100$, and the standard parameters for each data type (see Section \ref{data}). These examples were run on one data set each rather than averaged over multiple data sets and so should not be used to draw any conclusions.
+The inspiration for these heuristics comes from Shenmaier's Approximation, which returns a ball with some centre $c\in\A$. Our assumption is that a better solution exists in a local neighbourhood around $c$, i.e. we find a new centre that does not have to lie on a point in $\A$. Both heuristics consider only a single step, but as they are quick to run we may run each heuristic in succession to build a sequence of steps that lead to an improved solution. There are various stopping criteria one could consider in an implementation of these heuristics, such as setting an iteration limit or stopping once each iteration yields an improvement below some threshold. For ease of implementation we will choose the iteration limit since each iteration is computationally cheap.
+
+For an example of this refer to Figure \ref{fig:riterations} which shows the new radius after each iteration of each improvement heuristic on each data set for $n=1000$, $d=100$, and the standard parameters for each data type (see Section \ref{data}). These examples were run on one data set each rather than averaged over multiple data sets and so should not be used to draw any conclusions.
 
 \subsection{Direction-Constrained Single Step Heuristic}
 \subsubsection{Derivation}
@@ -1023,9 +1025,9 @@ To benchmark our construction methods we take a similar approach to that of benc
 
 For benchmarking $n$ we choose $n=1000$ to $n=28000$ in steps of 3000 with $d=30$ and $\eta=0.9$ fixed. For $d$ we choose $d=10$ to $d=100$ in steps of 10 with $n=10000$ and $\eta=0.9$ fixed. For $\eta$ we choose $\eta=0.5$ to $\eta=0.9$ in steps of 0.1 with $n=10000$, $d=30$ fixed.
 
-Like with the exact model, we solve the MEBwO problem with our methods on 5 different data sets for each choice of parameters, and again would prefer to do more but we chose 5 due to the time restrictions. Each solved instance has its solutions and other details recorded to a log file. When we use the Relaxation-Based Heuristic, we calculate a lower bound for the $M$ value required to solve the relaxed model by solving the MEB problem and setting $M:=2r$ where $r$ is the solution for the radius of the MEB problem, as discussed in Section \ref{sec:M}. This is only actually necessary for the normal data, as each of the other data types has a maximum diameter determined by the parameters chosen to generate it (see Section \ref{data}).
+Like with the exact model, we solve the MEBwO problem with our methods on 5 different data sets for each choice of parameters, and again would prefer to do more but we chose 5 due to the time restrictions. Each solved instance has its solutions, runtime and other details recorded to a log file. Runtime is recorded using Python's \texttt{timeit} library, calling the timer before and after running each algorithm. When we use the Relaxation-Based Heuristic, we calculate a lower bound for the $M$ value required to solve the relaxed model by solving the MEB problem and setting $M:=2r$ where $r$ is the solution for the radius of the MEB problem, as discussed in Section \ref{sec:M}. This is only actually necessary for the normal data, as each of the other data types has a maximum diameter determined by the parameters chosen to generate it (see Section \ref{data}).
 
-In presenting our results, we again report average runtimes and exact solutions and runtimes are available in the lob files in the \texttt{benchmarks} folder in the Github repository. We provide graphs which group results by data type and algorithm, so one may compare the performance of each algorithm on one data type as well as the performance of one algorithm on each data type.
+In presenting our results, we again report average runtimes and exact solutions and runtimes are available in the lob files in the \texttt{benchmarks} folder in the Github repository and tabular results may be found in the appendix (TODO: REF). We provide graphs which group results by data type and algorithm, so one may compare the performance of each algorithm on one data type as well as the performance of one algorithm on each data type.
 
 
 
@@ -1049,6 +1051,13 @@ In presenting our results, we again report average runtimes and exact solutions 
 
 \section{Improvement Heuristics}
 \subsection{Methodology}
+Our interest in benchmarking our improvement heuristics is in how well these heuristics improve an existing solution. Runtime is not a concern as we know that both heuristics will terminate very quickly as discussed in Section \ref{sec:improvement_heuristics}, though we include plots of the runtimes for the DCMEB model in the appendix (TODO: REF THIS) for completeness.
+
+These heuristics were designed to be used after gaining a solution from Shenmaier's approximation, so we first find this solution for the given data set and then run an improvement heuristic 100 times. As discussed in Section \ref{sec:improvement_heuristics} other stopping criteria could be implemented but we opt for an iterational limit for ease of implementation and simplicity.
+
+As seen in the previous section, Shenmaier's algorithm is not a particularly fast method, so with regard to the time constraint of this project we choose to benchmark our improvement heuristics on separate, smaller data sets than those we used to benchmark our construction methods. We follow the same methodology in generating and saving each data set. For benchmarking $n$ we choose $n=500$ to $n=5000$ in steps of 500 and for $d$ we choose $d=10$ to $d=150$ in steps of 10. The improvement heuristics, while primarily useful for improving an existing MEBwO, ultimately only improves an MEB on a subset of data so there is no $\eta$ parameter to vary.
+
+In each instance we solve, we record the initial radius returned by Shenmaier's approximation, and after running the improvement heuristic 100 times we record the new improved radius. In the results section we report average improvement for each heuristic, and tabular results may be found in the appendix (TODO: REF).
 
 \subsection{Results}
 \subsubsection{Normal}
@@ -1093,7 +1102,7 @@ In presenting our results, we again report average runtimes and exact solutions 
 \clearpage
 
 \begin{appendices}
-    \section{Tables of Results} \label{app:tables}
+    \section{Construction Method Tables}\label{app:constr_tables}
     Here we present all average results for each method, parameter, and data type in tabular form. For each individual result rather than averages, please refer to the \texttt{benchmarks} folder in the Github repository\footnote{\url{https://github.com/tomholmes19/Minimum-Enclosing-Balls-with-Outliers} \cite{Holmes_Minimum_Enclosing_Balls_2021}}.
     
     The tables are organised by data type, and each table contains results for a single varied parameter, with each column a different method.
@@ -1315,16 +1324,19 @@ In presenting our results, we again report average runtimes and exact solutions 
         \caption{Results as a Function of $\eta$ for each Algorithm on Uniform Ball with Outliers Data}
         \label{tab:uniform_ball_with_outliers_table_eta}
     \end{table}
-    
-    
-    
-    
+
     \clearpage
     
-    \section{Another Appendix}
-    \label{app:two}
+    \section{Improvement Heuristic Tables}\label{app:impr_tables}
+    Here we present results for each instance of benchmarking the improvement heuristic. We ran 5 separate instances for each particular benchmark, and $r_i$ represents the initial radius of the $i$th instance returned by Shenmaier's approximation while $\hat{r}_i$ represents the improved radius. The final column is the average improvement percentage which is presented in the main text.
     
-    Some other stuff.
+    \subsection{Normal}
+
+    \subsection{Uniform Ball}
+    
+    \subsection{Hyperspherical Shell}
+    
+    \subsection{Uniform Ball with Outliers}
 \end{appendices}
 
 
