@@ -6,10 +6,9 @@ from meb.mebwo_algorithms import alg__relaxation_heuristic, alg__shrink, alg__sh
 
 np.random.seed(10000)
 
-#numbers = range(10)
-#eta_list = [0.7, 0.75, 0.8, 0.85, 0.9, 0.95]
-numbers = [9]
-eta_list = [0.95]
+numbers = range(10)
+eta_list = [0.7, 0.75, 0.8, 0.85, 0.9, 0.95]
+
 funcs = {
     "shenmaier": alg__shenmaier,
     "shrink_avg": alg__shrink_avg,
@@ -24,7 +23,7 @@ for func in funcs:
 msg = int(input()) - 1
 
 func = list(funcs.values())[msg]
-
+print(func)
 log_file = "benchmarks/"
 log_file += list(funcs.keys())[msg]
 log_file += "/mnist/mnist_log.log"
