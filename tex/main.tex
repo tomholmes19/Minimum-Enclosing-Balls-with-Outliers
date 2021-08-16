@@ -815,7 +815,7 @@ Packages within Python we make use of in the implementation are NumPy \cite{nump
 For modelling and solving our exact models for the MEBwO and DCMEB problems we use the Gurobi optimization solver \cite{gurobi}. At the time of writing, Gurobi is one of the fastest and most powerful mathematical programming solvers available and in particular is able to formulate and solve the QCQP and MIQCQP problems we require, so Gurobi was an easy choice of solver. Gurobi also has an easy to use Python interface which we make use of in our implementation.
 
 \subsection{Implementation}
-Our implementation can be found on Github \footnote{\url{https://github.com/tomholmes19/Minimum-Enclosing-Balls-with-Outliers} \cite{Holmes_Minimum_Enclosing_Balls_2021}} within the \texttt{src} folder. All scripts used to run benchmarks and create figures are contained within this folder, and we have also written three packages contained therein. The \texttt{meb} package contains an object-oriented framework for MEB objects, defining \texttt{Ball}, \texttt{MEB}, and \texttt{MEBwO} objects within \texttt{ball.py} with a simple class hierarchy as seen in Figure \ref{fig:hierarchy}. 
+Our implementation can be found on Github \footnote{\url{https://github.com/tomholmes19/Minimum-Enclosing-Balls-with-Outliers} \cite{Holmes_Minimum_Enclosing_Balls_2021}} within the \texttt{src} folder and overall consists of around 2000 lines of code. All scripts used to run benchmarks and create figures are contained within this folder, and we have also written three packages contained therein. The \texttt{meb} package contains an object-oriented framework for MEB objects, defining \texttt{Ball}, \texttt{MEB}, and \texttt{MEBwO} objects within \texttt{ball.py} with a simple class hierarchy as seen in Figure \ref{fig:hierarchy}. 
 
 \begin{figure}
     \centering
@@ -924,10 +924,12 @@ which tends to $0$ as $d\to\infty$ since $r_2>r_1$. So, for sufficiently large $
     \caption{Acceptance-Rejection Method for Generating Points in a Hyperspherical Shell}
     \label{alg:shell}
 \end{algorithm}
+
+Like with the Uniform Ball data, Hyperspherical Shell data will have a guaranteed upper bound to the diameter and so we will not need to calculate $M$.
 \subsection{Uniform Ball with Outliers}
 Our final randomly generated data set is the Uniform Ball with Outliers. This data type consists of a uniform ball with a set amount of ``outliers" which we generate ourselves. The main benefit of using this data type to benchmark our algorithms is that since we can choose the exact number of points outside the uniform ball, if we set $\eta\%$ of our $n$ points to be outside of the ball with radius $r$ then $\MEBwO(\A,\eta)$ will have a radius close to $r$.
 
-To generate this data, we simply use Algorithm \ref{alg:unitball} to generate a uniform unit ball with radius $1$ which contains $\eta\%$ of our data, and then use Algorithm \ref{alg:shell} with inner radius $2$ and outer radius $3$ which contains $(1-\eta)\%$ of our data. We choose an inner radius of $2$ so that there is a distinct gap between the two parts of the data in the interest of having a clear inner ball. See Figure \ref{fig:unifballoutliers} for an example.
+To generate this data, we simply use Algorithm \ref{alg:unitball} to generate a uniform unit ball with radius $1$ which contains $\eta\%$ of our data, and then use Algorithm \ref{alg:shell} with inner radius $2$ and outer radius $3$ which contains $(1-\eta)\%$ of our data. We choose an inner radius of $2$ so that there is a distinct gap between the two parts of the data in the interest of having a clear inner ball. See Figure \ref{fig:unifballoutliers} for an example. Like before, we do not need to calculate an $M$ value for this data as we have a guaranteed upper bound to the diameter.
 
 \begin{algorithm}
     \KwIn{Number of points $n\in\mathbb{N}$, dimension $d\in\mathbb{N}$, percentage of inliers $\eta\in\left[0,1\right]$, radius of ball $r\in\mathbb{R}^{\geq0}$, inner radius of shell $r_1\in\mathbb{R}^{\geq0}$, outer radius of shell $r_2\in\mathbb{R}^{\geq0}$}
@@ -946,6 +948,7 @@ To generate this data, we simply use Algorithm \ref{alg:unitball} to generate a 
 
 \datafigure{uniform_ball_with_outliers}{Example of a Uniform Ball with Outliers}{fig:unifballoutliers}
 
+
 \subsection{MNIST}
 
 In the interest of easy reproducability and an example of a real-life application, we would like to test our construction methods on the MNIST data set \cite{lecun2010mnist}. This data set consists of hand-written digits from 0--9 which are size-normalized and centered in $28\times28$ pixel greyscale images, and examples can be seen in Figure \ref{fig:mnist_example}. MNIST is a popular data set for testing digit recognition models, a specific application of the broader class of image recognition models within computer vision. We may fit an MEBwO to the subset of data for a specific digit and this ball may then be used for outlier detection or as a more robust binary classification model than if one were to use an MEB. Further to this, seperate balls may be fit to each digit and used to make multi-class classifications, either in a voting-based ensemble model or as part of a decision tree. In Section (TODO: REF OUTLIER RECOGNITION) we will apply two of our algorithms as an outlier detection method.
@@ -963,15 +966,17 @@ In order to make this data usable by our algorithms, we would like to express ea
 In this chapter we present our experimental results from applying our algorithms to different types of data. For each class of benchmarks we first discuss the methodology used to gain results and then present and discuss those results.
 
 As discussed in Section \ref{sec:software} we implement our algorithms in Python 3.8. Results were obtained on a HP ENVY x360-15-dr0005na\footnote{\url{https://support.hp.com/gb-en/document/c06378310}} laptop running Ubuntu 20.04.2 LTS, with an Intel(R) Core(TM) i7 8565U  processor and 16GB DDR4-2400 SDRAM.
+
+
 \section{Exact Model}\label{exact benchmarks}
 \subsection{Methodology}
 Our interest in benchmarking the exact solver is simply to demonstrate the impracticality of using it to solve any reasonably sized problems, rather than an assessment of how this method is able to solve different types of problems. So, in order to save time, we benchmark the solver just on normal data.
 
-Parameters chosen for $n$ were $n=300$ to $n=750$ in steps of 50. For $d$ we choose $d=2$ to $d=20$ in steps of 2, and for $\eta$ we choose $\eta=0.5$ to $\eta=1$ in steps of 0.05. Note that the $\eta=1$ case reduces to the standard MEB problem.
+Parameters chosen for $n$ were $n=300$ to $n=750$ in steps of 50 with $d=10$ and $\eta=0.9$ fixed. For $d$ we choose $d=2$ to $d=20$ in steps of 2 with $n=300$ and $\eta=0.9$ fixed, and for $\eta$ we choose $\eta=0.5$ to $\eta=1$ in steps of 0.05 with $n=300$ and $d=10$ fixed. Note that the $\eta=1$ case reduces to the standard MEB problem.
 
 In Section \ref{sec:M} we discussed the effects of the big $M$ parameter on the solution time of the solver, and so we also benchmark the solutuon time when this parameter is varied. To calculate a lower bound on $M$ which ensures that our constraints work as intended, we use the maximum pairwise distance as discussed in the aforementioned section. This is a suitable choice as the size of data sets we use to benchmark the solver are relatively small and so calculating each pairwise distance does not take too much time. Then, we solve the model on the same data set while increasing $M$ in steps of $M/2$.
 
-We generate a large data set ($1000\times100000$) of random normal variates, from which we may sample $n$ many $d$-dimensional vectors to use as a data set. For each parameter, we solve 5 different models and record details such as the center and radius, elapsed time, and more to a log file. In presenting our results we give the average elapsed time, though exact times for each solved instance may be found in the log files in the \texttt{benchmarks} folder in the Github repository.
+We generate a large data set ($1000\times100000$) of random normal variates, from which we may sample $n$ many $d$-dimensional vectors to use as a data set. For each choice of parameters, we solve 5 different models and record details such as the center and radius, elapsed time from the solver, and more to a log file. While we choose 5 for our number of trials, more is always better in this context but due to the time constraints of the project we deemed 5 to be a sufficient amount of trials. In presenting our results we give the average elapsed time, though exact times for each solved instance may be found in the log files in the \texttt{benchmarks} folder in the Github repository.
 \subsection{Results}
 \begin{figure}
     \centering
@@ -1014,6 +1019,16 @@ Figure \ref{fig:exact_benchmarks_M} shows exactly what we expect, which is incre
 
 \section{Construction Methods}
 \subsection{Methodology}
+To benchmark our construction methods we take a similar approach to that of benchmarking the exact model. We generate separate data sets of each type for a given set of parameters, so that each method is benchmarked on exactly the same data sets.
+
+For benchmarking $n$ we choose $n=1000$ to $n=28000$ in steps of 3000 with $d=30$ and $\eta=0.9$ fixed. For $d$ we choose $d=10$ to $d=100$ in steps of 10 with $n=10000$ and $\eta=0.9$ fixed. For $\eta$ we choose $\eta=0.5$ to $\eta=0.9$ in steps of 0.1 with $n=10000$, $d=30$ fixed.
+
+Like with the exact model, we solve the MEBwO problem with our methods on 5 different data sets for each choice of parameters, and again would prefer to do more but we chose 5 due to the time restrictions. Each solved instance has its solutions and other details recorded to a log file. When we use the Relaxation-Based Heuristic, we calculate a lower bound for the $M$ value required to solve the relaxed model by solving the MEB problem and setting $M:=2r$ where $r$ is the solution for the radius of the MEB problem, as discussed in Section \ref{sec:M}. This is only actually necessary for the normal data, as each of the other data types has a maximum diameter determined by the parameters chosen to generate it (see Section \ref{data}).
+
+In presenting our results, we again report average runtimes and exact solutions and runtimes are available in the lob files in the \texttt{benchmarks} folder in the Github repository. We provide graphs which group results by data type and algorithm, so one may compare the performance of each algorithm on one data type as well as the performance of one algorithm on each data type.
+
+
+
 \subsection{Results}
 \subsubsection{By Data Type}
 \benchmarkfigurebydata{normal}{Runtimes for each Algorithm on Normal Data}{fig:normal_benchmarks}
@@ -1034,6 +1049,7 @@ Figure \ref{fig:exact_benchmarks_M} shows exactly what we expect, which is incre
 
 \section{Improvement Heuristics}
 \subsection{Methodology}
+
 \subsection{Results}
 \subsubsection{Normal}
 \imprfigure{normal}{Average Improvement Performance on Normal Data as a Function of $n$ and $d$}{fig:improvement_normal}
