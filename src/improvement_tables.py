@@ -28,6 +28,6 @@ for heuristic in heuristics:
             new_headers = {old_header: update_header(old_header) for old_header in old_headers}
 
             data = data.rename(columns=new_headers)
-            data = data.round(decimals=4)
+            data = data.round(decimals=2)
 
             data.to_csv("{}_table.csv".format(filepath), index=False, sep="&")
