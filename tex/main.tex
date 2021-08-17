@@ -55,6 +55,55 @@
     \pairfigure{improvement_r_benchmarks/avg_pct_func_n_d100_eta0p9_#1.png}{improvement_r_benchmarks/avg_pct_func_d_n1000_eta0p9_#1.png}{#2}{#3}
 }
 
+\newcommand{\benchmarkfiguresix}[2]{
+    \begin{figure}[ht]
+        \centering
+        \begin{subfigure}[b]{0.475\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{alg_benchmarks/by_data/func_n_d30_eta0p9_#1_r.png}
+            \caption{Radius as a Function of $n$}
+            \label{fig:constr_r_#1_n}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}[b]{0.475\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{alg_benchmarks/by_data/func_n_d30_eta0p9_#1.png}
+            \caption{Runtime as a Function of $n$}
+            \label{fig:constr_runtime_#1_n}
+        \end{subfigure}
+        
+        \begin{subfigure}[b]{0.475\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{alg_benchmarks/by_data/func_d_n10000_eta0p9_#1_r.png}
+            \caption{Radius as a Function of $d$}
+            \label{fig:constr_r_#1_d}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}[b]{0.475\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{alg_benchmarks/by_data/func_d_n10000_eta0p9_#1.png}
+            \caption{Runtime as a Function of $d$}
+            \label{fig:constr_runtime_#1_d}
+        \end{subfigure}
+        
+        \begin{subfigure}[b]{0.475\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{alg_benchmarks/by_data/func_eta_n10000_d30_#1_r.png}
+            \caption{Radius as a Function of $\eta$}
+            \label{fig:constr_r_#1_eta}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}[b]{0.475\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{alg_benchmarks/by_data/func_eta_n10000_d30_#1.png}
+            \caption{Runtime as a Function of $\eta$}
+            \label{fig:constr_runtime_#1_eta}
+        \end{subfigure}
+        \caption{Results for each Algorithm on #2 Data}
+        \label{fig:constr_#1}
+    \end{figure}
+}
+
 \newcommand{\benchmarkfigure}[5]{
     \begin{figure}[ht]
         \centering
@@ -83,13 +132,11 @@
     \end{figure}
 }
 
-\newcommand{\benchmarkfigurebydata}[3]{
-    \benchmarkfigure{alg_benchmarks/by_data/func_n_d30_eta0p9_#1.png}{alg_benchmarks/by_data/func_d_n10000_eta0p9_#1.png}{alg_benchmarks/by_data/func_eta_n10000_d30_#1.png}{#2}{#3}
-}
-
 \newcommand{\benchmarkfigurebyfunc}[3]{
     \benchmarkfigure{alg_benchmarks/by_func/#1_func_n_d30_eta0p9.png}{alg_benchmarks/by_func/#1_func_d_n10000_eta0p9.png}{alg_benchmarks/by_func/#1_func_eta_n10000_d30.png}{#2}{#3}
 }
+
+
 \DeclareMathOperator{\MEB}{MEB}
 \DeclareMathOperator{\MEBwO}{MEBwO}
 
@@ -1033,13 +1080,15 @@ In presenting our results, we again report average runtimes and exact solutions 
 
 \subsection{Results}
 \subsubsection{By Data Type}
-\benchmarkfigurebydata{normal}{Runtimes for each Algorithm on Normal Data}{fig:normal_benchmarks}
 
-\benchmarkfigurebydata{uniform_ball}{Runtimes for each Algorithm on Uniform Ball Data}{fig:uniform_ball_benchmarks}
+\benchmarkfiguresix{normal}{Normal}
 
-\benchmarkfigurebydata{hyperspherical_shell}{Runtimes for each Algorithm on Hyperspherical Shell Data}{fig:hyp_shell_benchmarks}
+\benchmarkfiguresix{uniform_ball}{Uniform Ball}
 
-\benchmarkfigurebydata{uniform_ball_with_outliers}{Runtimes for each Algorithm on Uniform Ball with Outiers Data}{fig:unifballwoutliers_benchmarks}
+\benchmarkfiguresix{hyperspherical_shell}{Hyperspherical Shell}
+
+\benchmarkfiguresix{uniform_ball_with_outliers}{Uniform Ball with Outliers}
+
 
 \subsubsection{By Algorithm}
 \benchmarkfigurebyfunc{relaxation_heuristic}{Runtimes for Relaxation-Based Heuristic on each Data Type}{fig:rbh_benchmarks}
@@ -1096,25 +1145,25 @@ In each instance we solve, we record the initial radius returned by Shenmaier's 
 
 \begin{appendices}
     \section{Construction Method Tables}\label{app:constr_tables}
-    Here we present all average results for each method, parameter, and data type in tabular form. For each individual result rather than averages, please refer to the \texttt{benchmarks} folder in the Github repository\footnote{\url{https://github.com/tomholmes19/Minimum-Enclosing-Balls-with-Outliers} \cite{Holmes_Minimum_Enclosing_Balls_2021}}.
+    Here we present all average results for each method, parameter, and data type in tabular form. In order to fit the tables within the page width, values were rounded to two decimal places and method names in the column headers were shortened. For each individual result rather than rounded averages, please refer to the \texttt{benchmarks} folder in the Github repository\footnote{\url{https://github.com/tomholmes19/Minimum-Enclosing-Balls-with-Outliers} \cite{Holmes_Minimum_Enclosing_Balls_2021}}.
     
-    The tables are organised by data type, and each table contains results for a single varied parameter, with each column a different method.
+    The tables are organised by data type, and each table contains results for a single varied parameter, with each pair of columns the radius and runtime for each method.
     
     \subsection{Normal}
     \begin{table}[ht]
         \centering
-        \begin{tabular}{|c||c|c|c|c|}\hline
-            $n$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
-            1000&6.3668&7.3439&6.5194&6.3244 \\
-            4000&6.5364&7.3344&6.5399&6.3456 \\
-            7000&6.746&7.2885&6.5689&6.3491 \\
-            10000&6.7353&7.1966&6.499&6.3405 \\
-            13000&6.8431&7.1874&6.5052&6.3485 \\
-            16000&6.8887&7.2076&6.4883&6.3444 \\
-            19000&6.8564&7.1804&6.501&6.3461 \\
-            22000&6.962&7.1195&6.4776&6.3416 \\
-            25000&6.9262&---&6.4696&6.3382 \\
-            28000&6.9413&---&6.4561&6.3463 \\ \hline
+        \begin{tabular}{|c||c|c||c|c||c|c||c|c|}\hline
+            $n$&RBH $r$&RBH $t$&Shenm. $r$&Shenm. $t$&Shrink $r$&Shrink $t$&APH $r$&APH $t$ \\ \hline
+            1000&6.37&12.4&7.34&5.38&6.52&0.37&6.32&0.02 \\
+            4000&6.54&58.21&7.33&85.02&6.54&0.86&6.35&0.07 \\
+            7000&6.75&127.11&7.29&262.29&6.57&1.25&6.35&0.11 \\
+            10000&6.74&335.94&7.2&541.61&6.5&1.84&6.34&0.16 \\
+            13000&6.84&509.54&7.19&932.43&6.51&2.31&6.35&0.2 \\
+            16000&6.89&546.73&7.21&1403.68&6.49&3.17&6.34&0.24 \\
+            19000&6.86&726.53&7.18&1978.03&6.5&3.49&6.35&0.29 \\
+            22000&6.96&973.81&7.12&2664.51&6.48&3.97&6.34&0.33 \\
+            25000&6.93&1637.88&---&---&6.47&4.61&6.34&0.36 \\
+            28000&6.94&1774.19&---&---&6.46&5.26&6.35&0.39 \\ \hline
         \end{tabular}
         \caption{Results as a Function of $n$ for each Algorithm on Normal Data}
         \label{tab:normal_table_n}
@@ -1122,18 +1171,18 @@ In each instance we solve, we record the initial radius returned by Shenmaier's 
     
     \begin{table}[ht]
         \centering
-        \begin{tabular}{|c||c|c|c|c|} \hline
-            $d$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
-            10&4.585&4.1108&4.1228&3.9936 \\
-            20&5.788&5.8051&5.4767&5.3263 \\
-            30&6.7353&7.1966&6.499&6.3405 \\
-            40&7.5588&8.3004&7.3926&7.1958 \\
-            50&8.2076&9.4147&8.0895&7.9454 \\
-            60&8.8664&10.274&8.8096&8.6194 \\
-            70&9.4592&11.2226&9.4445&9.2551 \\
-            80&10.0398&11.986&10.0404&9.8288 \\
-            90&10.5103&12.7818&10.5329&10.3658 \\
-            100&11.079&13.4179&11.0663&10.8786 \\ \hline
+        \begin{tabular}{|c||c|c||c|c||c|c||c|c|} \hline
+            $d$&RBH $r$&RBH $t$&Shenm. $r$&Shenm. $t$&Shrink $r$&Shrink $t$&APH $r$&APH $t$ \\ \hline
+            10&4.58&26.2&4.11&544.15&4.12&0.99&3.99&0.09 \\
+            20&5.79&139.09&5.81&553.07&5.48&1.52&5.33&0.12 \\
+            30&6.74&479.08&7.2&553.84&6.5&1.91&6.34&0.15 \\
+            40&7.56&487.73&8.3&558.3&7.39&2.89&7.2&0.17 \\
+            50&8.21&555.81&9.41&573.78&8.09&3.1&7.95&0.21 \\
+            60&8.87&1086.75&10.27&573.47&8.81&4.79&8.62&0.24 \\
+            70&9.46&1419.23&11.22&583.22&9.44&6.45&9.26&0.28 \\
+            80&10.04&1122.77&11.99&580.02&10.04&7.95&9.83&0.3 \\
+            90&10.51&1783.04&12.78&591.72&10.53&15.29&10.37&0.33 \\
+            100&11.08&3902.45&13.42&592.52&11.07&28.02&10.88&0.36 \\ \hline
         \end{tabular}
         \caption{Results as a Function of $d$ for each Algorithm on Normal Data}
         \label{tab:normal_table_d}
@@ -1141,13 +1190,13 @@ In each instance we solve, we record the initial radius returned by Shenmaier's 
     
     \begin{table}[ht]
         \centering
-        \begin{tabular}{|c||c|c|c|c|} \hline
-            $\eta$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
-            0.5&7.0989&6.167&5.5507&5.4123 \\
-            0.6&6.8849&6.3643&5.736&5.5898 \\
-            0.7&6.6525&6.5807&5.9285&5.7836 \\
-            0.8&6.5215&6.8376&6.1598&6.0107 \\
-            0.9&6.7353&7.1966&6.499&6.3405 \\ \hline
+        \begin{tabular}{|c||c|c||c|c||c|c||c|c|} \hline
+            $\eta$&RBH $r$&RBH $t$&Shenm. $r$&Shenm. $t$&Shrink $r$&Shrink $t$&APH $r$&APH $t$ \\ \hline
+            0.5&7.1&316.75&6.17&530.9&5.55&1.98&5.41&0.15 \\
+            0.6&6.88&589.73&6.36&535.7&5.74&1.97&5.59&0.15 \\
+            0.7&6.65&253.06&6.58&541.77&5.93&1.98&5.78&0.15 \\
+            0.8&6.52&353.67&6.84&545.55&6.16&1.99&6.01&0.15 \\
+            0.9&6.74&361.1&7.2&549.43&6.5&1.99&6.34&0.15 \\ \hline
         \end{tabular}
         \caption{Results as a Function of $\eta$ for each Algorithm on Normal Data}
         \label{tab:normal_table_eta}
@@ -1158,18 +1207,18 @@ In each instance we solve, we record the initial radius returned by Shenmaier's 
     \subsection{Uniform Ball}
     \begin{table}[ht]
         \centering
-        \begin{tabular}{|c||c|c|c|c|}\hline
-            $n$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
-            1000&0.9952&1.3934&0.9962&0.9968 \\
-            4000&0.9961&1.3723&0.9963&0.9963 \\
-            7000&0.9963&1.3445&0.9965&0.9965 \\
-            10000&0.9963&1.3369&0.9964&0.9964 \\
-            13000&0.9962&1.3425&0.9964&0.9963 \\
-            16000&0.9964&1.3402&0.9965&0.9964 \\
-            19000&0.9964&1.3395&0.9965&0.9964 \\
-            22000&0.9964&1.3364&0.9965&0.9964 \\
-            25000&0.9964&---&0.9965&0.9964 \\
-            28000&0.9964&---&0.9965&0.9965 \\ \hline
+        \begin{tabular}{|c||c|c||c|c||c|c||c|c|}\hline
+            $n$&RBH $r$&RBH $t$&Shenm. $r$&Shenm. $t$&Shrink $r$&Shrink $t$&APH $r$&APH $t$ \\ \hline
+            1000&1.0&8.04&1.39&4.84&1.0&8.37&1.0&0.02 \\
+            4000&1.0&32.25&1.37&84.61&1.0&15.76&1.0&0.05 \\
+            7000&1.0&62.13&1.34&262.36&1.0&20.5&1.0&0.09 \\
+            10000&1.0&92.07&1.34&536.42&1.0&19.87&1.0&0.13 \\
+            13000&1.0&128.33&1.34&912.68&1.0&25.44&1.0&0.17 \\
+            16000&1.0&168.09&1.34&1379.14&1.0&29.18&1.0&0.21 \\
+            19000&1.0&231.08&1.34&1957.49&1.0&28.08&1.0&0.26 \\
+            22000&1.0&310.96&1.34&2618.51&1.0&31.3&1.0&0.28 \\
+            25000&1.0&492.28&---&---&1.0&32.89&1.0&0.32 \\
+            28000&1.0&466.8&---&---&1.0&33.54&1.0&0.36 \\ \hline
         \end{tabular}
         \caption{Results as a Function of $n$ for each Algorithm on Uniform Ball Data}
         \label{tab:uniform_ball_table_n}
@@ -1177,18 +1226,18 @@ In each instance we solve, we record the initial radius returned by Shenmaier's 
     
     \begin{table}[ht]
         \centering
-        \begin{tabular}{|c||c|c|c|c|} \hline
-            $d$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
-            10&0.9893&1.1355&0.9896&0.9895 \\
-            20&0.9946&1.2906&0.9947&0.9947 \\
-            30&0.9963&1.3369&0.9964&0.9964 \\
-            40&0.9972&1.3811&0.9973&0.9973 \\
-            50&0.9978&1.3925&0.9978&0.9978 \\
-            60&0.9982&1.405&0.9982&0.9982 \\
-            70&0.9985&1.4114&0.9985&0.9985 \\
-            80&0.9987&1.4238&0.9987&0.9987 \\
-            90&0.9989&1.4211&0.9988&0.9988 \\
-            100&0.9991&1.43&0.9989&0.9989 \\ \hline
+        \begin{tabular}{|c||c|c||c|c||c|c||c|c|} \hline
+            $d$&RBH $r$&RBH $t$&Shenm. $r$&Shenm. $t$&Shrink $r$&Shrink $t$&APH $r$&APH $t$ \\ \hline
+            10&0.99&11.42&1.14&530.74&0.99&2.08&0.99&0.07 \\
+            20&0.99&41.34&1.29&576.21&0.99&7.91&0.99&0.1 \\
+            30&1.0&93.18&1.34&590.32&1.0&20.88&1.0&0.13 \\
+            40&1.0&185.42&1.38&594.8&1.0&58.73&1.0&0.15 \\
+            50&1.0&313.6&1.39&601.28&1.0&85.84&1.0&0.18 \\
+            60&1.0&572.94&1.4&606.33&1.0&262.42&1.0&0.21 \\
+            70&1.0&871.02&1.41&620.63&1.0&494.76&1.0&0.24 \\
+            80&1.0&1266.66&1.42&617.78&1.0&770.84&1.0&0.26 \\
+            90&1.0&1730.96&1.42&629.06&1.0&1292.3&1.0&0.29 \\
+            100&1.0&2689.86&1.43&636.3&1.0&1915.89&1.0&0.32 \\ \hline
         \end{tabular}
         \caption{Results as a Function of $d$ for each Algorithm on Uniform Ball Data}
         \label{tab:uniform_ball_table_d}
@@ -1196,13 +1245,13 @@ In each instance we solve, we record the initial radius returned by Shenmaier's 
     
     \begin{table}[ht]
         \centering
-        \begin{tabular}{|c||c|c|c|c|} \hline
-            $\eta$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
-            0.5&0.9776&1.2042&0.9771&0.977 \\
-            0.6&0.9829&1.2324&0.9831&0.983 \\
-            0.7&0.988&1.2612&0.9882&0.9881 \\
-            0.8&0.9924&1.2944&0.9926&0.9925 \\
-            0.9&0.9963&1.3369&0.9964&0.9964 \\ \hline
+        \begin{tabular}{|c||c|c||c|c||c|c||c|c|} \hline
+            $\eta$&RBH $r$&RBH $t$&Shenm. $r$&Shenm. $t$&Shrink $r$&Shrink $t$&APH $r$&APH $t$ \\ \hline
+            0.5&0.98&105.74&1.2&528.0&0.98&20.87&0.98&0.13 \\
+            0.6&0.98&73.97&1.23&536.72&0.98&21.25&0.98&0.13 \\
+            0.7&0.99&77.04&1.26&538.08&0.99&21.33&0.99&0.13 \\
+            0.8&0.99&83.24&1.29&543.65&0.99&21.31&0.99&0.14 \\
+            0.9&1.0&93.22&1.34&552.18&1.0&21.27&1.0&0.15 \\ \hline
         \end{tabular}
         \caption{Results as a Function of $\eta$ for each Algorithm on Uniform Ball Data}
         \label{tab:uniform_ball_table_eta}
@@ -1213,18 +1262,18 @@ In each instance we solve, we record the initial radius returned by Shenmaier's 
     \subsection{Hyperspherical Shell}
     \begin{table}[ht]
         \centering
-        \begin{tabular}{|c||c|c|c|c|}\hline
-            $n$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
-            1000&1.9909&2.7798&1.9927&1.9936 \\
-            4000&1.9922&2.7317&1.9929&1.9927 \\
-            7000&1.9926&2.7088&1.9931&1.9929 \\
-            10000&1.9925&2.6711&1.993&1.9927 \\
-            13000&1.9928&2.6598&1.9931&1.9929 \\
-            16000&1.9928&2.6748&1.993&1.9929 \\
-            19000&1.9927&2.6666&1.9929&1.9928 \\
-            22000&1.9928&2.6682&1.993&1.9929 \\
-            25000&1.9928&---&1.993&1.993 \\
-            28000&1.9929&---&1.993&1.993 \\ \hline
+        \begin{tabular}{|c||c|c||c|c||c|c||c|c|}\hline
+            $n$&RBH $r$&RBH $t$&Shenm. $r$&Shenm. $t$&Shrink $r$&Shrink $t$&APH $r$&APH $t$ \\ \hline
+            1000&1.99&8.61&2.78&5.27&1.99&5.62&1.99&0.02 \\
+            4000&1.99&42.17&2.73&85.99&1.99&14.05&1.99&0.07 \\
+            7000&1.99&70.81&2.71&266.54&1.99&16.1&1.99&0.11 \\
+            10000&1.99&212.18&2.67&544.19&1.99&20.79&1.99&0.15 \\
+            13000&1.99&357.39&2.66&917.93&1.99&22.94&1.99&0.19 \\
+            16000&1.99&549.89&2.67&1401.93&1.99&28.76&1.99&0.23 \\
+            19000&1.99&504.16&2.67&1974.51&1.99&23.89&1.99&0.27 \\
+            22000&1.99&616.03&2.67&2660.51&1.99&28.16&1.99&0.31 \\
+            25000&1.99&1104.94&---&---&1.99&27.87&1.99&0.35 \\
+            28000&1.99&1116.81&---&---&1.99&30.53&1.99&0.39 \\ \hline
         \end{tabular}
         \caption{Results as a Function of $n$ for each Algorithm on Hyperspherical Shell Data}
         \label{tab:hyperspherical_shell_table_n}
@@ -1232,18 +1281,18 @@ In each instance we solve, we record the initial radius returned by Shenmaier's 
     
     \begin{table}[ht]
         \centering
-        \begin{tabular}{|c||c|c|c|c|} \hline
-            $d$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
-            10&1.9791&2.4619&1.9793&1.9792 \\
-            20&1.9892&2.5899&1.9895&1.9895 \\
-            30&1.9925&2.6711&1.993&1.9927 \\
-            40&1.9945&2.7608&1.9948&1.9946 \\
-            50&1.9955&2.7855&1.9958&1.9957 \\
-            60&1.9963&2.7982&1.9965&1.9964 \\
-            70&1.9969&2.8242&1.9971&1.997 \\
-            80&1.9972&2.8264&1.9974&1.9974 \\
-            90&1.9975&2.8465&1.9977&1.9976 \\
-            100&1.9978&2.8579&1.9979&1.9979 \\ \hline
+        \begin{tabular}{|c||c|c||c|c||c|c||c|c|} \hline
+            $d$&RBH $r$&RBH $t$&Shenm. $r$&Shenm. $t$&Shrink $r$&Shrink $t$&APH $r$&APH $t$ \\ \hline
+            10&1.98&32.05&2.46&531.14&1.98&2.31&1.98&0.09 \\
+            20&1.99&108.26&2.59&539.75&1.99&6.62&1.99&0.12 \\
+            30&1.99&212.84&2.67&542.96&1.99&21.2&1.99&0.15 \\
+            40&1.99&179.66&2.76&544.81&1.99&58.01&1.99&0.17 \\
+            50&2.0&317.79&2.79&553.62&2.0&100.81&2.0&0.21 \\
+            60&2.0&506.3&2.8&579.88&2.0&249.42&2.0&0.23 \\
+            70&2.0&893.33&2.82&613.06&2.0&436.27&2.0&0.27 \\
+            80&2.0&1225.61&2.83&609.86&2.0&780.93&2.0&0.29 \\
+            90&2.0&1896.26&2.85&621.8&2.0&1174.07&2.0&0.33 \\
+            100&2.0&2710.25&2.86&626.08&2.0&1796.83&2.0&0.36 \\ \hline
         \end{tabular}
         \caption{Results as a Function of $d$ for each Algorithm on Hyperspherical Shell Data}
         \label{tab:hyperspherical_shell_table_d}
@@ -1251,13 +1300,13 @@ In each instance we solve, we record the initial radius returned by Shenmaier's 
     
     \begin{table}[ht]
         \centering
-        \begin{tabular}{|c||c|c|c|c|} \hline
-            $\eta$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
-            0.5&1.9532&2.4014&1.9538&1.9535 \\
-            0.6&1.9658&2.4563&1.9661&1.966 \\
-            0.7&1.9759&2.5157&1.9762&1.9762 \\
-            0.8&1.9847&2.5802&1.9852&1.985 \\
-            0.9&1.9925&2.6711&1.993&1.9927 \\ \hline
+        \begin{tabular}{|c||c|c||c|c||c|c||c|c|} \hline
+            $\eta$&RBH $r$&RBH $t$&Shenm. $r$&Shenm. $t$&Shrink $r$&Shrink $t$&APH $r$&APH $t$ \\ \hline
+            0.5&1.95&68.28&2.4&566.73&1.95&22.27&1.95&0.15 \\
+            0.6&1.97&69.93&2.46&573.75&1.97&22.33&1.97&0.15 \\
+            0.7&1.98&80.55&2.52&579.48&1.98&22.28&1.98&0.15 \\
+            0.8&1.98&103.16&2.58&579.65&1.99&22.35&1.98&0.15 \\
+            0.9&1.99&213.85&2.67&586.54&1.99&22.36&1.99&0.15 \\ \hline
         \end{tabular}
         \caption{Results as a Function of $\eta$ for each Algorithm on Hyperspherical Shell Data}
         \label{tab:hyperspherical_shell_table_eta}
@@ -1268,18 +1317,18 @@ In each instance we solve, we record the initial radius returned by Shenmaier's 
     \subsection{Uniform Ball with Outliers}
     \begin{table}[ht]
         \centering
-        \begin{tabular}{|c||c|c|c|c|}\hline
-            $n$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
-            1000&0.999&1.5417&1.088&1.0167 \\
-            4000&0.9998&1.4973&1.0245&1.0078 \\
-            7000&0.9999&1.5615&1.0123&1.0076 \\
-            10000&0.9999&1.5324&1.0107&1.0062 \\
-            13000&0.9999&1.5395&1.007&1.0058 \\
-            16000&0.9999&1.5545&1.0044&1.0048 \\
-            19000&0.9999&1.5311&1.0061&1.0046 \\
-            22000&0.9999&1.5454&1.0046&1.0039 \\
-            25000&1.0&---&1.004&1.0044 \\
-            28000&0.9999&---&1.0036&1.0043 \\ \hline
+        \begin{tabular}{|c||c|c||c|c||c|c||c|c|}\hline
+            $n$&RBH $r$&RBH $t$&Shenm. $r$&Shenm. $t$&Shrink $r$&Shrink $t$&APH $r$&APH $t$ \\ \hline
+            1000&1.0&37.9&1.54&5.8&1.09&1.04&1.02&0.02 \\
+            4000&1.0&209.2&1.5&92.97&1.02&3.72&1.01&0.06 \\
+            7000&1.0&266.03&1.56&302.46&1.01&6.81&1.01&0.11 \\
+            10000&1.0&614.47&1.53&798.67&1.01&9.89&1.01&0.15 \\
+            13000&1.0&909.65&1.54&958.93&1.01&12.85&1.01&0.19 \\
+            16000&1.0&1146.58&1.55&1525.25&1.0&15.65&1.0&0.23 \\
+            19000&1.0&1192.01&1.53&2247.41&1.01&17.79&1.0&0.27 \\
+            22000&1.0&1677.9&1.55&3008.78&1.0&19.1&1.0&0.31 \\
+            25000&1.0&2400.67&---&---&1.0&24.96&1.0&0.35 \\
+            28000&1.0&2797.06&---&---&1.0&24.59&1.0&0.39 \\ \hline
         \end{tabular}
         \caption{Results as a Function of $n$ for each Algorithm on Uniform Ball with Outliers Data}
         \label{tab:uniform_ball_with_outliers_table_n}
@@ -1287,18 +1336,18 @@ In each instance we solve, we record the initial radius returned by Shenmaier's 
     
     \begin{table}[ht]
         \centering
-        \begin{tabular}{|c||c|c|c|c|} \hline
-            $d$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
-            10&0.9999&1.3487&1.0101&1.0068 \\
-            20&0.9999&1.5107&1.0088&1.0083 \\
-            30&0.9999&1.5324&1.0107&1.0062 \\
-            40&0.9999&1.5778&1.0097&1.0057 \\
-            50&1.0&1.5776&1.012&1.0054 \\
-            60&1.0&1.5742&1.011&1.0044 \\
-            70&1.0&1.5756&1.0114&1.0041 \\
-            80&1.0001&1.5731&1.0111&1.0043 \\
-            90&---&1.5695&1.0107&1.0039 \\
-            100&---&1.5676&1.0109&1.0034 \\ \hline
+        \begin{tabular}{|c||c|c||c|c||c|c||c|c|} \hline
+$d$&RBH $r$&RBH $t$&Shenm. $r$&Shenm. $t$&Shrink $r$&Shrink $t$&APH $r$&APH $t$ \\ \hline
+10&1.0&15.96&1.35&565.55&1.01&1.95&1.01&0.09 \\
+20&1.0&221.79&1.51&612.36&1.01&4.01&1.01&0.12 \\
+30&1.0&526.7&1.53&625.06&1.01&9.5&1.01&0.15 \\
+40&1.0&993.85&1.58&630.42&1.01&18.86&1.01&0.18 \\
+50&1.0&1372.71&1.58&640.97&1.01&36.98&1.01&0.22 \\
+60&1.0&1771.32&1.57&642.91&1.01&96.25&1.0&0.26 \\
+70&1.0&2510.24&1.58&663.83&1.01&156.8&1.0&0.27 \\
+80&1.0&4159.73&1.57&653.19&1.01&259.48&1.0&0.29 \\
+90&---&---&1.57&670.26&1.01&439.24&1.0&0.33 \\
+100&---&---&1.57&678.45&1.01&673.86&1.0&0.38 \\ \hline
         \end{tabular}
         \caption{Results as a Function of $d$ for each Algorithm on Uniform Ball with Outliers Data}
         \label{tab:uniform_ball_with_outliers_table_d}
@@ -1306,13 +1355,13 @@ In each instance we solve, we record the initial radius returned by Shenmaier's 
     
     \begin{table}[ht]
         \centering
-        \begin{tabular}{|c||c|c|c|c|} \hline
-            $\eta$&RBH&Shenmaier&Shrink Heuristic&Avg. Point Heuristic \\ \hline
-            0.5&0.9998&1.5588&1.0016&1.009 \\
-            0.6&1.0902&1.5252&1.0021&1.0096 \\
-            0.7&0.9999&1.5343&1.0032&1.0083 \\
-            0.8&0.9999&1.5307&1.004&1.0074 \\
-            0.9&0.9999&1.5324&1.0107&1.0062 \\ \hline
+        \begin{tabular}{|c||c|c||c|c||c|c||c|c|} \hline
+$\eta$&RBH $r$&RBH $t$&Shenm. $r$&Shenm. $t$&Shrink $r$&Shrink $t$&APH $r$&APH $t$ \\ \hline
+0.5&1.0&495.3&1.56&529.62&1.0&16.5&1.01&0.15 \\
+0.6&1.09&454.97&1.53&535.17&1.0&15.77&1.01&0.16 \\
+0.7&1.0&512.09&1.53&541.98&1.0&15.7&1.01&0.15 \\
+0.8&1.0&582.12&1.53&542.77&1.0&13.57&1.01&0.15 \\
+0.9&1.0&545.39&1.53&549.27&1.01&10.05&1.01&0.15 \\ \hline
         \end{tabular}
         \caption{Results as a Function of $\eta$ for each Algorithm on Uniform Ball with Outliers Data}
         \label{tab:uniform_ball_with_outliers_table_eta}
