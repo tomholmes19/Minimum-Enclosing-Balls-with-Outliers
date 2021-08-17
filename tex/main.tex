@@ -1139,12 +1139,27 @@ and $\text{TP}$, $\text{FP}$, and $\text{FN}$ are the number of true positives, 
 
 For each method and each parameter we solve the MEBwO problem for each digit and then report the average $F_1$ score across each digit. Due to the random sampling in constructing each instance we would prefer to report average performance for each digit across multiple instances, but due to time constraints this is not possible and we hope that averaging across each digit provides enough robustness to the issues associated with random sampling.
 
-The algorithm in \cite{huding} is compared against three outlier recognition methods, which are angle-based outlier detection (ABOD) \cite{abod}, one-class support vector machine (OCSVM) \cite{ocsvm}, and discriminative reconstructions in an autoencoder (DRAE) \cite{drae}. See \cite{huding} for further details. We provide an extension to Table 2 of this paper, referring to their algorithm as HDMY. We assume that the total time column is the average time taken to solve each set of 10 models, which for our algorithms will not be averaged.
+The algorithm in \cite{huding} is compared against three outlier recognition methods, which are angle-based outlier detection (ABOD) \cite{abod}, one-class support vector machine (OCSVM) \cite{ocsvm}, and discriminative reconstructions in an auto-encoder (DRAE) \cite{drae}. See \cite{huding} for further details. We provide an extension to Table 2 of this paper, referring to their algorithm as HDMY. The total time reported is the total running time for each value of $\eta$ and we assume this is averaged over each of their 20 instances. It should be noted that the time for sampling is included in the runtimes in their paper, which we do not do, but in our experiments we find this takes at most a few seconds so the effect on the results is negligible considering the total runtime for each algorithm is reported on the order of hours.
 
 We present our results in tabular form as in \cite{huding} but also provide the results as a plot for the reader's viewing pleasure. Unfortunately Gurobi was unable to solve the relaxed model required for the relaxation-based heuristic, reaching the memory limit on our machine (16GB) before the model could be instantiated.
 
 \subsection{Results}
 
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|c|} \hline
+        $\eta$&ABOD&OCSVM&DRAE&HDMY&Shenmaier&Shrink Heuristic&APH \\ \hline
+        0.95&0.95&0.965&0.974&0.965&0.965&0.961&0.966 \\
+        0.9&0.896&0.934&0.949&0.935&0.934&0.925&0.94 \\
+        0.85&0.841&0.903&0.925&0.907&0.907&0.892&0.915 \\
+        0.8&0.781&0.868&0.898&0.883&0.881&0.855&0.89 \\
+        0.75&0.717&0.833&0.867&0.857&0.855&0.832&0.866 \\
+        0.7&0.648&0.797&0.838&0.831&0.832&0.797&0.84 \\ \hline
+        Runtime (s) & $2\times10^4$ & $3.4\times10^3$ & $1\times10^5$ & $1.6\times10^4$ & $5.1\times10^4$ & $1.6\times10^4$ & $131.7$ \\[4pt] \hline
+    \end{tabular}
+    \caption{$F_1$ Score and Runtime of each Method for MNIST Outlier Recognition}
+    \label{tab:mnist_table}
+\end{table}
 
 \section{Discussion}
 
