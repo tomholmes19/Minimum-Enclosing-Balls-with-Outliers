@@ -9,7 +9,7 @@ from meb.gurobi_solvers import dc_meb
 from meb.improvement_algorithms import alg__dcmeb, alg__dcssh
 
 from meb.meb_algorithms import alg__socp_heuristic
-from meb.mebwo_algorithms import alg__shenmaier, alg__shrink_avg
+from meb.mebwo_algorithms import alg__relaxation_heuristic, alg__shenmaier, alg__shrink_avg
 
 from . import utils
 import meb
@@ -291,8 +291,16 @@ def mnist_benchmark(df, func, number, eta, log_file=None):
     print("\teta:\t{}".format(eta))
     print(bar)
     # fit and time MEBwO
+    if func == alg__relaxation_heuristic:
+        _, r_ball, _ = alg__socp_heuristic(data, eps=1e-4)
+        M = 2*r_ball
+        outputflag = 1
+        print(M)
+    else:
+        M = None
+
     start = timeit.default_timer()
-    c, r, _ = func(data, eta)
+    c, r, _ = func(data, eta, M, outputflag)
     elapsed = timeit.default_timer() - start
 
     # calculate F1 score
