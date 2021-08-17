@@ -72,7 +72,10 @@ for data_type in data_types:
 
         # get times from log
         times_dict = {heuristic: benchmarking.utils.get_times_from_log(r"benchmarks/{0}/{1}/{2}.log".format(heuristic, data_type, filename)) for heuristic in heuristics}
-        
+        results_dict = {heuristic: benchmarking.utils.get_r_from_log(r"benchmarks/{0}/{1}/{2}.log".format(heuristic, data_type, filename)) for heuristic in heuristics}
+
+        # === times
+        """
         plt.figure()
         plt.xlabel(param)
         plt.ylabel("Time (s)")
@@ -94,7 +97,27 @@ for data_type in data_types:
 
         plt.savefig("images/alg_benchmarks/by_data/{}".format(filename), bbox_inches="tight")
         plt.close()
+        """
+        # === results
+        plt.figure()
+        plt.xlabel(param)
+        plt.ylabel("Radius")
 
+        for heuristic, results in results_dict.items():
+            if heuristic == "shenmaier" and param == "n":
+                x_axis = [1000 + 3000*i for i in range(8)]
+            elif heuristic == "relaxation_heuristic" and data_type == "uniform_ball_with_outliers" and param == "d":
+                x_axis = [10 + 10*i for i in range(8)]
+            else:
+                x_axis = axes[param]
+            
+            plt.plot(x_axis, results, marker=markers_funcs[heuristic], color=colours_funcs[heuristic], linestyle=":", label=labels_funcs[heuristic])
+        
+        plt.legend()
+        plt.savefig("images/alg_benchmarks/by_data/{}_r".format(filename), bbox_inches="tight")
+        plt.close()
+
+"""
 for heuristic in heuristics:
     for param in params:
         # construct filename
@@ -127,3 +150,4 @@ for heuristic in heuristics:
         
         plt.savefig(r"images/alg_benchmarks/by_func/{0}_{1}".format(heuristic, filename), bbox_inches="tight")
         plt.close()
+"""
