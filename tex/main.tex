@@ -639,7 +639,7 @@ The Average Point Heuristic works by finding the average point, i.e. $c=\frac{1}
 \end{algorithm}
 
 \subsubsection{Complexity}
-This algorithm runs extremely quickly, with the dominating term in the time complexity being $O(n\log n)$ on average as a result of sorting the list of distances on line 4. This is far faster than any other construction method and is more resistant to outliers than the MEB shrinking heuristic.
+This algorithm runs extremely quickly, with the dominating term in the time complexity being $O(nd\log n)$ on average as a result of sorting the list of distances on line 4, so when . This is far faster than any other construction method and is more resistant to outliers than the MEB shrinking heuristic.
 
 
 
@@ -1194,6 +1194,13 @@ Each of our algorithms is able to outperform the ABOD model and all but the shri
 \clearpage
 
 \begin{appendices}
+    \section{Average Point Heuristic Runtime Plots}
+    Here we present the runtime plots for the average point heuristic. Since this heuristic has a time complexity of $O(nd\log n)$ we know it will run extremely quickly, and so the runtimes were not included in the main text but we include them here for completeness.
+    
+    \benchmarkfigurebyfunc{shrink_avg}{Runtimes for the Average Point Heuristic on each Data Type}{fig:aph_benchmarks}
+    
+    \clearpage
+    
     \section{Construction Method Tables}\label{app:constr_tables}
     Here we present all average results for each method, parameter, and data type in tabular form. In order to fit the tables within the page width, values were rounded to two decimal places and method names in the column headers were shortened. For each individual result rather than rounded averages, please refer to the \texttt{benchmarks} folder in the Github repository\footnote{\url{https://github.com/tomholmes19/Minimum-Enclosing-Balls-with-Outliers} \cite{Holmes_Minimum_Enclosing_Balls_2021}}.
     
