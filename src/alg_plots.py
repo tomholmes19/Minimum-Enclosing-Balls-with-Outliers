@@ -90,15 +90,16 @@ for data_type in data_types:
         plt.ylabel("Time (s)")
 
         for heuristic, times in times_dict.items():
-            if heuristic == "shenmaier" and param == "n":
-                x_axis = [1000 + 3000*i for i in range(8)]
-            elif heuristic == "relaxation_heuristic" and data_type == "uniform_ball_with_outliers" and param == "d":
-                x_axis = [10 + 10*i for i in range(8)]
-            else:
-                x_axis = axes[param]
+            if heuristic != "shrink_avg":
+                if heuristic == "shenmaier" and param == "n":
+                    x_axis = [1000 + 3000*i for i in range(8)]
+                elif heuristic == "relaxation_heuristic" and data_type == "uniform_ball_with_outliers" and param == "d":
+                    x_axis = [10 + 10*i for i in range(8)]
+                else:
+                    x_axis = axes[param]
 
-            plt.plot(x_axis, times, marker=markers_funcs[heuristic], color=colours_funcs[heuristic], linestyle=":", label=labels_funcs[heuristic])
-        
+                plt.plot(x_axis, times, marker=markers_funcs[heuristic], color=colours_funcs[heuristic], linestyle=":", label=labels_funcs[heuristic])
+            
         if data_type == "normal" and param == "eta":
             plt.legend(loc="best", bbox_to_anchor=(0.5,0.,0.5,0.5))
         else:
