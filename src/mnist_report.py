@@ -1,5 +1,8 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+
+import plot_settings
 
 heuristics = ["shenmaier", "shrink", "shrink_avg"]
 eta_list = [0.95, 0.9, 0.85, 0.8, 0.75, 0.7]
@@ -43,5 +46,17 @@ for heuristic in heuristics:
 
 
 F1_df = pd.DataFrame.from_dict(F1_dict)
+print(F1_df)
+fig, ax = plt.subplots()
+for column in F1_df:
+    if column != "$\eta$":
+        plt.plot(eta_list, F1_df[column], label=column)
+
+ax.set_xlim(0.95, 0.7)
+plt.xlabel("$\eta$")
+plt.ylabel("$F_1$ Score")
+plt.legend()
+plt.savefig(r"images/mnist_plot.png", bbox_inches="tight")
+
 F1_df.to_csv("tables/mnist_table.csv", index=False, sep="&")
 print(times_dict)
