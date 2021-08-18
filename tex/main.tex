@@ -824,7 +824,7 @@ and as such the DCMEB problem may be solved by interior-point methods \cite{socp
 
 \subsubsection{Complexity}
 
-The operations in this heuristic are simply finding a maximally distant point which runs in $O(n)$ time, solving the DCMEB problem, and an assignment which runs in $O(1)$ time. So, the interest is in the time complexity of the method used to solve the DCMEB problem. As this problem is a SOCP it makes sense to apply interior-point methods which may then solve it in polynomial time (TODO: NEEDS CITATION).
+The operations in this heuristic are simply finding a maximally distant point which runs in $O(nd)$ time, solving the DCMEB problem, and an assignment which runs in $O(1)$ time. So, the interest is in the time complexity of the method used to solve the DCMEB problem. As this problem is a SOCP it makes sense to apply interior-point methods which may then solve it in polynomial time (TODO: NEEDS CITATION).
 
 
 \begin{figure}
@@ -1032,8 +1032,9 @@ Parameters chosen for $n$ were $n=300$ to $n=750$ in steps of 50 with $d=10$ and
 In Section \ref{sec:M} we discussed the effects of the big $M$ parameter on the solution time of the solver, and so we also benchmark the solutuon time when this parameter is varied. To calculate a lower bound on $M$ which ensures that our constraints work as intended, we use the maximum pairwise distance as discussed in the aforementioned section. This is a suitable choice as the size of data sets we use to benchmark the solver are relatively small and so calculating each pairwise distance does not take too much time. Then, we solve the model on the same data set while increasing $M$ in steps of $M/2$.
 
 We generate a large data set ($1000\times100000$) of random normal variates, from which we may sample $n$ many $d$-dimensional vectors to use as a data set. For each choice of parameters, we solve 5 different models and record details such as the center and radius, elapsed time from the solver, and more to a log file. While we choose 5 for our number of trials, more is always better in this context but due to the time constraints of the project we deemed 5 to be a sufficient amount of trials. In presenting our results we give the average elapsed time, though exact times for each solved instance may be found in the log files in the \texttt{benchmarks} folder in the Github repository.
+
 \subsection{Results}
-\begin{figure}
+\begin{figure}[ht]
     \centering
     \begin{subfigure}[b]{0.475\textwidth}
         \centering
@@ -1143,17 +1144,20 @@ In each instance we solve, we record the initial radius returned by Shenmaier's 
     \label{fig:dcmeb_plot}
 \end{figure}
 
-\subsubsection{Normal}
+From these plots we see what looks to be a polynomial relationship between runtime and $n$ as expected when using an interior point method, and no relationship between runtime and $d$. Although the longest that a single model took to solve was about 1.1 seconds, since this model is solved many times (100 in our case) this leads to non-insignificant runtimes when applying the heuristic, especially when compared to the DCSSH which runs in linear time.
+
+\subsubsection{Performance}
 \imprfigure{normal}{Average Improvement Performance on Normal Data as a Function of $n$ and $d$}{fig:improvement_normal}
 
-\subsubsection{Uniform Ball}
 \imprfigure{uniform_ball}{Average Improvement Performance on Uniform Ball Data as a Function of $n$ and $d$}{fig:improvement_unifball}
 
-\subsubsection{Hyperspherical Shell}
 \imprfigure{hyperspherical_shell}{Average Improvement Performance on Hyperspherical Shell Data as a Function of $n$ and $d$}{fig:improvement_hypshell}
 
-\subsubsection{Uniform Ball with Outliers}
 \imprfigure{uniform_ball_with_outliers}{Average Improvement Performance on Uniform Ball with Outliers Data as a Function of $n$ and $d$}{fig:improvement_unifballwoutliers}
+
+From the first three plots we see the same trends, where the average improvement decreases as $n$ decreases and average improvement increases as $d$ increases. This is likely due to more free space between points near the surface of the ball and that surface as dimension increases, while increasing the number of points will mean there are more points which are near the surface, thus giving a lower minimal distance between each point and the surface of the ball in the opposite improving direction. Interestingly we observe the exact opposite trend for the uniform ball with outliers data and it is uncertain why this is, though it is likely due to the unique structure of this data type.
+
+Both heuristics give very similar performances, though the DCSSH appears to always be marginally better than the DCMEB. We can then conclude that, out of these two heuristics, one should always use the DCSSH over the DCMEB since the DCSSH runs in linear time as opposed to the polynomial time of the DCMEB, and for ease of implementation as the DCSSH does not require the use of an optimization solver which requires specific knowledge of how to use and in a commercial setting will in most cases require a payment of sorts.
 
 \section{Outlier Recognition}
 \subsection{Methodology}
