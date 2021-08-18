@@ -20,6 +20,8 @@
 
 \usepackage[toc,page]{appendix}
 
+\usepackage[nottoc,notlot,notlof]{tocbibind}
+
 %TC:ignore
 \newcolumntype{C}{>{$}c<{$}}    % math-mode version of "l" column type
 \newcolumntype{L}{>{$}l<{$}} 
@@ -1074,26 +1076,33 @@ For benchmarking $n$ we choose $n=1000$ to $n=28000$ in steps of 3000 with $d=30
 
 Like with the exact model, we solve the MEBwO problem with our methods on 5 different data sets for each choice of parameters, and again would prefer to do more but we chose 5 due to the time restrictions. Each solved instance has its solutions, runtime and other details recorded to a log file. Runtime is recorded using Python's \texttt{timeit} library, calling the timer before and after running each algorithm. When we use the Relaxation-Based Heuristic, we calculate a lower bound for the $M$ value required to solve the relaxed model by solving the MEB problem and setting $M:=2r$ where $r$ is the solution for the radius of the MEB problem, as discussed in Section \ref{sec:M}. This is only actually necessary for the normal data, as each of the other data types has a maximum diameter determined by the parameters chosen to generate it (see Section \ref{data}).
 
-In presenting our results, we again report average radii and runtimes while exact solutions and runtimes are available in the log files in the \texttt{benchmarks} folder in the Github repository and tabular results may be found in the Appendix \ref{app:constr_tables}. We provide graphs which group results by data type and algorithm, so one may compare the performance of each algorithm on one data type as well as the performance of one algorithm on each data type.
-
-
+In presenting our results, we again report average radii and runtimes while exact solutions and runtimes are available in the log files in the \texttt{benchmarks} folder in the Github repository and tabular results may be found in the Appendix \ref{app:constr_tables}. We provide graphs which group results by data type and algorithm, so one may compare the performance of each algorithm on one data type as well as the performance of one algorithm on each data type. When grouping by data type we also present the radii returned by each method so we may compare the radii returned by each method on the same data, while it does not make sense to compare radii returned by one algorithm on different data types. Note that in some plots the relaxation based heuristic is not visible, but this is because it is covered by the markers for the shrink heuristic as they often give the same radii. When grouping by function we are interested in how the runtime varies so that we may verify our time complexity derivations.
 
 \subsection{Results}
 \subsubsection{By Data Type}
 
 \benchmarkfiguresix{normal}{Normal}
+On normal data we observe that Shenmaier's approximation gives strictly worse solutions as both $n$ and $d$ vary. For $n$ Shenmaier's approximation also has the longest run time for each $n$, while for $d$ it runs in less time than the relaxation-based heuristic for $d$ greater than 50. The shrink heuristic tends to perform the best on normal data while also sporting very low runtimes (on the order of seconds), only performing worse than the relaxation-based heuristic on the $n=1000$ instance.
 
 \benchmarkfiguresix{uniform_ball}{Uniform Ball}
+On uniform ball data, the relaxation-based heuristic and shrink heuristic give the same solutions as each parameter varies, but the shrink heuristic has strictly shorter runtimes for each parameter. Shenmaier's approximation has shorter runtimes for $d$ greater than 70, but has significantly worse radii on these instances (around 40\% worse).
+
 
 \benchmarkfiguresix{hyperspherical_shell}{Hyperspherical Shell}
+On hyperspherical shell data we observe a similar story to that of uniform ball data, with the relaxation-based heuristic and shrink heuristic giving the same results, with the shrink heuristic running in less time for each parameter. Shenmaier's approximation again is the fastest method for $d$ greater than 70, but like before has strictly worse performance.
+
 
 \benchmarkfiguresix{uniform_ball_with_outliers}{Uniform Ball with Outliers}
+On uniform ball with outliers data, the relaxation-based heuristic is our best performing method, though we observe a larger than usual increase in runtime as the dimension increases, with a runtime of a little over an hour for each instance at $d=80$, so we were unable to solve instances for $d=90$ and $d=100$ within the time constraints. The shrink heuristic as usual gives short runtimes with only marginally worse radii. Recall that the optimal solution for our uniform ball with outliers data will be a radius of 1, which is indeed returned by the relaxation-based heuristic while the shrink heuristic returns radii marginally above 1. Shenmaier's approximation gives far worse than expected solutions, on average around 55\% worse than optimal.
 
 
 \subsubsection{By Algorithm}
 \benchmarkfigurebyfunc{relaxation_heuristic}{Runtimes for Relaxation-Based Heuristic on each Data Type}{fig:rbh_benchmarks}
+The complexity of the relaxation-based heuristic is hard to assess due to being solved by an optimization solver, so these plots are able to give us some insight. With respect to $n$, we can observe a trend somewhere between linear and polynomial. With respect to $d$, the trend appears to be polynomial, and with respect to $\eta$ there does not appear to be any strong trend.
 
 \benchmarkfigurebyfunc{shenmaier}{Runtimes for Shenmaier's Approximation on each Data Type}{fig:shenmaier_benchmarks}
+We know that the average time complexity of Shenmaier's approximation will be $O(n^2d)$ which is fortunately exactly what we observe in these plots. We would expect no significant difference in runtimes when comparing data types since Shenmaier's approximation works by iterating over each point, but we do see slight differences in runtime then varying the dimension of the data. This could be explained by the sorting of distances which takes place when finding the $k$ closest points, as this list will have a different distribution when sorted for each data type. The overall trend as dimension is increased is linear but we observe a lesser increase in runtime than expected. This is likely because of optimizations made by NumPy where the computations for arrays/vectors are written in C.
+
 
 \benchmarkfigurebyfunc{shrink}{Runtimes for Shrink Heuristic on each Data Type}{fig:shrink_benchmarks}
 
@@ -1129,7 +1138,7 @@ We largely follow the methodology in \cite[Section 4.2]{huding} by Hu Ding and M
 
 Once we have solved each instance, to measure the performance of the MEBwO as an outlier recognition model we calculate the $F_1$ score which is defined as
 \begin{equation*}
-    2\cdot\frac{\text{Precision}\cdot\text{Recall}}{\text{Precision}+\text{Recall}}
+    F_1 = 2\cdot\frac{\text{Precision}\cdot\text{Recall}}{\text{Precision}+\text{Recall}}
 \end{equation*}
 where the precision and recall are defined as 
 \begin{equation*}
@@ -1141,13 +1150,19 @@ For each method and each parameter we solve the MEBwO problem for each digit and
 
 The algorithm in \cite{huding} is compared against three outlier recognition methods, which are angle-based outlier detection (ABOD) \cite{abod}, one-class support vector machine (OCSVM) \cite{ocsvm}, and discriminative reconstructions in an auto-encoder (DRAE) \cite{drae}. See \cite{huding} for further details. We provide an extension to Table 2 of this paper, referring to their algorithm as HDMY. The total time reported is the total running time for each value of $\eta$ and we assume this is averaged over each of their 20 instances. It should be noted that the time for sampling is included in the runtimes in their paper, which we do not do, but in our experiments we find this takes at most a few seconds so the effect on the results is negligible considering the total runtime for each algorithm is reported on the order of hours.
 
-We present our results in tabular form as in \cite{huding} but also provide the results as a plot for the reader's viewing pleasure. Unfortunately Gurobi was unable to solve the relaxed model required for the relaxation-based heuristic, reaching the memory limit on our machine (16GB) before the model could be instantiated.
+We present our results in tabular form as in \cite{huding} but also provide the results as a plot for the reader's enjoyment. It should be noted that HDMY and each of our algorithms are all MEBwO models and we are comparing the effectiveness and runtime of each algorithm used to create the MEBwO. Unfortunately Gurobi was unable to solve the relaxed model required for the relaxation-based heuristic, reaching the memory limit on our machine (16GB) before the model could be instantiated.
 
 \subsection{Results}
 
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.6666\textwidth]{images/mnist_plot.png}
+    \caption{$F_1$ Score and Runtime of each Method for MNIST Outlier Recognition}
+    \label{fig:mnist_fig}
+\end{figure}
 \begin{table}[ht]
     \centering
-    \begin{tabular}{|c|c|c|c|c|c|c|c|} \hline
+    \begin{tabular}{|c||c|c|c|c||c|c|c|} \hline
         $\eta$&ABOD&OCSVM&DRAE&HDMY&Shenmaier&Shrink Heuristic&APH \\ \hline
         0.95&0.95&0.965&0.974&0.965&0.965&0.961&0.966 \\
         0.9&0.896&0.934&0.949&0.935&0.934&0.925&0.94 \\
@@ -1155,13 +1170,16 @@ We present our results in tabular form as in \cite{huding} but also provide the 
         0.8&0.781&0.868&0.898&0.883&0.881&0.855&0.89 \\
         0.75&0.717&0.833&0.867&0.857&0.855&0.832&0.866 \\
         0.7&0.648&0.797&0.838&0.831&0.832&0.797&0.84 \\ \hline
-        Runtime (s) & $2\times10^4$ & $3.4\times10^3$ & $1\times10^5$ & $1.6\times10^4$ & $5.1\times10^4$ & $1.6\times10^4$ & $131.7$ \\[4pt] \hline
+        Runtime (s) & $2\times10^4$ & $3.4\times10^3$ & $1\times10^5$ & $1.6\times10^4$ & $5.1\times10^4$ & $1.6\times10^4$ & $131.7$ \\ \hline
     \end{tabular}
     \caption{$F_1$ Score and Runtime of each Method for MNIST Outlier Recognition}
     \label{tab:mnist_table}
 \end{table}
 
-\section{Discussion}
+Comparing just our algorithms, both Shenmaier's approximation and the average point heuristic achieve similar performance, interestingly with the average point heuristic being marginally better---a surprise to be sure, but a welcome one, considering the very short runtime of the average point heuristic (two minutes compared to fourteen hours). The shrink heuristic finds worse performance than each of our other algorithms despite taking four hours in total to run.
+
+Each of our algorithms is able to outperform the ABOD model and all but the shrink heuristic outperform the OCSVM model. Each algorithm gives worse performance then the DRAE model, which was also true for the algorithm in \cite{huding}. This algorithm gives similar performance to Shenmaier's approximation, but Shenmaier's approximation takes a little over three times as long to run. The average point heuristic is able to outperform HDMY which again is interesting considering the short runtime. It should again be noted that we were unable to run averages for these scores over multiple samplings of the MNIST data set, so it is possible that the average point heuristic on average has a worse performance than in our results, and we have randomly sampled a more favourable set of instances for this algorithm.
+
 
 % =============================================================================
 % Chapter 5
@@ -1171,6 +1189,8 @@ We present our results in tabular form as in \cite{huding} but also provide the 
 % =============================================================================
 %the entries have to be in the file literature.bib
 \bibliography{literature}
+%\addcontentsline{toc}{chapter}{Bibliography}
+
 \clearpage
 
 \begin{appendices}
