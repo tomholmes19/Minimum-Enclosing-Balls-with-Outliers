@@ -7,14 +7,15 @@ import matplotlib.pyplot as plt
 import plot_settings
 import benchmarking.utils
 
-heuristics = ["relaxation_heuristic", "shenmaier", "shrink"]
+heuristics = ["relaxation_heuristic", "shenmaier", "shrink", "shrink_avg"]
 data_types = ["hyperspherical_shell", "normal", "uniform_ball", "uniform_ball_with_outliers"]
 params = ["n", "d", "eta"]
 
 colours_funcs = {
     "relaxation_heuristic": "r",
     "shenmaier": "b",
-    "shrink": "g"
+    "shrink": "g",
+    "shrink_avg": "m"
 }
 
 colours_data = {
@@ -27,7 +28,8 @@ colours_data = {
 markers_funcs = {
     "relaxation_heuristic": "o",
     "shenmaier": "^",
-    "shrink": "D"
+    "shrink": "D",
+    "shrink_avg": "s"
 }
 
 markers_data = {
@@ -40,7 +42,8 @@ markers_data = {
 labels_funcs = {
     "relaxation_heuristic": "RBH",
     "shenmaier": "Shenmaier",
-    "shrink": "Shrink"
+    "shrink": "Shrink",
+    "shrink_avg": "APH"
 }
 
 labels_data = {
