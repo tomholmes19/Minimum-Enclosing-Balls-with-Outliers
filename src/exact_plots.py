@@ -21,6 +21,14 @@ fixed_params = {
     "eta": "n300_d10",
     "M": "n300_d10"
 }
+
+xlabels = {
+    "n": "$n$",
+    "d": "$d$",
+    "eta": "$\eta$",
+    "M": "$M$"
+}
+
 for param in params:
     # construct filename
     filename = "func_{0}_{1}".format(param, fixed_params[param])
@@ -35,7 +43,7 @@ for param in params:
         axes[param] = benchmarking.utils.get_M_from_log(log_file)
 
     plt.figure()
-    plt.xlabel(param)
+    plt.xlabel(xlabels[param])
     plt.ylabel("Time (s)")
 
     if param == "d":

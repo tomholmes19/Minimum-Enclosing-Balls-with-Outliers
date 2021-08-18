@@ -15,6 +15,10 @@ colours = {"dcmeb": "r", "dcssh": "b"}
 markers = {"dcmeb": "o", "dcssh": "^"}
 axes = {"n": [500+500*i for i in range(10)], "d": [10+10*i for i in range(15)]}
 fixed_params = {"n": "d100", "d": "n1000"}
+xlabels = {
+    "n": "$n$",
+    "d": "$d$"
+}
 
 for data_type in data_types:
     for param in params:
@@ -27,7 +31,7 @@ for data_type in data_types:
         pct_lists = {heuristic: df["avg%"] for heuristic, df in dfs.items()}
 
         plt.figure()
-        plt.xlabel(param)
+        plt.xlabel(xlabels[param])
         plt.ylabel("avg%")
         
         for heuristic, pct_list in pct_lists.items():

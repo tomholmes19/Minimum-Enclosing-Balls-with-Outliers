@@ -62,6 +62,12 @@ fixed_params = {
     "eta": "n10000_d30"
 }
 
+xlabels = {
+    "n": "$n$",
+    "d": "$d$",
+    "eta": "$\eta$"
+}
+
 for data_type in data_types:
     for param in params:
         # construct filename
@@ -75,9 +81,9 @@ for data_type in data_types:
         results_dict = {heuristic: benchmarking.utils.get_r_from_log(r"benchmarks/{0}/{1}/{2}.log".format(heuristic, data_type, filename)) for heuristic in heuristics}
 
         # === times
-        """
+        
         plt.figure()
-        plt.xlabel(param)
+        plt.xlabel(xlabels[param])
         plt.ylabel("Time (s)")
 
         for heuristic, times in times_dict.items():
@@ -97,10 +103,10 @@ for data_type in data_types:
 
         plt.savefig("images/alg_benchmarks/by_data/{}".format(filename), bbox_inches="tight")
         plt.close()
-        """
+        
         # === results
         plt.figure()
-        plt.xlabel(param)
+        plt.xlabel(xlabels[param])
         plt.ylabel("Radius")
 
         for heuristic, results in results_dict.items():
@@ -117,7 +123,7 @@ for data_type in data_types:
         plt.savefig("images/alg_benchmarks/by_data/{}_r".format(filename), bbox_inches="tight")
         plt.close()
 
-"""
+
 for heuristic in heuristics:
     for param in params:
         # construct filename
@@ -129,7 +135,7 @@ for heuristic in heuristics:
         times_dict = {data_type: benchmarking.utils.get_times_from_log(r"benchmarks/{0}/{1}/{2}_{3}.log".format(heuristic, data_type, filename, data_type)) for data_type in data_types}
         
         plt.figure()
-        plt.xlabel(param)
+        plt.xlabel(xlabels[param])
         plt.ylabel("Time (s)")
 
         for data_type, times in times_dict.items():
@@ -150,4 +156,3 @@ for heuristic in heuristics:
         
         plt.savefig(r"images/alg_benchmarks/by_func/{0}_{1}".format(heuristic, filename), bbox_inches="tight")
         plt.close()
-"""

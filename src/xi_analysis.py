@@ -45,7 +45,7 @@ for name, data in datas.items():
     # plot
     sns.lineplot(x=M_list, y=variances.values(), label=name)
 
-plt.xlabel("M")
+plt.xlabel("$M$")
 plt.ylabel("Variance")
 plt.legend()
 plt.savefig(r"images/xi_analysis.png")
