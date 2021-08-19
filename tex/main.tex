@@ -944,7 +944,6 @@ Now we will discuss the data type we call the Hyperspherical Shell. This consist
 In this paper we choose the zero vector as our center, an inner radius of $1$, and an outer radius of $2$. See Figure \ref{fig:hypshell} for an example. Note that we colour the points in this plot by their distance to the origin, so that the shape of the data may be seen in the three-dimensional plot. In two dimensions the shape approximated by this data is known as an annulus, and in three dimensions a spherical shell, so for the general $d$-dimensional case we opt to call it a hyperspherical shell.
 
 \datafigure{hyperspherical_shell}{Example of a Hyperspherical Shell}{fig:hypshell}
-%TODO: colour code to make 3d plot clearer
 
 This data type is chosen as the optimal centre of the MEBwO on any sufficiently large data set is guaranteed to be ``far" away from any point in the data set. This poses issues for Shenmaier's Approximation which always returns a centre which is a point within the data set.
 
@@ -1006,7 +1005,7 @@ To generate this data, we simply use Algorithm \ref{alg:unitball} to generate a 
 
 \subsection{MNIST}
 
-In the interest of easy reproducability and an example of a real-life application, we would like to test our construction methods on the MNIST data set \cite{lecun2010mnist}. This data set consists of 70000 hand-written digits from 0--9 which are size-normalized and centered in $28\times28$ pixel greyscale images, and examples can be seen in Figure \ref{fig:mnist_example}. MNIST is a popular data set for testing digit recognition models, a specific application of the broader class of image recognition models within computer vision. We may fit an MEBwO to the subset of data for a specific digit and this ball may then be used for outlier recognition or as a more robust binary classification model than if one were to use an MEB. Further to this, seperate balls may be fit to each digit and used to make multi-class classifications, either in a voting-based ensemble model or as part of a decision tree. In Section (TODO: REF OUTLIER RECOGNITION) we will apply two of our algorithms as an outlier recognition method.
+In the interest of easy reproducability and an example of a real-life application, we would like to test our construction methods on the MNIST data set \cite{lecun2010mnist}. This data set consists of 70000 hand-written digits from 0--9 which are size-normalized and centered in $28\times28$ pixel greyscale images, and examples can be seen in Figure \ref{fig:mnist_example}. MNIST is a popular data set for testing digit recognition models, a specific application of the broader class of image recognition models within computer vision. We may fit an MEBwO to the subset of data for a specific digit and this ball may then be used for outlier recognition or as a more robust binary classification model than if one were to use an MEB. Further to this, seperate balls may be fit to each digit and used to make multi-class classifications, either in a voting-based ensemble model or as part of a decision tree. In Section \ref{sec:outlier_recognition} we will apply two of our algorithms as an outlier recognition method.
 
 \begin{figure}
     \centering
@@ -1115,13 +1114,13 @@ Recall that the shrink heuristic's time complexity depends on the algorithm used
 
 \section{Improvement Heuristics}
 \subsection{Methodology}
-Our interest in benchmarking our improvement heuristics is in how well these heuristics improve an existing solution. Runtime is not a concern as we know that both heuristics will terminate very quickly as discussed in Section \ref{sec:improvement_heuristics}, though we include plots of the runtimes for the DCMEB model in the appendix (TODO: REF THIS) for completeness.
+Our interest in benchmarking our improvement heuristics is in how well these heuristics improve an existing solution. As discussed in Section \ref{sec:improvement_heuristics} we know that both heuristics will run very quickly, however we are interested in the differences in runtimes between the heuristics. The DCSSH will run in polynomial time while the DCMEB is expected to run in polynomial time as is typical of interior point methods, so we will benchmark the runtimes of the solver for this model.
 
 These heuristics were designed to be used after gaining a solution from Shenmaier's approximation, so we first find this solution for the given data set and then run an improvement heuristic 100 times. As discussed in Section \ref{sec:improvement_heuristics} other stopping criteria could be implemented but we opt for an iteration limit for ease of implementation and simplicity.
 
 As seen in the previous section, Shenmaier's algorithm is not a particularly fast method, so with regard to the time constraint of this project we choose to benchmark our improvement heuristics on separate, smaller data sets than those we used to benchmark our construction methods. We follow the same methodology in generating and saving each data set. For benchmarking $n$ we choose $n=500$ to $n=5000$ in steps of 500 and for $d$ we choose $d=10$ to $d=150$ in steps of 10. The improvement heuristics, while primarily useful for improving an existing MEBwO, ultimately only improves an MEB on a subset of data so there is no $\eta$ parameter to vary.
 
-In each instance we solve, we record the initial radius returned by Shenmaier's approximation, and after running the improvement heuristic 100 times we record the new improved radius. In the results section we report average improvement for each heuristist, where if $r$ is the initial radius and $\hat{r}$ is the improved radius, the improvement percentage is calculated as $(1-\hat{r}/r)\cdot100$. Tabular results may be found in Appendix \ref{app:impr_tables}.
+In each instance we solve, we record the initial radius returned by Shenmaier's approximation, and after running the improvement heuristic 100 times we record the new improved radius. For benchmarking the runtime of the solver for the DCMEB solver, we will record the runtime from the model instance after running Shenmaier's approximation.  In the results section we report average improvement for each heuristic, where if $r$ is the initial radius and $\hat{r}$ is the improved radius, the improvement percentage is calculated as $(1-\hat{r}/r)\cdot100$. Tabular results may be found in Appendix \ref{app:impr_tables}.
 
 \subsection{Results}
 \subsubsection{DCMEB Runtime}
@@ -1160,7 +1159,7 @@ From the first three plots we see the same trends, where the average improvement
 
 Both heuristics give very similar performances, though the DCSSH appears to always be marginally better than the DCMEB. We can then conclude that, out of these two heuristics, one should always use the DCSSH over the DCMEB since the DCSSH runs in linear time as opposed to the polynomial time of the DCMEB, and for ease of implementation as the DCSSH does not require the use of an optimization solver which requires specific knowledge of how to use and in a commercial setting will in most cases require a payment of sorts.
 
-\section{Outlier Recognition}
+\section{Outlier Recognition}\label{sec:outlier_recognition}
 \subsection{Methodology}
 We largely follow the methodology in \cite[Section 4.2]{huding} by Hu Ding and Mingquan Ye for benchmarking their algorithm on the MNIST data set. For each digit 0--9, we construct a base data set by taking all points corresponding to that digit, then randomly sample points from the remaining digits as outliers. So, suppose we have $n$ many points which are labelled 0, we then sample $(1-\eta)n$ many outliers from the digits 1--9. We use the entire 70000-point data set for this as we are not interested in a test-train split for an outlier recognition problem.
 
