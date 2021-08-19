@@ -346,7 +346,7 @@ In the interest of contextualizing Algorithm \ref{core-set algorithm}, we define
 \end{definition}
 Finally, the following two definitions allow us to formally define the MEBwO.
 \begin{definition}
-    For a set $\A$, the set of $k$-subsets of $\A$ is the set $\mathfrak{K}=\left\{\K\in\mathscr{P}(\A): |\K|=k\right\}$ where $\mathcal{P}:\textbf{Set}\to\textbf{Set}$ is the usual power set functor.
+    For a set $\A$, the set of $k$-subsets of $\A$ is the set $\mathfrak{K}=\left\{\K\in\mathscr{P}(\A): |\K|=k\right\}$ where $\mathcal{P}(\A)$ is the usual power-set of $\A$.
 \end{definition}
 
 \begin{definition}
@@ -408,7 +408,7 @@ For a simple example, consider the data set $\A=\left\{(-2,-1),(2,-1),(2,1),(-2,
         \end{tabular}
     \end{center}
 \end{definition}
-Since this problem can be modelled as a SOCP we know it may be solved by interior-point methods \cite{socp_ipm}. This problem has $d+1$ variables and $n$ constraints, so it quickly become slow to find an optimal solution for large $n$ and $d$ when using a solver such as Xpress or Gurobi, but many alternative approaches are present in the literature which offer very fast solutions within a guaranteed accuracy (\cite{core-sets}, \cite{two-algorithms}).
+Since this problem can be modelled as a SOCP we know it may be solved by interior-point methods \cite{socp_ipm}. This problem has $d+1$ variables and $n$ constraints, so it quickly become slow to find an optimal solution for large $n$ and $d$ when using a solver such as Xpress or Gurobi, but many alternative approaches are present in the literature which offer very fast solutions within a guaranteed accuracy (\cite{core-sets,two-algorithms}).
 
 We will discuss here one such algorithm to solve the MEB problem from \cite{core-sets} that will be used in algorithms in Chapter \ref{algorithms}. The central idea is that of the \textit{core-set} \cite{badoiu}, which is a small set of points that approximate the shape of a larger set of points. For example, a circle in two dimensions can be represented by a core-set of three points which lie on the boundary of the circle (see Figure \ref{fig:core set example}).
 
@@ -453,9 +453,9 @@ Algorithm \ref{core-set algorithm} runs in $O\left(\frac{nd}{\epsilon}+\frac{d^2
     \begin{center}
         \begin{tabular}{CCC}
              \displaystyle\min_{c,r,\xi} & r \\
-             \text{s.t.} & \norm{c-a^i} \leq r + M\xi_i & i=1,\ldots,n \\
-             & \displaystyle\sum_{i=1}^n\xi_i \leq k \\
-             & \xi_i \in \binary & i=1,\ldots,n
+             \text{s.t.} & \norm{c-a^i} \leq r + M\xi_i, & i=1,\ldots,n, \\
+             & \displaystyle\sum_{i=1}^n\xi_i \leq k, \\
+             & \xi_i \in \binary, & i=1,\ldots,n.
         \end{tabular}
     \end{center}
     
@@ -478,7 +478,7 @@ Algorithm \ref{core-set algorithm} runs in $O\left(\frac{nd}{\epsilon}+\frac{d^2
 This model gives us a way to solve the MEBwO problem optimally for a given data set. However, by examining the structure of this model we can expect the solution times to be unreasonable for any meaningfully large instance. Note that, of $n$ many binary variables $\xi_i$, we can choose up to $k\leq n$ many of them to have a value of 1, though by Proposition \ref{removing data} we know that removing data gives us an MEB with potentially lower radius, meaning we will always pick the highest possible number of points ($k$ many) to be excluded. Thus, by a total brute force search we may expect to explore $\binom{n}{k}$ many individual MEB problems. Modern optimization solvers will work more efficiently than this, utilizing techniques such as branch-and-bound. Regardless, we expect a very large solution space which leads to exponentially larger solution times as we will see in Section \ref{exact benchmarks}.
 
 
-\subsection{On the Big M Parameter}\label{sec:M}
+\subsection{On the Big-M Parameter}\label{sec:M}
 The ``big $M$ constraint" in Definition \ref{mebwo} is a commonly known technique within Operational Research and an important question is that of what $M$ do we choose? A sufficiently large $M$ is required such that when the corresponding binary variable is equal to $1$, the constraint is effectively nullified. But, as we will see within this section, a value of $M$ which is too large will lead to a longer solution time with worse solutions.
 
 \subsubsection{An Upper Bound on $M$}
@@ -499,7 +499,7 @@ We can look to \cite[Lemma 1]{core-sets} for a $1/\sqrt{3}$-approximation to the
     \caption{Diameter Approximation Algorithm \cite[Lemma 1]{core-sets}}
 \end{algorithm}
 A caveat to this approach is that it the value of $M$ will change depending on the initial random point chosen, and can vary significantly. To demonstrate this, we generate a standard normal data set $\A$ with $n=1000$, $d=10$ (see Section \ref{data}), and by running Algorithm \ref{alg:diameter approx} for each $a\in\A$ we construct a distribution of approximate diameters. From \texttt{src/diameter\_approx\_analysis.py} we find an average diameter of $8.939$ with variance $0.170$ and a density plot is shown in Figure \ref{fig:diameter approx density}.
-
+TODO: report actual diameters and change M on x axis to diameter
 \begin{figure}
     \centering
     \includegraphics[width=0.5\textwidth]{pw_M_density.png}
@@ -564,7 +564,7 @@ This method will always return a feasible solution that covers $\eta\%$ of the d
     \SetAlgoLined
     \KwIn{Data set $\A=\left\{a^1,\ldots,a^n\right\}$, percentage of data to be covered $\eta\in[0,1]$, error tolerance for MEB heuristic $\epsilon>0$, big $M$ parameter $M>0$}
     \KwOut{Ball $B(c,r)$}
-     $\xi=\left[\xi_1,\ldots,\xi_n\right]$ relaxed binary variables returned by relaxed MEBwO solver for $\A$, $\eta$, and $M$\;
+     $\xi=\left[\xi_1,\ldots,\xi_n\right]$ the relaxed binary variables returned by relaxed MEBwO solver for $\A$, $\eta$, and $M$\;
      Let $\xi'$ be the smallest $k=\floor{\eta\cdot n}$ elements of $\xi$\;
      Let $\A':=\left\{a^i\in\A: \xi_i\in\xi',\ i=1,\ldots,n\right\}$\;
      Let $c,r$ be the center and radius of $\MEB(\A')$ returned by heuristic\;
@@ -581,7 +581,7 @@ This approximation scheme developed by Vladimir Shenmaier in \cite[Algorithm 1]{
     \KwOut{Ball $B(c,r)$}
     $k=\floor{n(1-\eta)}$\;
     \For{$i=1,\ldots,n$}{
-        $D:=\left\{\norm{c-a}: a\in\A\right\}$\;
+        $D:=\left\{\norm{a^i-a}: a\in\A\right\}$\; % TODO: FIX THIS
         Let $D'$ be $D$ sorted in ascending order\;
         Let $\delta_i$ be the $(k-1)$th element of $D'$ (indexing from 0)\;
     }
@@ -593,7 +593,7 @@ This approximation scheme developed by Vladimir Shenmaier in \cite[Algorithm 1]{
     \caption{Shenmaier's Approximation \cite[Algorithm 1]{SHENMAIER201581}}
     \label{shenmaier}
 \end{algorithm}
-\subsubsection{Approximation Guarantee}
+\subsubsection{Approximation Guarantee} %TODO: could make this a theorem
  From \cite[Theorem 4]{SHENMAIER201581} we know that Algorithm \ref{shenmaier} returns a 2-approximation solution to the MEBwO problem. What this means is that if we have a minimum radius of $r$ returned by Algorithm \ref{shenmaier} for a data set $\A$, then the true optimal value to the MEBwO problem on that data is no less than $r/2$. This is useful for assessing how close a heuristic is to an optimal solution in the worst case when we have a solution via Algorithm \ref{shenmaier}, but not an optimal solution via solving the exact model.
 
 \subsubsection{Complexity}
@@ -625,7 +625,7 @@ The MEB Shrinking Heuristic works by computing $\MEB(\A) = B(c,r)$, then simply 
 The complexity of this heuristic mostly depends on the choice of heuristic for solving the MEB problem on $\A$. The dominant term in lines 3 though 7 is on average $O(n\log n)$ from sorting the list of distances, so the overall complexity is the greater out of this and the complexity of the heuristic. Our implementation uses Algorithm \ref{core-set algorithm}, which in this case is $O\left(\frac{nd}{\epsilon}+\frac{d^2}{\epsilon^{3/2}}\left(\frac{1}{\epsilon}+d\right)\log\frac{1}{\epsilon}\right)$ \cite[Page 6]{core-sets}.
 \subsection{Average Point Heuristic}
 \subsubsection{Statement}
-The Average Point Heuristic works by finding the average point, i.e. $c=\frac{1}{n}\sum_{i=1}^n a^i$, then finding the $n-k$ closest points and returning the ball $B(c,r)$ where $r$ is the greatest distance from $c$ to each of the $n-k$ points.
+The Average Point Heuristic (APH) works by finding the average point, i.e. $c=\frac{1}{n}\sum_{i=1}^n a^i$, then finding the $n-k$ closest points and returning the ball $B(c,r)$ where $r$ is the greatest distance from $c$ to each of the $n-k$ points.
 
 \begin{algorithm}[H]\label{avg point shrink}
     \SetAlgoLined
@@ -643,12 +643,12 @@ The Average Point Heuristic works by finding the average point, i.e. $c=\frac{1}
 \end{algorithm}
 
 \subsubsection{Complexity}
-This algorithm runs extremely quickly, with the dominating term in the time complexity being $O(nd\log n)$ on average as a result of sorting the list of distances on line 4, so when . This is far faster than any other construction method and is more resistant to outliers than the MEB shrinking heuristic.
-
-
+This algorithm runs extremely quickly, with the dominating term in the time complexity being $O(nd\log n)$ on average as a result of sorting the list of distances on line 4, so when . TODO: what is this This is far faster than any other construction method and is more resistant to outliers than the MEB shrinking heuristic.
+%TODO: can order the algorithms in order of complexity
+%TODO: talk about how improvement heuristics can be used after each heuristic except the relaxation-based heuristic since it finds and MEB so minimum
 
 \section{Improvement Heuristics}\label{sec:improvement_heuristics}
-We now consider some improvement heuristics. The two heuristics described here are, strictly speaking, designed to improve an existing MEB rather than an MEBwO. However, quick and effective methods exist for solving the MEB problem and so improvement heuristics have not been needed, while heuristics which solve the MEBwO problem may return a solution which has considerable space for improvement.
+We now consider some improvement heuristics. The two heuristics described here are, strictly speaking, designed to improve an existing MEB rather than an MEBwO. However, quick and effective methods exist for solving the MEB problem and so improvement heuristics have not been needed, while heuristics which solve the MEBwO problem may return a solution which has considerable space for improvement. %TODO: not talking about MEB
 
 The two improvement heuristics work in a similar way, by considering an improving direction in which moving the centre of the MEB in that direction while keeping the same radius retains a feasible solution, then shrinking the radius to the furthest point from the new centre. The Direction-Constrained Single Step Heuristic (DCSSH) works by pure geometric reasoning to find a new centre, while the Direction-Constrained MEB (DCMEB) uses an optimization solver such as Gurobi to find an optimal step in the improving direction to minimize the radius of the new ball.
 
@@ -757,7 +757,7 @@ since $\norm{a^i-a^i_\beta}\geq0$. Hence $\norm{c-a^i}\leq r$ for $i=1,\ldots,n$
         % labels
         \node at (2.598, 3.5) {$\norm{a^i-a^i_\beta}$};
         \draw[->] (2.598, 3) to[bend left=10] (2.098, 1.625);
-        
+        % TODO: make it clear that a^ibeta are not points
     \end{tikzpicture}
     \caption{Visual Aid for Proposition \ref{imp heuristic feasibility}}
     \label{vis aid feasibility}
@@ -915,7 +915,7 @@ This can be easily generated using NumPy \cite{numpy} by calling the function \t
 Our next data type consists of points sampled uniformly from a hypersphere of dimension $d$, and in this paper we will specifically choose to uniformly sample points within the unit ball centered on the zero vector, $B(\mathbf{0},1)\subseteq\mathbb{R}^d$. See Figure \ref{fig:unifball} for an example. Like with the choice of normal data, spherical data such as that of a uniform ball is a reasonable choice for the MEBwO problem.
 
 \datafigure{uniform_ball}{Example of a Uniform Ball}{fig:unifball}
-
+%TODO: 3d looks a bit squished
 To generate points uniformly within a unit ball, we must first generate points uniformly on the unit hypersphere. \cite{hyperspheresurface} provides a fast and easy to implement method of doing this, by first generating the standard normal vector $\mathbf{x}=(x_1,\ldots,x_d)$ where $x_i\sim N(0,1)$ for $i=1,\ldots,d$, and then the distribution of the normalized vectors $\mathbf{x}/\norm{\mathbf{x}}$ is uniform over the hypersphere of dimension $d$.
 
 A naive approach would then be to multiply the point on the surface of the hypersphere by a uniform random variate $U\sim U(0,1)$ to obtain a point inside the unit ball, and indeed this does generate points within the unit ball, but they will not be uniformly distributed and points will be more densely located near the centre of the ball. Instead, from \cite{eldredge} we find that we can instead multiply our point on the surface of the hypersphere by $U^{1/d}$ to have our points be uniformly distributed within the hypersphere. More generally, multiplying our point on the surface by $r\cdot U^{1/d}$ for some radius $r>0$ gives us a point within the hypersphere of radius $r$. See Algorithm \ref{alg:unitball} for a detailed outline of this method.
@@ -945,6 +945,7 @@ Now we will discuss the data type we call the Hyperspherical Shell. This consist
 In this paper we choose the zero vector as our center, an inner radius of $1$, and an outer radius of $2$. See Figure \ref{fig:hypshell} for an example. In two dimensions the shape approximated by this data is known as an annulus, and in three dimensions a spherical shell, so for the general $d$-dimensional case we opt to call it a hyperspherical shell.
 
 \datafigure{hyperspherical_shell}{Example of a Hyperspherical Shell}{fig:hypshell}
+%TODO: colour code to make 3d plot clearer
 
 This data type is chosen as the optimal centre of the MEBwO on any sufficiently large data set is guaranteed to be ``far" away from any point in the data set. This poses issues for Shenmaier's Approximation which always returns a centre which is a point within the data set.
 
@@ -1066,6 +1067,7 @@ We generate a large data set ($1000\times100000$) of random normal variates, fro
     \caption{Runtimes for the Exact Model on Normal Data}
     \label{fig:exact_benchmarks}
 \end{figure}
+% TODO: add more detail to captions (specify fixed parameters)
 In Figure \ref{fig:exact_benchmarks_n} and Figure \ref{fig:exact_benchmarks_d} we observe gradual increases in runtime as each parameter increases, until we see a sharp increase in runtime. This is what we expected due to the highly combinatorial nature of this problem, though we did not expect such a large and sudden change. One potential explanation to this is optimizations made by the Gurobi solver which make smaller instances quicker to solve, but eventually lose effedctiveness as problem size increases. These optimizations are how Gurobi Optimization make their money and are not publicly known so we are not able to comment on exactly how they achieve this.
 
 Figure \ref{fig:exact_benchmarks_eta} also produces strange results, as we would expect the maximum number of feasible solutions to be available when $\eta=0.5$, but the solver is actually able to solve these instances from 0.5 up to 0.7 extremely quickly. We observe spikes at $\eta=0.75$ and $\eta=0.9$, and again the exact behaviour we observe here is hard to explain due to the closed nature of the Gurobi solver.
@@ -1081,11 +1083,11 @@ For benchmarking $n$ we choose $n=1000$ to $n=28000$ in steps of 3000 with $d=30
 
 Like with the exact model, we solve the MEBwO problem with our methods on 5 different data sets for each choice of parameters, and again would prefer to do more but we chose 5 due to the time restrictions. Each solved instance has its solutions, runtime and other details recorded to a log file. Runtime is recorded using Python's \texttt{timeit} library, calling the timer before and after running each algorithm. When we use the Relaxation-Based Heuristic, we calculate a lower bound for the $M$ value required to solve the relaxed model by solving the MEB problem and setting $M:=2r$ where $r$ is the solution for the radius of the MEB problem, as discussed in Section \ref{sec:M}. This is only actually necessary for the normal data, as each of the other data types has a maximum diameter determined by the parameters chosen to generate it (see Section \ref{data}).
 
-In presenting our results, we again report average radii and runtimes while exact solutions and runtimes are available in the log files in the \texttt{benchmarks} folder in the Github repository and tabular results may be found in the Appendix \ref{app:constr_tables}. We provide graphs which group results by data type and algorithm, so one may compare the performance of each algorithm on one data type as well as the performance of one algorithm on each data type. When grouping by data type we also present the radii returned by each method so we may compare the radii returned by each method on the same data, while it does not make sense to compare radii returned by one algorithm on different data types. Note that in some plots, some methods are not visible, but this is because they is covered by the markers for other methods when they give the same solutions. We do not report runtime for the average point heuristic as this runs extremely quickly, but runtime plots are given separately in the appendix (TODO: REF) for completeness. When grouping by function we are interested in how the runtime varies so that we may verify our time complexity derivations and do not report solutions.
+In presenting our results, we again report average radii and runtimes while exact solutions and runtimes are available in the log files in the \texttt{benchmarks} folder in the Github repository and tabular results may be found in the Appendix \ref{app:constr_tables}. We provide graphs which group results by data type and algorithm, so one may compare the performance of each algorithm on one data type as well as the performance of one algorithm on each data type. When grouping by data type we also present the radii returned by each method so we may compare the radii returned by each method on the same data, while it does not make sense to compare radii returned by one algorithm on different data types. Note that in some plots, some methods are not visible, but this is because they is covered by the markers for other methods when they give the same solutions. We do not report runtime for the average point heuristic as this runs extremely quickly, but runtime plots are given separately in Appendix \ref{app:aph_runtime} for completeness. When grouping by function we are interested in how the runtime varies so that we may verify our time complexity derivations and do not report solutions.
 
 \subsection{Results}
 \subsubsection{By Data Type}
-
+%TODO: want to put figures close to the text that talks about them
 \benchmarkfiguresix{normal}{Normal}
 On normal data we observe that Shenmaier's approximation gives strictly worse solutions as both $n$ and $d$ vary. For $n$ Shenmaier's approximation also has the longest run time for each $n$, while for $d$ it runs in less time than the relaxation-based heuristic for $d$ greater than 50. The average point heuristic tends to perform the best on normal data while also sporting near-instant runtimes.
 
@@ -1175,8 +1177,8 @@ and $\text{TP}$, $\text{FP}$, and $\text{FN}$ are the number of true positives, 
 
 For each method and each parameter we solve the MEBwO problem for each digit and then report the average $F_1$ score across each digit. Due to the random sampling in constructing each instance we would prefer to report average performance for each digit across multiple instances, but due to time constraints this is not possible and we hope that averaging across each digit provides enough robustness to the issues associated with random sampling.
 
-The algorithm in \cite{huding} is compared against three outlier recognition methods, which are angle-based outlier detection (ABOD) \cite{abod}, one-class support vector machine (OCSVM) \cite{ocsvm}, and discriminative reconstructions in an auto-encoder (DRAE) \cite{drae}. See \cite{huding} for further details. We provide an extension to Table 2 of this paper, referring to their algorithm as HDMY. The total time reported is the total running time for each value of $\eta$ and we assume this is averaged over each of their 20 instances. It should be noted that the time for sampling is included in the runtimes in their paper, which we do not do, but in our experiments we find this takes at most a few seconds so the effect on the results is negligible considering the total runtime for each algorithm is reported on the order of hours.
-
+The algorithm in \cite{huding} is compared against three outlier recognition methods, which are angle-based outlier detection (ABOD) \cite{abod}, one-class support vector machine (OCSVM) \cite{ocsvm}, and discriminative reconstructions in an auto-encoder (DRAE) \cite{drae}. See \cite{huding} for further details. We provide an extension to Table 2 of this paper, referring to their algorithm as HDMY. The total time reported is the total running time for each value of $\eta$ and we assume this is averaged over each of their 20 instances. It should be noted that the time for sampling is included in the runtimes in their paper, which we do not do, but in our experiments we find this takes at most a few seconds so the effect on the results is negligible considering the total runtime for each algorithm is reported on the order of hours. %TODO: different computer too
+%TODO: legend blocks plot in 5.2.1a
 We present our results in tabular form as in \cite{huding} but also provide the results as a plot for the reader's enjoyment. It should be noted that HDMY and each of our algorithms are all MEBwO models and we are comparing the effectiveness and runtime of each algorithm used to create the MEBwO. Unfortunately Gurobi was unable to solve the relaxed model required for the relaxation-based heuristic, reaching the memory limit on our machine (16GB) before the model could be instantiated.
 
 \subsection{Results}
@@ -1221,7 +1223,7 @@ Each of our algorithms is able to outperform the ABOD model and all but the shri
 \clearpage
 
 \begin{appendices}
-    \section{Average Point Heuristic Runtime Plots}
+    \section{Average Point Heuristic Runtime Plots}\label{app:aph_runtime}
     Here we present the runtime plots for the average point heuristic. Since this heuristic has a time complexity of $O(nd\log n)$ we know it will run extremely quickly, and so the runtimes were not included in the main text but we include them here for completeness.
     
     \benchmarkfigurebyfunc{shrink_avg}{Runtimes for the Average Point Heuristic on each Data Type}{fig:aph_benchmarks}
