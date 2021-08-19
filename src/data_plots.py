@@ -33,5 +33,8 @@ for name, data in datas.items():
 
         ax.scatter(data[:,0], data[:,1], data[:,2], alpha=0.5)
     
-    plt.savefig(r"images/data_plots/{0}".format(name), bbox_inches='tight', transparent=True)
+    if dim == "2d":
+        plt.savefig(r"images/data_plots/{0}".format(name), bbox_inches='tight')
+    else:
+        plt.savefig(r"images/data_plots/{0}".format(name), bbox_inches='tight', transparent=True)
     plt.clf()
