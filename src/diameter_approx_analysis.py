@@ -21,8 +21,9 @@ for i in range(n):
 print(np.mean(D_list))
 print(np.var(D_list))
 
-sns.set_theme()
-sns.displot(x=D_list, kind="kde")
+import plot_settings
+
+sns.kdeplot(x=D_list)
 plt.xlabel("Diameter")
 plt.savefig(r"images/pw_M_density.png")
 plt.show()
