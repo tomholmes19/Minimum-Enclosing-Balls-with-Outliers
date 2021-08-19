@@ -23,6 +23,6 @@ print(np.var(D_list))
 
 sns.set_theme()
 sns.displot(x=D_list, kind="kde")
-plt.xlabel("$M$")
+plt.xlabel("Diameter")
 plt.savefig(r"images/pw_M_density.png")
 plt.show()
