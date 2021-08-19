@@ -25,9 +25,8 @@ datas = {
 for name, data in datas.items():
     dim = name.split("_")[-1]
     if name.startswith("hyperspherical_shell"):
-        print(name)
         c = [np.linalg.norm(x-np.zeros(int(dim[0]))) for x in data]
-        cmap = "winter"
+        cmap = "crest"
     else:
         c = None
         cmap = None
