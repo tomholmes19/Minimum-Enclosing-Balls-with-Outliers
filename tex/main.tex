@@ -499,10 +499,10 @@ We can look to \cite[Lemma 1]{core-sets} for a $1/\sqrt{3}$-approximation to the
     \caption{Diameter Approximation Algorithm \cite[Lemma 1]{core-sets}}
 \end{algorithm}
 A caveat to this approach is that it the value of $M$ will change depending on the initial random point chosen, and can vary significantly. To demonstrate this, we generate a standard normal data set $\A$ with $n=1000$, $d=10$ (see Section \ref{data}), and by running Algorithm \ref{alg:diameter approx} for each $a\in\A$ we construct a distribution of approximate diameters. From \texttt{src/diameter\_approx\_analysis.py} we find an average diameter of $8.939$ with variance $0.170$ and a density plot is shown in Figure \ref{fig:diameter approx density}.
-TODO: report actual diameters and change M on x axis to diameter
+
 \begin{figure}
     \centering
-    \includegraphics[width=0.5\textwidth]{pw_M_density.png}
+    \includegraphics[width=0.6666\textwidth]{pw_M_density.png}
     \caption{Density Plot of Approximate Diameters from Algorithm \ref{alg:diameter approx}}
     \label{fig:diameter approx density}
 \end{figure}
@@ -581,7 +581,7 @@ This approximation scheme developed by Vladimir Shenmaier in \cite[Algorithm 1]{
     \KwOut{Ball $B(c,r)$}
     $k=\floor{n(1-\eta)}$\;
     \For{$i=1,\ldots,n$}{
-        $D:=\left\{\norm{a^i-a}: a\in\A\right\}$\; % TODO: FIX THIS
+        $D:=\left\{\norm{a^i-a}: a\in\A\right\}$\;
         Let $D'$ be $D$ sorted in ascending order\;
         Let $\delta_i$ be the $(k-1)$th element of $D'$ (indexing from 0)\;
     }
@@ -645,8 +645,8 @@ The Average Point Heuristic (APH) works by finding the average point, i.e. $c=\f
 \subsubsection{Complexity}
 This algorithm runs extremely quickly, with the dominating term in the time complexity being $O(nd\log n)$ on average as a result of sorting the list of distances on line 4, so when . TODO: what is this This is far faster than any other construction method and is more resistant to outliers than the MEB shrinking heuristic.
 %TODO: can order the algorithms in order of complexity
-%TODO: talk about how improvement heuristics can be used after each heuristic except the relaxation-based heuristic since it finds and MEB so minimum
 
+%TODO: talk about how improvement heuristics can be used after each heuristic except the relaxation-based heuristic since it finds and MEB so minimum
 \section{Improvement Heuristics}\label{sec:improvement_heuristics}
 We now consider some improvement heuristics. The two heuristics described here are, strictly speaking, designed to improve an existing MEB rather than an MEBwO. However, quick and effective methods exist for solving the MEB problem and so improvement heuristics have not been needed, while heuristics which solve the MEBwO problem may return a solution which has considerable space for improvement. %TODO: not talking about MEB
 
@@ -747,8 +747,8 @@ since $\norm{a^i-a^i_\beta}\geq0$. Hence $\norm{c-a^i}\leq r$ for $i=1,\ldots,n$
         \draw[fill] (1,0) circle (1.5pt) node[below]{$\hat{c}$};
         
         \draw[fill] (1.598, 1.5) circle (1.5pt) node[above left]{$a^i$};
-        \draw[fill] (2.598, 1.5) circle (1.5pt) node[above right]{$a^i_\beta$};
-        \draw[fill] (3.598, 1.5) circle (1.5pt) node[above right]{$\hat{a}^i_\beta$};
+        \draw (2.598, 1.5) node[cross]{} node[above right]{$a^i_\beta$};
+        \draw (3.598, 1.5) node[cross]{} node[above right]{$\hat{a}^i_\beta$};
         
         % balls
         \draw (0,0) circle (3);
@@ -757,7 +757,6 @@ since $\norm{a^i-a^i_\beta}\geq0$. Hence $\norm{c-a^i}\leq r$ for $i=1,\ldots,n$
         % labels
         \node at (2.598, 3.5) {$\norm{a^i-a^i_\beta}$};
         \draw[->] (2.598, 3) to[bend left=10] (2.098, 1.625);
-        % TODO: make it clear that a^ibeta are not points
     \end{tikzpicture}
     \caption{Visual Aid for Proposition \ref{imp heuristic feasibility}}
     \label{vis aid feasibility}
@@ -824,7 +823,7 @@ and as such the DCMEB problem may be solved by interior-point methods \cite{socp
 
 \subsubsection{Complexity}
 
-The operations in this heuristic are simply finding a maximally distant point which runs in $O(nd)$ time, solving the DCMEB problem, and an assignment which runs in $O(1)$ time. So, the interest is in the time complexity of the method used to solve the DCMEB problem. As this problem is a SOCP it makes sense to apply interior-point methods which may then solve it in polynomial time (TODO: NEEDS CITATION).
+The operations in this heuristic are simply finding a maximally distant point which runs in $O(nd)$ time, solving the DCMEB problem, and an assignment which runs in $O(1)$ time. So, the interest is in the time complexity of the method used to solve the DCMEB problem. As this problem is a SOCP it makes sense to apply interior-point methods which may then solve it in polynomial time.
 
 
 \begin{figure}
