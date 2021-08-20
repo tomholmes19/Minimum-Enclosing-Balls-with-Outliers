@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 import plot_settings
 
@@ -46,11 +47,16 @@ for heuristic in heuristics:
 
 
 F1_df = pd.DataFrame.from_dict(F1_dict)
-print(F1_df)
+
 fig, ax = plt.subplots()
+
+colours = sns.color_palette("hls", 7)
+markers = [".", "v", "^", "s", "x", "D", "p"]
+i = 0
 for column in F1_df:
     if column != "$\eta$":
-        plt.plot(eta_list, F1_df[column], label=column)
+        plt.plot(eta_list, F1_df[column], label=column, marker=markers[i], c=colours[i])
+        i += 1
 
 ax.set_xlim(0.95, 0.7)
 plt.xlabel("$\eta$")
