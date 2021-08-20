@@ -67,42 +67,42 @@
         \begin{subfigure}[b]{0.475\textwidth}
             \centering
             \includegraphics[width=\textwidth]{alg_benchmarks/by_data/func_n_d30_eta0p9_#1_r.png}
-            \caption{Radius as a Function of $n$}
+            \caption{Radius as a Function of $n$ ($d=30$, $\eta=0.9$)}
             \label{fig:constr_r_#1_n}
         \end{subfigure}
         \hfill
         \begin{subfigure}[b]{0.475\textwidth}
             \centering
             \includegraphics[width=\textwidth]{alg_benchmarks/by_data/func_n_d30_eta0p9_#1.png}
-            \caption{Runtime as a Function of $n$}
+            \caption{Runtime as a Function of $n$ ($d=30$, $\eta=0.9$)}
             \label{fig:constr_runtime_#1_n}
         \end{subfigure}
         
         \begin{subfigure}[b]{0.475\textwidth}
             \centering
             \includegraphics[width=\textwidth]{alg_benchmarks/by_data/func_d_n10000_eta0p9_#1_r.png}
-            \caption{Radius as a Function of $d$}
+            \caption{Radius as a Function of $d$ ($n=10000$, $\eta=0.9$)}
             \label{fig:constr_r_#1_d}
         \end{subfigure}
         \hfill
         \begin{subfigure}[b]{0.475\textwidth}
             \centering
             \includegraphics[width=\textwidth]{alg_benchmarks/by_data/func_d_n10000_eta0p9_#1.png}
-            \caption{Runtime as a Function of $d$}
+            \caption{Runtime as a Function of $d$ ($n=10000$, $\eta=0.9$)}
             \label{fig:constr_runtime_#1_d}
         \end{subfigure}
         
         \begin{subfigure}[b]{0.475\textwidth}
             \centering
             \includegraphics[width=\textwidth]{alg_benchmarks/by_data/func_eta_n10000_d30_#1_r.png}
-            \caption{Radius as a Function of $\eta$}
+            \caption{Radius as a Function of $\eta$ ($n=10000$, $d=30$)}
             \label{fig:constr_r_#1_eta}
         \end{subfigure}
         \hfill
         \begin{subfigure}[b]{0.475\textwidth}
             \centering
             \includegraphics[width=\textwidth]{alg_benchmarks/by_data/func_eta_n10000_d30_#1.png}
-            \caption{Runtime as a Function of $\eta$}
+            \caption{Runtime as a Function of $\eta$ ($n=10000$, $d=30$)}
             \label{fig:constr_runtime_#1_eta}
         \end{subfigure}
         \caption{Results for each Algorithm on #2 Data}
@@ -116,21 +116,21 @@
         \begin{subfigure}[b]{0.475\textwidth}
             \centering
             \includegraphics[width=\textwidth]{#1}
-            \caption{By $n$}
+            \caption{By $n$ ($d=30$, $\eta=0.9$)}
             \label{#5_n}
         \end{subfigure}
         \hfill
         \begin{subfigure}[b]{0.475\textwidth}
             \centering
             \includegraphics[width=\textwidth]{#2}
-            \caption{By $d$}
+            \caption{By $d$ ($n=10000$, $\eta=0.9$)}
             \label{#5_d}
         \end{subfigure}
         
         \begin{subfigure}[b]{0.475\textwidth}
             \centering
             \includegraphics[width=\textwidth]{#3}
-            \caption{By $\eta$}
+            \caption{By $\eta$ ($n=10000$, $d=30$)}
             \label{#5_eta}
         \end{subfigure}
         \caption{#4}
@@ -555,51 +555,28 @@ Due to the time constraints of this project and the difficulty of implementing b
 In this chapter we propose some non-exact construction methods to solving the MEBwO problem which return a feasible solution. We also investigate some improvement heuristics which, given a feasible MEB or MEBwO, seek to locally find a new center such that a smaller radius can be found.
 
 \section{Construction Methods}
-\subsection{Relaxation-Based Heuristic}
-This heuristic works by first solving the relaxed QP formulation for the MEBwO problem in Definition \ref{mebwo}, and then making the assumption that a higher value of $\xi_i$ (i.e. closer to 1) means that the model treats the data point $a^i$ as ``more" of an outlier. From this assumption, we pick the largest $k$ values of $xi_i$ and treat each corresponding $a^i$ as an outlier, therefore treating the remaining data as inliers. We then solve the MEB problem for this remaining data. A more formal outline of this algorithm is detailed in Algorithm \ref{relaxation heuristic}.
-
-This method will always return a feasible solution that covers $\eta\%$ of the data as we will always remove $k=\floor{n(1-\eta)}$ many points. As discussed in the previous chapter, solving the final MEB problem is relatively easy and selecting outliers using the MEBwO QP relaxation is trivial, but the difficulty lays in solving the initial QP relaxation, and as such a heuristic method which can solve this model quickly and return approximate solutions to each $xi_i$ is a valuable direction for further research in order to speed up this method.
-
-\begin{algorithm}[H]\label{relaxation heuristic}
-    \SetAlgoLined
-    \KwIn{Data set $\A=\left\{a^1,\ldots,a^n\right\}$, percentage of data to be covered $\eta\in[0,1]$, error tolerance for MEB heuristic $\epsilon>0$, big $M$ parameter $M>0$}
-    \KwOut{Ball $B(c,r)$}
-     $\xi=\left[\xi_1,\ldots,\xi_n\right]$ the relaxed binary variables returned by relaxed MEBwO solver for $\A$, $\eta$, and $M$\;
-     Let $\xi'$ be the smallest $k=\floor{\eta\cdot n}$ elements of $\xi$\;
-     Let $\A':=\left\{a^i\in\A: \xi_i\in\xi',\ i=1,\ldots,n\right\}$\;
-     Let $c,r$ be the center and radius of $\MEB(\A')$ returned by heuristic\;
-     \KwRet $B(c, r)$\;
-     
-    \caption{Relaxation-Based Heuristic}
-\end{algorithm}
-
-\subsection{Shenmaier's Approximation}
+\subsection{Average Point Heuristic}
 \subsubsection{Statement}
-This approximation scheme developed by Vladimir Shenmaier in \cite[Algorithm 1]{SHENMAIER201581} is a brute-force algorithm to solving the MEBwO problem with $O(n^2d)$ time complexity. It works by considering each point in the input set, finding the $k$-closest points to that point, then returning the point-distance pair such that the maximum distance from each point to each other point in its $k$-closest points is minimised. See Algorithm \ref{shenmaier} for a detailed outline of this algorithm.
-\begin{algorithm}
+The Average Point Heuristic (APH) works by finding the average point, i.e. $c=\frac{1}{n}\sum_{i=1}^n a^i$, then finding the $n-k$ closest points and returning the ball $B(c,r)$ where $r$ is the greatest distance from $c$ to each of the $n-k$ points.
+
+\begin{algorithm}[H]\label{avg point shrink}
+    \SetAlgoLined
     \KwIn{Data set $\A$, $\eta\in[0,1]$}
     \KwOut{Ball $B(c,r)$}
-    $k=\floor{n(1-\eta)}$\;
-    \For{$i=1,\ldots,n$}{
-        $D:=\left\{\norm{a^i-a}: a\in\A\right\}$\;
-        Let $D'$ be $D$ sorted in ascending order\;
-        Let $\delta_i$ be the $(k-1)$th element of $D'$ (indexing from 0)\;
-    }
-    $i^* := \arg\min_{i=1,\ldots,n}\delta_i$\;
-    $c := a^{i^*}$\;
-    $r := \delta_{i^*}$\;
-    \KwRet{$B(c,r)$}\;
+    $k:=\floor{n(1-\eta)}$\;
+    $c:=\frac{1}{n}\sum_{i=1}^na^i$\;
+    $D:=\left\{\norm{c-x}: x\in\A\right\}$\;
+    Let $D'$ be $D$ sorted in ascending order\;
+    Let $\delta$ be the $(k-1)$th element of $D'$ (indexing from 0)\;
+    $r = \max_{a\in\A'}\norm{c-a}$\;
+    \KwRet{$B(c,r)$}
     
-    \caption{Shenmaier's Approximation \cite[Algorithm 1]{SHENMAIER201581}}
-    \label{shenmaier}
+    \caption{Average Point Shrinking Heuristic}
 \end{algorithm}
-\subsubsection{Approximation Guarantee} %TODO: could make this a theorem
- From \cite[Theorem 4]{SHENMAIER201581} we know that Algorithm \ref{shenmaier} returns a 2-approximation solution to the MEBwO problem. What this means is that if we have a minimum radius of $r$ returned by Algorithm \ref{shenmaier} for a data set $\A$, then the true optimal value to the MEBwO problem on that data is no less than $r/2$. This is useful for assessing how close a heuristic is to an optimal solution in the worst case when we have a solution via Algorithm \ref{shenmaier}, but not an optimal solution via solving the exact model.
 
 \subsubsection{Complexity}
-Referring to Algorithm \ref{shenmaier}, on line 1 we have an assignment which runs in $O(1)$ time. On lines 2 through 5 we have a \texttt{for} loop which runs $n$ many times, and on line 3 we compute a list of $n$ many distances, which for $d$-dimensional vectors runs in $O(nd)$ time. Line 4 involves sorting the aforementioned list, so the time complexity depends on the sorting algorithm used. It is well known within computer science that algorithms are often subject to a time-memory trade off, meaning that it is possible to design algorithms that run faster as a result of using less memory, and vice-versa. We can then assume that a sensible implementation of Algorithm \ref{shenmaier} would use the fastest available sorting algorithm given that the size of our data sets are small enough that we do not run into memory constraints, so the recommended sorting algorithm is Quicksort \cite{hoare1962quicksort} which runs on average in $O(n\log n)$ time. Line 5 simply accesses the $(k-1)$th element of the sorted list and so runs in $O(1)$ time.
-
-Line 6 finds the minimum element from a set of values and runs in $O(n)$ time. Lines 7 and 8 are simple assignments and run in $O(1)$ time. Finally, our overall time complexity is then $O(n^2(d+\log n))$. This will usually reduce to $O(n^2d)$ as typically $d>\log n$, though for particularly large $n$ and very small $d$ the alternative reduction of $O(n^2\log n)$ is of course possible.
+This algorithm runs extremely quickly, with the dominating term in the time complexity being $O(nd\log n)$ on average as a result of sorting the list of distances on line 4. This is far faster than any other construction method and is more resistant to outliers than the MEB shrinking heuristic.
+%TODO: can order the algorithms in order of complexity
 
 \subsection{MEB Shrinking Heuristic}
 \subsubsection{Statement}
@@ -623,32 +600,60 @@ The MEB Shrinking Heuristic works by computing $\MEB(\A) = B(c,r)$, then simply 
 
 \subsubsection{Complexity}
 The complexity of this heuristic mostly depends on the choice of heuristic for solving the MEB problem on $\A$. The dominant term in lines 3 though 7 is on average $O(n\log n)$ from sorting the list of distances, so the overall complexity is the greater out of this and the complexity of the heuristic. Our implementation uses Algorithm \ref{core-set algorithm}, which in this case is $O\left(\frac{nd}{\epsilon}+\frac{d^2}{\epsilon^{3/2}}\left(\frac{1}{\epsilon}+d\right)\log\frac{1}{\epsilon}\right)$ \cite[Page 6]{core-sets}.
-\subsection{Average Point Heuristic}
-\subsubsection{Statement}
-The Average Point Heuristic (APH) works by finding the average point, i.e. $c=\frac{1}{n}\sum_{i=1}^n a^i$, then finding the $n-k$ closest points and returning the ball $B(c,r)$ where $r$ is the greatest distance from $c$ to each of the $n-k$ points.
 
-\begin{algorithm}[H]\label{avg point shrink}
+
+\subsection{Relaxation-Based Heuristic}
+\subsubsection{Statement}
+This heuristic works by first solving the relaxed QP formulation for the MEBwO problem in Definition \ref{mebwo}, and then making the assumption that a higher value of $\xi_i$ (i.e. closer to 1) means that the model treats the data point $a^i$ as ``more" of an outlier. From this assumption, we pick the largest $k$ values of $xi_i$ and treat each corresponding $a^i$ as an outlier, therefore treating the remaining data as inliers. We then solve the MEB problem for this remaining data. A more formal outline of this algorithm is detailed in Algorithm \ref{relaxation heuristic}.
+
+This method will always return a feasible solution that covers $\eta\%$ of the data as we will always remove $k=\floor{n(1-\eta)}$ many points. As discussed in the previous chapter, solving the final MEB problem is relatively easy and selecting outliers using the MEBwO QP relaxation is trivial, but the difficulty lays in solving the initial QP relaxation, and as such a heuristic method which can solve this model quickly and return approximate solutions to each $xi_i$ is a valuable direction for further research in order to speed up this method.
+
+\begin{algorithm}[H]\label{relaxation heuristic}
     \SetAlgoLined
+    \KwIn{Data set $\A=\left\{a^1,\ldots,a^n\right\}$, percentage of data to be covered $\eta\in[0,1]$, error tolerance for MEB heuristic $\epsilon>0$, big $M$ parameter $M>0$}
+    \KwOut{Ball $B(c,r)$}
+     $\xi=\left[\xi_1,\ldots,\xi_n\right]$ the relaxed binary variables returned by relaxed MEBwO solver for $\A$, $\eta$, and $M$\;
+     Let $\xi'$ be the smallest $k=\floor{\eta\cdot n}$ elements of $\xi$\;
+     Let $\A':=\left\{a^i\in\A: \xi_i\in\xi',\ i=1,\ldots,n\right\}$\;
+     Let $c,r$ be the center and radius of $\MEB(\A')$ returned by heuristic\;
+     \KwRet $B(c, r)$\;
+     
+    \caption{Relaxation-Based Heuristic}
+\end{algorithm}
+\subsubsection{Complexity}
+The complexity of this heuristic is difficult to determine as the relaxed model must be solved by an optimization solver. Typically, and in our case, these solvers make use of interior point methods which are able to reach an optimal solution in polynomial time. We will benchmark this algorithm in Section \ref{sec:benchmark_constr} to gain some insight into how the runtime scales as the problem size varies.
+
+\subsection{Shenmaier's Approximation}
+\subsubsection{Statement}
+This approximation scheme developed by Vladimir Shenmaier in \cite[Algorithm 1]{SHENMAIER201581} is a brute-force algorithm to solving the MEBwO problem with $O(n^2d)$ time complexity. It works by considering each point in the input set, finding the $k$-closest points to that point, then returning the point-distance pair such that the maximum distance from each point to each other point in its $k$-closest points is minimised. See Algorithm \ref{shenmaier} for a detailed outline of this algorithm.
+\begin{algorithm}
     \KwIn{Data set $\A$, $\eta\in[0,1]$}
     \KwOut{Ball $B(c,r)$}
-    $k:=\floor{n(1-\eta)}$\;
-    $c:=\frac{1}{n}\sum_{i=1}^na^i$\;
-    $D:=\left\{\norm{c-x}: x\in\A\right\}$\;
-    Let $D'$ be $D$ sorted in ascending order\;
-    Let $\delta$ be the $(k-1)$th element of $D'$ (indexing from 0)\;
-    $r = \max_{a\in\A'}\norm{c-a}$\;
-    \KwRet{$B(c,r)$}
+    $k=\floor{n(1-\eta)}$\;
+    \For{$i=1,\ldots,n$}{
+        $D:=\left\{\norm{a^i-a}: a\in\A\right\}$\;
+        Let $D'$ be $D$ sorted in ascending order\;
+        Let $\delta_i$ be the $(k-1)$th element of $D'$ (indexing from 0)\;
+    }
+    $i^* := \arg\min_{i=1,\ldots,n}\delta_i$\;
+    $c := a^{i^*}$\;
+    $r := \delta_{i^*}$\;
+    \KwRet{$B(c,r)$}\;
     
-    \caption{Average Point Shrinking Heuristic}
+    \caption{Shenmaier's Approximation \cite[Algorithm 1]{SHENMAIER201581}}
+    \label{shenmaier}
 \end{algorithm}
+\subsubsection{Approximation Guarantee}
+ From \cite[Theorem 4]{SHENMAIER201581} we know that Algorithm \ref{shenmaier} returns a 2-approximation solution to the MEBwO problem. What this means is that if we have a minimum radius of $r$ returned by Algorithm \ref{shenmaier} for a data set $\A$, then the true optimal value to the MEBwO problem on that data is no less than $r/2$. This is useful for assessing how close a heuristic is to an optimal solution in the worst case when we have a solution via Algorithm \ref{shenmaier}, but not an optimal solution via solving the exact model.
 
 \subsubsection{Complexity}
-This algorithm runs extremely quickly, with the dominating term in the time complexity being $O(nd\log n)$ on average as a result of sorting the list of distances on line 4, so when . TODO: what is this This is far faster than any other construction method and is more resistant to outliers than the MEB shrinking heuristic.
-%TODO: can order the algorithms in order of complexity
+Referring to Algorithm \ref{shenmaier}, on line 1 we have an assignment which runs in $O(1)$ time. On lines 2 through 5 we have a \texttt{for} loop which runs $n$ many times, and on line 3 we compute a list of $n$ many distances, which for $d$-dimensional vectors runs in $O(nd)$ time. Line 4 involves sorting the aforementioned list, so the time complexity depends on the sorting algorithm used. It is well known within computer science that algorithms are often subject to a time-memory trade off, meaning that it is possible to design algorithms that run faster as a result of using less memory, and vice-versa. We can then assume that a sensible implementation of Algorithm \ref{shenmaier} would use the fastest available sorting algorithm given that the size of our data sets are small enough that we do not run into memory constraints, so the recommended sorting algorithm is Quicksort \cite{hoare1962quicksort} which runs on average in $O(n\log n)$ time. Line 5 simply accesses the $(k-1)$th element of the sorted list and so runs in $O(1)$ time.
 
-%TODO: talk about how improvement heuristics can be used after each heuristic except the relaxation-based heuristic since it finds and MEB so minimum
+Line 6 finds the minimum element from a set of values and runs in $O(n)$ time. Lines 7 and 8 are simple assignments and run in $O(1)$ time. Finally, our overall time complexity is then $O(n^2(d+\log n))$. This will usually reduce to $O(n^2d)$ as typically $d>\log n$, though for particularly large $n$ and very small $d$ the alternative reduction of $O(n^2\log n)$ is of course possible.
+
+
 \section{Improvement Heuristics}\label{sec:improvement_heuristics}
-We now consider some improvement heuristics. The two heuristics described here are, strictly speaking, designed to improve an existing MEB rather than an MEBwO. However, quick and effective methods exist for solving the MEB problem and so improvement heuristics have not been needed, while heuristics which solve the MEBwO problem may return a solution which has considerable space for improvement. %TODO: not talking about MEB
+We now consider some improvement heuristics. The two heuristics described here are, strictly speaking, designed to improve an existing ball without considering outliers. Quick and effective methods exist for solving the MEB problem and so improvement heuristics have not been needed thus far, while heuristics which heuristically solve the MEBwO problem may return a solution which has considerable space for improvement. These improvement heuristics may be used after a method which attempts to solve the MEBwO problem where the initial solution is not an MEB, since if we do have an MEB that ball is by definition the minimum radius ball which may be fit to the given subset of data. So, in our implementation, we may use improvement heuristics after the average point heuristic, MEB shrinking heuristic, and Shenmaier's approximation since these methods do not necessarily return an MEB.
 
 The two improvement heuristics work in a similar way, by considering an improving direction in which moving the centre of the MEB in that direction while keeping the same radius retains a feasible solution, then shrinking the radius to the furthest point from the new centre. The Direction-Constrained Single Step Heuristic (DCSSH) works by pure geometric reasoning to find a new centre, while the Direction-Constrained MEB (DCMEB) uses an optimization solver such as Gurobi to find an optimal step in the improving direction to minimize the radius of the new ball.
 
@@ -1038,28 +1043,28 @@ We generate a large data set ($1000\times100000$) of random normal variates, fro
     \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \includegraphics[width=\textwidth]{exact_benchmarks/func_n_d10_eta0p9_normal.png}
-        \caption{By $n$}
+        \caption{By $n$ ($d=10$, $\eta=0.9$)}
         \label{fig:exact_benchmarks_n}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \includegraphics[width=\textwidth]{exact_benchmarks/func_d_n300_eta0p9_normal.png}
-        \caption{By $d$}
+        \caption{By $d$ ($n=300$, $\eta=0.9$)}
         \label{fig:exact_benchmarks_d}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \includegraphics[width=\textwidth]{exact_benchmarks/func_eta_n300_d10_normal.png}
-        \caption{By $\eta$}
+        \caption{By $\eta$ $(n=300$, $d=10$)}
         \label{fig:exact_benchmarks_eta}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \includegraphics[width=\textwidth]{exact_benchmarks/func_M_n300_d10_eta0p9_normal.png}
-        \caption{By $M$}
+        \caption{By $M$ ($n=300$, $d=10$, $eta=0.9$)}
         \label{fig:exact_benchmarks_M}
     \end{subfigure}
     \caption{Runtimes for the Exact Model on Normal Data}
@@ -1073,7 +1078,7 @@ Figure \ref{fig:exact_benchmarks_eta} also produces strange results, as we would
 Figure \ref{fig:exact_benchmarks_M} shows exactly what we expect, which is increasing runtime as $M$ increases beyond what is necessary. This provides justification for some sort of optimized approach to calculating a lower bound as we have done in order to reduce run times as discussed in Section \ref{sec:M}.
 
 
-\section{Construction Methods}
+\section{Construction Methods}\label{sec:benchmark_constr}
 \subsection{Methodology}
 To benchmark our construction methods we take a similar approach to that of benchmarking the exact model. We generate separate data sets of each type for a given set of parameters, so that each method is benchmarked on exactly the same data sets.
 
@@ -1130,14 +1135,14 @@ In each instance we solve, we record the initial radius returned by Shenmaier's 
     \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \includegraphics[width=\textwidth]{images/dcmeb_benchmarks/func_n_d100_eta0p9_uniform_ball_with_outliers.png}
-        \caption{By $n$}
+        \caption{By $n$ ($d=100$)}
         \label{fig:dcmeb_plot_n}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.475\textwidth}
         \centering
         \includegraphics[width=\textwidth]{images/dcmeb_benchmarks/func_d_n1000_eta0p9_uniform_ball_with_outliers.png}
-        \caption{By $d$}
+        \caption{By $d$ ($n=1000$)}
         \label{fig:dcmeb_plot_d}
     \end{subfigure}
     \caption{Runtimes for the DCMEB Model on each Data Type}
@@ -1175,7 +1180,7 @@ and $\text{TP}$, $\text{FP}$, and $\text{FN}$ are the number of true positives, 
 
 For each method and each parameter we solve the MEBwO problem for each digit and then report the average $F_1$ score across each digit. Due to the random sampling in constructing each instance we would prefer to report average performance for each digit across multiple instances, but due to time constraints this is not possible and we hope that averaging across each digit provides enough robustness to the issues associated with random sampling.
 
-The algorithm in \cite{huding} is compared against three outlier recognition methods, which are angle-based outlier detection (ABOD) \cite{abod}, one-class support vector machine (OCSVM) \cite{ocsvm}, and discriminative reconstructions in an auto-encoder (DRAE) \cite{drae}. See \cite{huding} for further details. We provide an extension to Table 2 of this paper, referring to their algorithm as HDMY. The total time reported is the total running time for each value of $\eta$ and we assume this is averaged over each of their 20 instances. It should be noted that the time for sampling is included in the runtimes in their paper, which we do not do, but in our experiments we find this takes at most a few seconds so the effect on the results is negligible considering the total runtime for each algorithm is reported on the order of hours. %TODO: different computer too
+The algorithm in \cite{huding} is compared against three outlier recognition methods, which are angle-based outlier detection (ABOD) \cite{abod}, one-class support vector machine (OCSVM) \cite{ocsvm}, and discriminative reconstructions in an auto-encoder (DRAE) \cite{drae}. See \cite{huding} for further details. We provide an extension to Table 2 of this paper, referring to their algorithm as HDMY. The total time reported is the total running time for each value of $\eta$ and we assume this is averaged over each of their 20 instances. It should be noted that the time for sampling is included in the runtimes in their paper, which we do not do, but in our experiments we find this takes at most a few seconds so the effect on the results is negligible considering the total runtime for each algorithm is reported on the order of hours. Additionally, a different computer is used to compute these results and this an unavoidable (bar buying a new machine) limiting factor on the comparisons we may draw.
 %TODO: legend blocks plot in 5.2.1a
 We present our results in tabular form as in \cite{huding} but also provide the results as a plot for the reader's enjoyment. It should be noted that HDMY and each of our algorithms are all MEBwO models and we are comparing the effectiveness and runtime of each algorithm used to create the MEBwO. Unfortunately Gurobi was unable to solve the relaxed model required for the relaxation-based heuristic, reaching the memory limit on our machine (16GB) before the model could be instantiated.
 
