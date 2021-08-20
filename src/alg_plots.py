@@ -73,59 +73,63 @@ xlabels = {
 
 for data_type in data_types:
     for param in params:
-        # construct filename
-        filename = "func_{0}_{1}".format(param, fixed_params[param])
-        if param != "eta":
-            filename += "_eta0p9"
-        filename += "_{}".format(data_type)
+        if data_type == "normal" and param == "n":
+            # construct filename
+            filename = "func_{0}_{1}".format(param, fixed_params[param])
+            if param != "eta":
+                filename += "_eta0p9"
+            filename += "_{}".format(data_type)
 
-        # get times from log
-        times_dict = {heuristic: benchmarking.utils.get_times_from_log(r"benchmarks/{0}/{1}/{2}.log".format(heuristic, data_type, filename)) for heuristic in heuristics}
-        results_dict = {heuristic: benchmarking.utils.get_r_from_log(r"benchmarks/{0}/{1}/{2}.log".format(heuristic, data_type, filename)) for heuristic in heuristics}
+            # get times from log
+            times_dict = {heuristic: benchmarking.utils.get_times_from_log(r"benchmarks/{0}/{1}/{2}.log".format(heuristic, data_type, filename)) for heuristic in heuristics}
+            results_dict = {heuristic: benchmarking.utils.get_r_from_log(r"benchmarks/{0}/{1}/{2}.log".format(heuristic, data_type, filename)) for heuristic in heuristics}
 
-        # === times
-        
-        plt.figure()
-        plt.xlabel(xlabels[param])
-        plt.ylabel("Time (s)")
+            # === times
+            
+            plt.figure()
+            plt.xlabel(xlabels[param])
+            plt.ylabel("Time (s)")
 
-        for heuristic, times in times_dict.items():
-            if heuristic != "shrink_avg":
+            for heuristic, times in times_dict.items():
+                if heuristic != "shrink_avg":
+                    if heuristic == "shenmaier" and param == "n":
+                        x_axis = [1000 + 3000*i for i in range(8)]
+                    elif heuristic == "relaxation_heuristic" and data_type == "uniform_ball_with_outliers" and param == "d":
+                        x_axis = [10 + 10*i for i in range(8)]
+                    else:
+                        x_axis = axes[param]
+
+                    plt.plot(x_axis, times, marker=markers_funcs[heuristic], color=colours_funcs[heuristic], linestyle=":", label=labels_funcs[heuristic])
+                
+            if data_type == "normal" and param == "eta":
+                plt.legend(loc="best", bbox_to_anchor=(0.5,0.,0.5,0.5))
+            else:
+                plt.legend()
+
+            plt.savefig("images/alg_benchmarks/by_data/{}".format(filename), bbox_inches="tight")
+            plt.close()
+            
+            # === results
+            plt.figure()
+            plt.xlabel(xlabels[param])
+            plt.ylabel("Radius")
+
+            for heuristic, results in results_dict.items():
                 if heuristic == "shenmaier" and param == "n":
                     x_axis = [1000 + 3000*i for i in range(8)]
                 elif heuristic == "relaxation_heuristic" and data_type == "uniform_ball_with_outliers" and param == "d":
                     x_axis = [10 + 10*i for i in range(8)]
                 else:
                     x_axis = axes[param]
-
-                plt.plot(x_axis, times, marker=markers_funcs[heuristic], color=colours_funcs[heuristic], linestyle=":", label=labels_funcs[heuristic])
+                
+                plt.plot(x_axis, results, marker=markers_funcs[heuristic], color=colours_funcs[heuristic], linestyle=":", label=labels_funcs[heuristic])
             
-        if data_type == "normal" and param == "eta":
-            plt.legend(loc="best", bbox_to_anchor=(0.5,0.,0.5,0.5))
-        else:
-            plt.legend()
-
-        plt.savefig("images/alg_benchmarks/by_data/{}".format(filename), bbox_inches="tight")
-        plt.close()
-        
-        # === results
-        plt.figure()
-        plt.xlabel(xlabels[param])
-        plt.ylabel("Radius")
-
-        for heuristic, results in results_dict.items():
-            if heuristic == "shenmaier" and param == "n":
-                x_axis = [1000 + 3000*i for i in range(8)]
-            elif heuristic == "relaxation_heuristic" and data_type == "uniform_ball_with_outliers" and param == "d":
-                x_axis = [10 + 10*i for i in range(8)]
+            if data_type == "normal" and param == "n":
+                plt.legend(loc=2, bbox_to_anchor=(0,0.75))
             else:
-                x_axis = axes[param]
-            
-            plt.plot(x_axis, results, marker=markers_funcs[heuristic], color=colours_funcs[heuristic], linestyle=":", label=labels_funcs[heuristic])
-        
-        plt.legend()
-        plt.savefig("images/alg_benchmarks/by_data/{}_r".format(filename), bbox_inches="tight")
-        plt.close()
+                plt.legend()
+            plt.savefig("images/alg_benchmarks/by_data/{}_r".format(filename), bbox_inches="tight")
+            plt.close()
 
 
 for heuristic in heuristics:
