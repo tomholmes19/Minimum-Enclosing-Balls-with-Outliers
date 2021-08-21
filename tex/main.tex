@@ -576,7 +576,6 @@ The Average Point Heuristic (APH) works by finding the average point, i.e. $c=\f
 
 \subsubsection{Complexity}
 This algorithm runs extremely quickly, with the dominating term in the time complexity being $O(nd\log n)$ on average as a result of sorting the list of distances on line 4. This is far faster than any other construction method and is more resistant to outliers than the MEB shrinking heuristic.
-%TODO: can order the algorithms in order of complexity
 
 \subsection{MEB Shrinking Heuristic}
 \subsubsection{Statement}
@@ -1070,7 +1069,7 @@ We generate a large data set ($1000\times100000$) of random normal variates, fro
     \caption{Runtimes for the Exact Model on Normal Data}
     \label{fig:exact_benchmarks}
 \end{figure}
-% TODO: add more detail to captions (specify fixed parameters)
+
 In Figure \ref{fig:exact_benchmarks_n} and Figure \ref{fig:exact_benchmarks_d} we observe gradual increases in runtime as each parameter increases, until we see a sharp increase in runtime. This is what we expected due to the highly combinatorial nature of this problem, though we did not expect such a large and sudden change. One potential explanation to this is optimizations made by the Gurobi solver which make smaller instances quicker to solve, but eventually lose effedctiveness as problem size increases. These optimizations are how Gurobi Optimization make their money and are not publicly known so we are not able to comment on exactly how they achieve this.
 
 Figure \ref{fig:exact_benchmarks_eta} also produces strange results, as we would expect the maximum number of feasible solutions to be available when $\eta=0.5$, but the solver is actually able to solve these instances from 0.5 up to 0.7 extremely quickly. We observe spikes at $\eta=0.75$ and $\eta=0.9$, and again the exact behaviour we observe here is hard to explain due to the closed nature of the Gurobi solver.
@@ -1181,7 +1180,7 @@ and $\text{TP}$, $\text{FP}$, and $\text{FN}$ are the number of true positives, 
 For each method and each parameter we solve the MEBwO problem for each digit and then report the average $F_1$ score across each digit. Due to the random sampling in constructing each instance we would prefer to report average performance for each digit across multiple instances, but due to time constraints this is not possible and we hope that averaging across each digit provides enough robustness to the issues associated with random sampling.
 
 The algorithm in \cite{huding} is compared against three outlier recognition methods, which are angle-based outlier detection (ABOD) \cite{abod}, one-class support vector machine (OCSVM) \cite{ocsvm}, and discriminative reconstructions in an auto-encoder (DRAE) \cite{drae}. See \cite{huding} for further details. We provide an extension to Table 2 of this paper, referring to their algorithm as HDMY. The total time reported is the total running time for each value of $\eta$ and we assume this is averaged over each of their 20 instances. It should be noted that the time for sampling is included in the runtimes in their paper, which we do not do, but in our experiments we find this takes at most a few seconds so the effect on the results is negligible considering the total runtime for each algorithm is reported on the order of hours. Additionally, a different computer is used to compute these results and this an unavoidable (bar buying a new machine) limiting factor on the comparisons we may draw.
-%TODO: legend blocks plot in 5.2.1a
+
 We present our results in tabular form as in \cite{huding} but also provide the results as a plot for the reader's enjoyment. It should be noted that HDMY and each of our algorithms are all MEBwO models and we are comparing the effectiveness and runtime of each algorithm used to create the MEBwO. Unfortunately Gurobi was unable to solve the relaxed model required for the relaxation-based heuristic, reaching the memory limit on our machine (16GB) before the model could be instantiated.
 
 \subsection{Results}
