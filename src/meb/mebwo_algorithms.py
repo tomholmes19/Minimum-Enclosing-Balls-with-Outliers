@@ -14,8 +14,8 @@ def M_approx(data):
     M = sq_3*diam
     return M
 
-def alg__exact(data, eta, M, relax=False, time_limit=None, log_file=""):
-    c, r, xi, _  = gurobi_solvers.mebwo(data, eta, M, relax, time_limit, log_file)
+def alg__exact(data, eta, M, relax=False, time_limit=None, log_file="", outputflag=0):
+    c, r, xi, _  = gurobi_solvers.mebwo(data, eta, M, relax, time_limit, log_file, outputflag)
     return c, r, xi
 
 def alg__relaxation_heuristic(data, eta, M, eps=1e-4):
