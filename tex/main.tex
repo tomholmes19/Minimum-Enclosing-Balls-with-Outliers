@@ -288,9 +288,48 @@ Here come your acknowledgments ...
 %       Clustering
 %   
 %   Draw parallels and comparisons to Support Vector Machines
+
+% What
+The minimum enclosing ball with outliers problem is one that my be stated simply: given a set of numerical data, find the smallest ball which contains some percentage of that data (see Figure \ref{fig:mebwo}). Like many problems within mathematics however, a simple problem statement does not necessarily imply the existence of a simple solution. The minimum enclosing ball with outliers problem is an extension of the well-known minimum enclosing ball problem within computational geometric optimization, which is to totally enclose a set of data within a ball of minimum radius, and this is a well-studied problem with known methods to solve it quickly and efficiently. The difficulty when extending to the problem of that with outliers is in the choice of which points to exclude as outliers, which depending on the number of points to exclude leads to a combinatoral explosion of individual minimum encosing ball problems. Indeed, this problem is NP-hard and it is known that no fully polynomial-time approximation scheme exists in Euclidean space unless $\text{P}=\text{NP}$ \cite{SHENMAIER201581}.
+
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.6666\textwidth]{images/sample_mebwo.png}
+    \caption{Example of a MEBwO}
+    \label{fig:mebwo}
+\end{figure}
+
+% Why
+One may ask why should we concern ourselves with the minimum enclosing ball with outliers problem, considering the significant increase in difficulty when compared to the minimum enclosing ball problem. The reason is in the name of the problem: outliers can have a significant negative effect on the optimal solution of the minimum enclosing ball problem which reduces the effectiveness of a minimum enclosing ball in applications. Outliers can come from many sources, for example by human error in data entry or by measurement error due to a faulty sensor. The minimum enclosing ball with outliers problem is able to identify these outliers and return a more robust ball whose solution is closer to that of the ``true" data without outliers.
+
+There are many applications of the minimum enclosing ball with outliers problem. In two or three dimensions there are some obvious spatial applications, for example finding the optimal location of a service facility such as a shop such that the maximum distance from homes/businesses to the shop is minimized. A single building which is significantly further from the main cluster of buildings could have a significant effect on the location of the shop to the detriment of the majority of customers, so a minimum enclosing ball with outliers applied to this problem would be able to prioritize this majority. Beyond three dimensions we often turn to problems within data science and specifically machine learning.
+
+A ball may be used as a binary classification model, where points are labelled based on whether they are inside or outside the ball. This type of model is easy to interpret and requires very little information to construct it, only a radius and a $d$-dimensional vector. Ball classifiers are similar in concept to support-vector machines \cite{cortes1995support}, which aim to linearly divide a space into two regions and use this rule to determine labels, similar to how a ball may divide a space into two regions. A ball classifier may be used as an outlier recognition model, where points which lie outside the ball are considered to be outliers, and we will benchmark this application of the minimum enclosing ball with outliers problem in Section \ref{sec:outlier_recognition}.
+
+Another application of the minimum enclosing ball with outliers problem is to clustering, where if we have $n$ data points we may find the minimum enclosing ball with outliers which contains $k$ many points, then removing these points from the data set and repeating this process until all data is enclosed within a ball and labelled. An example of this application can be seen in Figure \ref{fig:clustering}, though in this paper we do not investigate the effectiveness of this method compared to other known clustering algorithms.
+
+\begin{figure}[ht]
+    \centering
+    \begin{subfigure}[b]{0.475\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/clustering/with_balls.png}
+        \caption{With Balls}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.475\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/clustering/no_balls.png}
+        \caption{Without Balls}
+    \end{subfigure}
+    \caption{MEBwO Clustering Example on Normal Data from $N(0,5)$}
+    \label{fig:clustering}
+\end{figure}
 \section{Outline}
 
-% Detail each chapter
+% How
+
+In Chapter \ref{exact}
 
 % =============================================================================
 % Chapter 2
@@ -533,7 +572,7 @@ We will now conduct a review of the current literature on the MEBwO problem.
 
 Early approaches were developed specifically for the $d=2$ case of finding the minimum enclosing circle with outliers. One such paper is \cite{AGGARWAL199138} which discusses computing Voronoi cells and then performing a search of the resulting Voronoi cells. \cite{efrat} makes use of a parametric search technique proposed by \cite{megiddo}, and \cite{MATOUSEK1995217} uses a randomized search algorithm. These papers all gave exact solutions to the MEBwO problem in the two-dimensional case, while \cite{harpeled} presents some approximate algorithms.
 
-Some more recent approaches are as follows. \cite{SHENMAIER201581} proves the NP-hardness of the MEBwO problem in Euclidean space (Theorem 1) and also that no fully polynomial time approximation scheme exists for the MEBwO problem unless $P=NP$ (Theorem 3). Shenmaier's paper also proposes two algorithms for solving the MEBwO problem in $\mathbb{R}^d$ which both have an approximation guarantee. We implement and benchmark Algorithm 1 in this paper which Shenmaier proves to give 2-approximate solutions, meaning we may get a lower bound on the optimal value of the MEBwO problem for a given data set. This algorithm works by computing the $k$-nearest points to each point in the data set and returning the smallest ball found. The second algorithm, not implemented in this paper, is an extension of the prior algorithm where a grid of candidate centres is constructed in a local neighbourhood of each point. This algorithm provides a tighter approximation guarantee but has significantly worse time complexity. Shenmaier also discusses the dual of the MEBwO problem, and the hardness of this dual is an interesting area of further research.
+Some more recent approaches are as follows. \cite{SHENMAIER201581} proves the NP-hardness of the MEBwO problem in Euclidean space (Theorem 1) and also that no fully polynomial time approximation scheme exists for the MEBwO problem unless $\text{P}=\text{NP}$ (Theorem 3). Shenmaier's paper also proposes two algorithms for solving the MEBwO problem in $\mathbb{R}^d$ which both have an approximation guarantee. We implement and benchmark Algorithm 1 in this paper which Shenmaier proves to give 2-approximate solutions, meaning we may get a lower bound on the optimal value of the MEBwO problem for a given data set. This algorithm works by computing the $k$-nearest points to each point in the data set and returning the smallest ball found. The second algorithm, not implemented in this paper, is an extension of the prior algorithm where a grid of candidate centres is constructed in a local neighbourhood of each point. This algorithm provides a tighter approximation guarantee but has significantly worse time complexity. Shenmaier also discusses the dual of the MEBwO problem, and the hardness of this dual is an interesting area of further research.
 
 \cite{cavaleiro} presents an algorithm built on branch-and-bound \cite{bnb} which orders the nodes of the tree in such a way that along with a first-in-first-out search strategy results in a small number of nodes explored. \cite{huding} also presents a branch-and-bound algorithm, this time using the idea of core-sets and a bi-criteria approximation with respect to both the radius and percentage of points covered. This paper also utilizes the algorithm as a classification model on the MNIST \cite{lecun2010mnist} data set (for further details please see Section \ref{data}).
 
