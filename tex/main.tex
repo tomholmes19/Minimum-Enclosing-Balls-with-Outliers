@@ -325,11 +325,23 @@ Another application of the minimum enclosing ball with outliers problem is to cl
     \caption{MEBwO Clustering Example on Normal Data from $N(0,5)$}
     \label{fig:clustering}
 \end{figure}
-\section{Outline}
 
 % How
 
-In Chapter \ref{exact}
+Fortunately, there are many heuristic and approximation methods which attempt to solve the minimum enclosing ball with outliers problem in a reasonable time. Many methods are already known in the literature, and in this paper we will investigate one of these known methods and propose three of our own of varying complexity.
+
+
+\section{Outline}
+
+In Chapter \ref{exact} we make some important definitions as well as discuss a few theorems and propositions. We explicity define the minimum enclosing ball and minimum enclosing ball with outliers problems as well as discuss the implications of the big-$M$ parameter within the optimization model formulation of the minimum enclosing ball with outliers problem. We close this chapter with a literature review of the historical and current progress on this problem.
+
+Chapter \ref{algorithms} is concerned with the statement and derivation of the heuristic and approximation methods we discuss within this paper, as well as their expected time complexities. First we present the construction methods which find a feasible solution to the minimum enclosing ball with outliers problem, and then we have the improvement heuristics which aim to improve an existing feasible solution. 
+
+We discuss our implementation of the algorithms and software used in this paper in Section \ref{implementation}, and we also present the data we use to solve the minimum enclosing ball with outliers problem for. We use a variety of randomly generated data sets as well as the widely known MNIST data set of hand-written digits \cite{lecun2010mnist}.
+
+In Chapter \ref{experiments} we benchmark both our construction methods and our improvement heuristics, the former by finding feasible solutions to the minimum enclosing ball with outliers problem and recording the runtime and feasible solution, and the latter by recording the improvement made to an initial feasible solution. We also investigate an application of our construction methods as an outlier recognition model using the MNIST data set.
+
+Finally in Chapter \ref{conclusion} we %TODO
 
 % =============================================================================
 % Chapter 2
@@ -385,7 +397,7 @@ In the interest of contextualizing Algorithm \ref{core-set algorithm}, we define
 \end{definition}
 Finally, the following two definitions allow us to formally define the MEBwO.
 \begin{definition}
-    For a set $\A$, the set of $k$-subsets of $\A$ is the set $\mathfrak{K}=\left\{\K\in\mathscr{P}(\A): |\K|=k\right\}$ where $\mathcal{P}(\A)$ is the usual power-set of $\A$.
+    For a set $\A$, the set of $k$-subsets of $\A$ is the set $\mathfrak{K}=\left\{\K\in\mathscr{P}(\A): |\K|=k\right\}$ where $\mathscr(\A)$ is the usual power-set of $\A$.
 \end{definition}
 
 \begin{definition}
@@ -936,7 +948,7 @@ The \texttt{data} package contains modules regarding the data used in this paper
 The \texttt{benchmarking} package contains the \texttt{trials.py} module which contains functions used for benchmarking, though the code in here is not very good from a software engineering perspective so I will neglect to detail it further. The other module in this package, \texttt{utils.py}, simply abstracts various functions away from \texttt{trials.py}.
 
 \section{Data}\label{data}
-In this section we present and discuss the types of data we will use for bench-marking our algorithms for solving the MEBwO problem. Functions written and used for this project can be found in the module \texttt{src/data/generation.py}.
+In this section we present and discuss the types of data we will use for bench-marking our algorithms for solving the MEBwO problem. Functions written and used for this paper can be found in the module \texttt{src/data/generation.py}.
 
 \subsubsection{On Random Number Generation}
 In order to generate our data, we must have some method of creating random numbers. To generate uniform random variates from the distribution $U(0,1)$, the method of linear congruential generators \cite{lcg1,lcg2} is well known within the literature, and provide us a computationally trivial way of generating pseudo-random uniform numbers.
@@ -1059,7 +1071,12 @@ In the interest of easy reproducability and an example of a real-life applicatio
 
 In order to make this data usable by our algorithms, we would like to express each image as a vector. To do this we may simply transform each pixel value (an integer in the range 0--255) to an element of a $784$-dimensional array, and this is easily achieved using the \texttt{np.ndarray.flatten} method from NumPy.
 
-\chapter{Experiments}
+
+% =============================================================================
+% Chapter 5
+% =============================================================================
+
+\chapter{Experiments}\label{experiments}
 In this chapter we present our experimental results from applying our algorithms to different types of data. For each class of benchmarks we first discuss the methodology used to gain results and then present and discuss those results.
 
 As discussed in Section \ref{sec:software} we implement our algorithms in Python 3.8. Results were obtained on a HP ENVY x360-15-dr0005na\footnote{\url{https://support.hp.com/gb-en/document/c06378310}} laptop running Ubuntu 20.04.2 LTS, with an Intel(R) Core(TM) i7 8565U  processor and 16GB DDR4-2400 SDRAM.
@@ -1252,9 +1269,11 @@ Each of our algorithms is able to outperform the ABOD model and all but the shri
 
 
 % =============================================================================
-% Chapter 5
+% Chapter 6
 % =============================================================================
-\chapter{Conclusion}
+\chapter{Conclusion}\label{conclusion}
+
+% TODO
 
 % =============================================================================
 %the entries have to be in the file literature.bib
