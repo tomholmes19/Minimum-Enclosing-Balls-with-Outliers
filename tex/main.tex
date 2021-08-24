@@ -210,6 +210,15 @@ MSc in Operational Research with Computational Optimization}\\
 % =============================================================================
 % Abstract, acknowledgments, and own work declaration
 % =============================================================================
+
+\vspace*{\fill}
+\begin{center}
+    For Mum
+\end{center}
+\vspace*{\fill}
+
+\clearpage
+
 \vspace*{10mm}
 \begin{center}
 \textbf{\huge{Abstract}}
@@ -227,7 +236,9 @@ The minimum enclosing ball with outliers problem is that of finding the ball wit
 \vspace*{20mm}
 
 %TODO
-Here come your acknowledgments ...
+My biggest thanks to my supervisor, Dr. E. Alper Yıldırım for his invaluable guidance during this dissertation. Without him, this paper would look very different. I would also like to thank Toby Yıldırım.
+
+Thank you to my family and all of my friends, both in Edinburgh and elsewhere, for their support over this very strange, challenging, but ultimately rewarding year. Thank you, Kevin and Benjamin, may our EP go platinum.
 
 \clearpage
 
@@ -757,7 +768,7 @@ Then let $x=\min\left\{Q(\alpha_i, \beta, \gamma):i=1,\ldots,n\right\}$, so $\no
         % ball
         \draw (0,0) circle (3);
     \end{tikzpicture}
-    \caption{Visual Aid for Direction-Constrained Single Step Heuristic}
+    \caption{Visual Aid for the Direction-Constrained Single Step Heuristic}
     \label{vis aid derivation}
 \end{figure}
 
@@ -851,7 +862,7 @@ This model has $n+1$ constraints and, most crucially, 2 decision variables. This
 \end{equation*}
 and as such, the DCMEB problem may be solved by interior-point methods \cite{socp_ipm}. The DCMEB heuristic is then to simply solve the DCMEB, given a data set $\A$ and initial ball $B(\hat{c},\hat{r}$, using the solutions of the solved DCMEB problem for the new ball.
 
-\begin{algorithm}[H]
+\begin{algorithm}
     \KwIn{Data set $\A$, Ball $B(\hat{c},\hat{r}$)}
     \KwOut{Ball $B(c,r)$}
     $\hat{a}:=\arg\max_{a\in\A}\norm{\hat{c}-a}$\;
@@ -876,7 +887,7 @@ and as such, the DCMEB problem may be solved by interior-point methods \cite{soc
         % ball
         \draw (0,0) circle (3);
     \end{tikzpicture}
-    \caption{Visual Aid for Derivation of the Direction-Constrained MEB}
+    \caption{Visual Aid for the Derivation of the Direction-Constrained MEB}
     \label{fig:dcmeb}
 \end{figure}
 
