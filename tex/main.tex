@@ -22,6 +22,8 @@
 
 \usepackage[nottoc,notlot,notlof]{tocbibind}
 
+\usepackage{float}
+
 %TC:ignore
 \newcolumntype{C}{>{$}c<{$}}    % math-mode version of "l" column type
 \newcolumntype{L}{>{$}l<{$}} 
@@ -62,7 +64,7 @@
 }
 
 \newcommand{\benchmarkfiguresix}[2]{
-    \begin{figure}[ht]
+    \begin{figure}[p]
         \centering
         \begin{subfigure}[b]{0.475\textwidth}
             \centering
@@ -110,24 +112,26 @@
     \end{figure}
 }
 
-\newcommand{\benchmarkfigure}[5]{
+\newcommand{\benchmarkfigure}[6]{
     \begin{figure}[ht]
         \centering
-        \begin{subfigure}[b]{0.475\textwidth}
+        \hspace*{\fill}
+        \begin{subfigure}[b]{#6\textwidth}
             \centering
             \includegraphics[width=\textwidth]{#1}
             \caption{By $n$ ($d=30$, $\eta=0.9$)}
             \label{#5_n}
         \end{subfigure}
         \hfill
-        \begin{subfigure}[b]{0.475\textwidth}
+        \begin{subfigure}[b]{#6\textwidth}
             \centering
             \includegraphics[width=\textwidth]{#2}
             \caption{By $d$ ($n=10000$, $\eta=0.9$)}
             \label{#5_d}
         \end{subfigure}
+        \hspace*{\fill}
         
-        \begin{subfigure}[b]{0.475\textwidth}
+        \begin{subfigure}[b]{#6\textwidth}
             \centering
             \includegraphics[width=\textwidth]{#3}
             \caption{By $\eta$ ($n=10000$, $d=30$)}
@@ -139,7 +143,7 @@
 }
 
 \newcommand{\benchmarkfigurebyfunc}[3]{
-    \benchmarkfigure{alg_benchmarks/by_func/#1_func_n_d30_eta0p9.png}{alg_benchmarks/by_func/#1_func_d_n10000_eta0p9.png}{alg_benchmarks/by_func/#1_func_eta_n10000_d30.png}{#2}{#3}
+    \benchmarkfigure{alg_benchmarks/by_func/#1_func_n_d30_eta0p9.png}{alg_benchmarks/by_func/#1_func_d_n10000_eta0p9.png}{alg_benchmarks/by_func/#1_func_eta_n10000_d30.png}{#2}{#3}{0.4075}
 }
 
 
@@ -226,7 +230,7 @@ MSc in Operational Research with Computational Optimization}\\
 \vspace*{20mm}
 
 
-The minimum enclosing ball with outliers problem is that of finding the ball with the smallest radius that covers at least $\eta\%$ of $n$ many points in $\mathbb{R}^d$. Solving this model optimally is incredibly computationally difficult and in fact this problem is known to be NP-hard, and as such in this paper we investigate heuristic and approximate methods which aim to provide a feasible solution to this problem in a reasonable time, as well as develop improvement heuristics which improve an existing feasible but sub-optimal solution. To ascertain the effectiveness of each method, we run computational experiments on a variety of randomly generated data while varying each parameter of the problem. We also test the application of this problem to finding a binary classifier which we use as an outlier recognition model on the MNIST data set of hand-written digits, comparing the performance of balls found by our methods with a previously known construction method, as well as with some other baseline algorithms commonly used for outlier recognition.
+The minimum enclosing ball with outliers problem is that of finding the ball with the smallest radius that covers at least $\eta\%$ of $n$ many points in $\mathbb{R}^d$. Solving this model optimally is incredibly computationally difficult and in fact this problem is known to be NP-hard, and as such in this paper we investigate heuristic and approximate methods which aim to provide a feasible solution to this problem in a reasonable time, as well as develop improvement heuristics which improve an existing feasible but sub-optimal solution. To ascertain the effectiveness of each method, we run computational experiments on a variety of randomly generated data while varying each parameter of the problem. We also test the application of this problem to finding a binary classifier which we use as an outlier recognition model on the MNIST data set of hand-written digits, comparing the performance of balls found by our methods with a previously known construction method, as well as with some other baseline algorithms commonly used for outlier recognition. An implementation of our work is publicly available on GitHub.
 
 \clearpage
 \vspace*{10mm}
@@ -343,7 +347,7 @@ Another application of the minimum enclosing ball with outliers problem is to cl
 
 % How
 
-Fortunately, there are many heuristic and approximation methods which attempt to solve the minimum enclosing ball with outliers problem in a reasonable time. Many methods are already known in the literature, and in this paper we will investigate one of these known methods and propose three of our own of varying complexity.
+Fortunately, there are many heuristic and approximation methods which attempt to solve the minimum enclosing ball with outliers problem in a reasonable time. Many methods are already known in the literature, and in this paper we will investigate one of these known methods and propose three of our own of varying complexity. An implementation of our work is available on GitHub\footnote{\url{https://github.com/tomholmes19/Minimum-Enclosing-Balls-with-Outliers} \cite{Holmes_Minimum_Enclosing_Balls_2021}} and we discuss this implementation further in Section \ref{sec:impl_python}.
 
 
 \section{Outline}
@@ -363,7 +367,7 @@ Finally, in Chapter \ref{conclusion} we make our conclusions and provide recomme
 % =============================================================================
 \chapter{Problem Definition and Literature Review}\label{exact}
 \section{Preliminaries}
-In this paper, we shall denote our data set of finite vectors as $\mathcal{A} = \left\{a^1,\ldots,a^n\right\}\subseteq\mathbb{R}^d$ for $n,d\in\mathbb{N}$. The centre of a ball is represented by a vector $c\in\mathbb{R}^d$, the radius a scalar $r\in\mathbb{R}$, and the squared radius $\gamma=r^2$. We denote the percentage of inliers for a minimum enclosing ball with outliers (MEBwO) by $\eta\in(0,1]$, i.e. if $\eta=0.9$ then we seek a ball which covers $90\%$ of our data. While it may be easier for us to think practically of the MEBwO as covering $\eta\%$ of our data, it is easier mathematically to consider a MEBwO which covers $n-k$ out of $n$ data points, where $k=\floor{n(1-\eta)}$ is the number of outliers.
+In this paper, we shall denote our data set of finite vectors as $\mathcal{A} = \left\{a^1,\ldots,a^n\right\}\subseteq\mathbb{R}^d$ for $n,d\in\mathbb{N}$. The centre of a ball is represented by a vector $c\in\mathbb{R}^d$, the radius a scalar $r\in\mathbb{R}$, and the squared radius $\gamma=r^2$. We denote the percentage of inliers for a minimum enclosing ball with outliers (MEBwO) by $\eta\in(0,1]$, i.e. if $\eta=0.9$ then we seek a ball which covers $90\%$ of our data. We will write $\eta\%$ to mean 90\% rather than 0.9\% in this case. While it may be easier for us to think practically of the MEBwO as covering $\eta\%$ of our data, it is easier mathematically to consider a MEBwO which covers $n-k$ out of $n$ data points, where $k=\floor{n(1-\eta)}$ is the number of outliers.
 
 We would now like to make some formal definitions.
 
@@ -527,7 +531,7 @@ Algorithm \ref{core-set algorithm} runs in $O\left(\frac{nd}{\epsilon}+\frac{d^2
     
     where $\xi_i$ are binary variables corresponding to the distance constraint on each variable, with $M\in\mathbb{R}$ a sufficiently large scalar. One can interpret this as, if $\xi_i=1$ for some $i\in\left\{1,\ldots,n\right\}$, then $a_i$ does not need to be inside the ball. The constraint $\sum_{i=1}^n\xi_i\leq k$ where $k=\floor{n(1-\eta)}$ ensures that $\eta\%$ of the data is covered.
     
-    We can instead extend the QCQP in Definition \ref{meb} to get the following mixed integer QCQP (MIQCQP) formulation:
+    We can instead extend the QCQP in Definition \ref{meb} to get the following mixed-integer QCQP (MIQCQP) formulation:
     \begin{center}
         \begin{tabular}{CLC}
             \displaystyle\min_{c,\gamma, \xi} & \gamma \\
@@ -545,7 +549,7 @@ This model gives us a way to solve the MEBwO problem optimally for a given data 
 
 
 \subsection{On the Big-M Parameter}\label{sec:M}
-The ``big $M$ constraint" in Definition \ref{mebwo} is a commonly known technique within Operational Research, and an important question is that of what $M$ do we choose? A sufficiently large $M$ is required such that when the corresponding binary variable is equal to $1$, the constraint is effectively nullified. But, as we will see within this section, a value of $M$ which is too large will lead to a longer solution time with worse solutions.
+The ``big-$M$ constraint" in Definition \ref{mebwo} is a commonly known technique within Operational Research, and an important question is that of what $M$ do we choose? A sufficiently large $M$ is required such that when the corresponding binary variable is equal to $1$, the constraint is effectively nullified. But, as we will see within this section, a value of $M$ which is too large will lead to a longer solution time with worse solutions.
 
 \subsubsection{An Upper Bound on $M$}
 Finding a suitable value of $M$ depends heavily on the nature of the problem the constraint is being applied to. For the minimum enclosing ball with outliers problem, where we are concerned with the distances $\norm{c-a^i}$ being less than the radius $r$, we look to add a value to $r$ such that for any reasonable $c$, this constraint is always satisfied. Thus, a candidate upper bound for $M$ may be found by calculating each pairwise distance within the data and recording the largest distance. Formally, this may be written as $M:= \max\left\{\norm{a^i-a^j}: i,j = 1,\ldots,n, i\neq j\right\}$.
@@ -583,7 +587,7 @@ One concern with our choice of $M$ is the effect on the solution time of the sol
 \subsubsection{Quality of $\xi_i$ Solutions in the QCQP Relaxation}
 Another concern regarding the value of $M$ for the exact model is the effect on the optimal solutions for the relaxed $\xi_i$ variables in the QCQP relaxation. This is important as good quality relaxed solutions are essential to Algorithm \ref{relaxation heuristic}, which uses high-valued $\xi_i$ as a proxy for how far a data point lies from the optimal centre, and so for how much of an outlier that point is.
 
-We can evaluate the quality and diversity of relaxed solutions by solving the relaxed model on the same data set with different values of $M$. We generate random data sets (see Section \ref{data}) with $n=1000$, $d=10$, and the standard parameters described in Section \ref{data}, then calculate a lower bound for $M^*$ using Algorithm \ref{alg:diameter approx} for each data set, then solve the model for a sequence of multiples of $M^*$ and record the variance of the list of relaxed solutions. We choose to test 50 different values of $M$ in the sequence $\langle M^*(1+k/2)\rangle _{k=1,\ldots,50}$. The implementation can be found in \texttt{src/xi\_analysis.py} and a plot of the variances can be seen in Figure \ref{fig:xi analysis}.
+We can evaluate the quality and diversity of relaxed solutions by solving the relaxed model on the same data set with different values of $M$. We generate random data sets (see Section \ref{data}) with $n=1000$, $d=10$, and the standard parameters described in Section \ref{data}, then calculate a lower bound for $M^*$ using Algorithm \ref{alg:diameter approx} for each data set, then solve the model for a sequence of multiples of $M^*$ and record the variance of the list of relaxed solutions. We choose to test 50 different values of $M$ in the sequence $\langle M^*(1+k/2)\rangle _{k=1,\ldots,50}$. The implementation can be found in \texttt{src/xi\_analysis.py} (see Section \ref{sec:impl_python}) and a plot of the variances can be seen in Figure \ref{fig:xi analysis}.
 
 \begin{figure}
     \centering
@@ -592,7 +596,7 @@ We can evaluate the quality and diversity of relaxed solutions by solving the re
     \label{fig:xi analysis}
 \end{figure}
 
-We can see in Figure \ref{fig:xi analysis} that, for each data set, the variance of the relaxed solutions for $xi_i$ decreases sharply as $M$ increases and tends to zero. Interestingly, there is actually a slight increase in variance at first for the normal data, but like the rest this does still tend to zero.
+We can see in Figure \ref{fig:xi analysis} that, for each data set, the variance of the relaxed solutions for $\xi_i$ decreases sharply as $M$ increases and tends to zero. Interestingly, there is actually a slight increase in variance at first for the normal data, but like the rest this does still tend to zero.
 
 \section{Literature Review}\label{lit review}
 We will now conduct a review of the current literature on the MEBwO problem.
@@ -623,7 +627,7 @@ In this chapter we propose some non-exact construction methods to solving the ME
 \section{Construction Methods}
 \subsection{Average Point Heuristic}
 \subsubsection{Statement}
-The Average Point Heuristic (APH) works by finding the average point, i.e. $c=\frac{1}{n}\sum_{i=1}^n a^i$, then finding the $n-k$ closest points and returning the ball $B(c,r)$ where $r$ is the greatest distance from $c$ to each of the $n-k$ points.
+The Average Point Heuristic (APH) works by finding the average point, i.e. $c=\frac{1}{n}\sum_{i=1}^n a^i$, then finding the $k$ closest points and returning the ball $B(c,r)$ where $r$ is the greatest distance from $c$ to each of the $k$ points.
 
 \begin{algorithm}[H]\label{avg point shrink}
     \SetAlgoLined
@@ -633,7 +637,8 @@ The Average Point Heuristic (APH) works by finding the average point, i.e. $c=\f
     $c:=\frac{1}{n}\sum_{i=1}^na^i$\;
     $D:=\left\{\norm{c-x}: x\in\A\right\}$\;
     Let $D'$ be $D$ sorted in ascending order\;
-    Let $\delta$ be the $(k-1)$th element of $D'$ (indexing from 0)\;
+    Let $\delta=D[k-1]$ be the $(k-1)$th element of $D'$ (indexing from 0)\;
+    $\A' = \left\{a^i\in\A: D[i] \leq \delta, i=1,\ldots,n\right\}$\;
     $r = \max_{a\in\A'}\norm{c-a}$\;
     \KwRet{$B(c,r)$}
     
@@ -645,7 +650,7 @@ This algorithm runs extremely quickly, with the dominating term in the time comp
 
 \subsection{MEB Shrinking Heuristic}
 \subsubsection{Statement}
-The MEB Shrinking Heuristic works by computing $\MEB(\A) = B(c,r)$, then simply shrinking the radius until $\eta\%$ of points are covered. This is done by calculating the $n-k$ closest points to $c$ and returning the ball $B(c,r')$ where $r'$ is the greatest distance from $c$ to each of the $n-k$ points.
+The MEB Shrinking Heuristic works by computing $\MEB(\A) = B(c,r)$, then simply shrinking the radius until $\eta\%$ of points are covered. This is done by calculating the $k$ closest points to $c$ and returning the ball $B(c,r')$ where $r'$ is the greatest distance from $c$ to each of the $n-k$ points.
 
 \begin{algorithm}[H]\label{meb shrink}
     \SetAlgoLined
@@ -669,15 +674,15 @@ The complexity of this heuristic mostly depends on the choice of heuristic for s
 
 \subsection{Relaxation-Based Heuristic}
 \subsubsection{Statement}
-This heuristic works by first solving the relaxed QCQP formulation for the MEBwO problem in Definition \ref{mebwo}, and then making the assumption that a higher value of $\xi_i$ (i.e. closer to 1) means that the model treats the data point $a^i$ as ``more" of an outlier. From this assumption, we pick the largest $k$ values of $xi_i$ and treat each corresponding $a^i$ as an outlier, therefore treating the remaining data as inliers. We then solve the MEB problem for this remaining data. A more formal outline of this algorithm is detailed in Algorithm \ref{relaxation heuristic}.
+This heuristic works by first solving the relaxed QCQP formulation for the MEBwO problem in Definition \ref{mebwo}, and then making the assumption that a higher value of $\xi_i$ (i.e. closer to 1) means that the model treats the data point $a^i$ as ``more" of an outlier. From this assumption, we pick the largest $k$ values of $\xi_i$ and treat each corresponding $a^i$ as an outlier, therefore treating the remaining data as inliers. We then solve the MEB problem for this remaining data. A more formal outline of this algorithm is detailed in Algorithm \ref{relaxation heuristic}.
 
-This method will always return a feasible solution that covers $\eta\%$ of the data as we will always remove $k=\floor{n(1-\eta)}$ many points. As discussed in the previous chapter, solving the final MEB problem is relatively easy and selecting outliers using the MEBwO QCQP relaxation is trivial, but the difficulty lays in solving the initial QCQP relaxation, and as such a heuristic method which can solve this model quickly and return approximate solutions to each $xi_i$ is a valuable direction for further research in order to speed up this method.
+This method will always return a feasible solution that covers $\eta\%$ of the data as we will always remove $k=\floor{n(1-\eta)}$ many points. As discussed in the previous chapter, solving the final MEB problem is relatively easy and selecting outliers using the MEBwO QCQP relaxation is trivial, but the difficulty lays in solving the initial QCQP relaxation, and as such a heuristic method which can solve this model quickly and return approximate solutions to each $\xi_i$ is a valuable direction for further research in order to speed up this method.
 
 \begin{algorithm}[H]\label{relaxation heuristic}
     \SetAlgoLined
-    \KwIn{Data set $\A=\left\{a^1,\ldots,a^n\right\}$, percentage of data to be covered $\eta\in[0,1]$, error tolerance for MEB heuristic $\epsilon>0$, big $M$ parameter $M>0$}
+    \KwIn{Data set $\A=\left\{a^1,\ldots,a^n\right\}$, percentage of data to be covered $\eta\in[0,1]$, error tolerance for MEB heuristic $\epsilon>0$, big-$M$ parameter $M>0$}
     \KwOut{Ball $B(c,r)$}
-     $\xi=\left[\xi_1,\ldots,\xi_n\right]$ the relaxed binary variables returned by relaxed MEBwO solver for $\A$, $\eta$, and $M$\;
+     Let $\xi=\left[\xi_1,\ldots,\xi_n\right]$ be the relaxed binary variables returned by relaxed MEBwO solver for $\A$, $\eta$, and $M$\;
      Let $\xi'$ be the smallest $k=\floor{\eta\cdot n}$ elements of $\xi$\;
      Let $\A':=\left\{a^i\in\A: \xi_i\in\xi',\ i=1,\ldots,n\right\}$\;
      Let $c,r$ be the centre and radius of $\MEB(\A')$ returned by heuristic\;
@@ -690,7 +695,7 @@ The complexity of this heuristic is difficult to determine, as the relaxed model
 
 \subsection{Shenmaier's Approximation}
 \subsubsection{Statement}
-This approximation scheme developed by Vladimir Shenmaier in \cite[Algorithm 1]{SHENMAIER201581} is a brute-force algorithm for solving the MEBwO problem with $O(n^2d)$ time complexity. It works by considering each point in the input set, finding the $k$-closest points to that point, then returning the point-distance pair such that the maximum distance from each point to each other point in its $k$-closest points is minimised. See Algorithm \ref{shenmaier} for a detailed outline of this algorithm.
+This approximation scheme developed by Vladimir Shenmaier \cite[Algorithm 1]{SHENMAIER201581} is a brute-force algorithm for solving the MEBwO problem with $O(n^2d)$ time complexity. It works by considering each point in the input set, finding the $k$-closest points to that point, then returning the point-distance pair such that the maximum distance from each point to each other point in its $k$-closest points is minimised. See Algorithm \ref{shenmaier} for a detailed outline of this algorithm.
 \begin{algorithm}
     \KwIn{Data set $\A$, $\eta\in[0,1]$}
     \KwOut{Ball $B(c,r)$}
@@ -718,31 +723,31 @@ Line 6 finds the minimum element from a set of values and runs in $O(n)$ time. L
 
 
 \section{Improvement Heuristics}\label{sec:improvement_heuristics}
-We now consider some improvement heuristics. The two heuristics described here are, strictly speaking, designed to improve an existing ball without considering outliers. Quick and effective methods exist for solving the MEB problem and so improvement heuristics have not been needed thus far, while heuristics which heuristically solve the MEBwO problem may return a solution which has considerable space for improvement. These improvement heuristics may be used after a method which attempts to solve the MEBwO problem where the initial solution is not an MEB, since if we do have an MEB, that ball is by definition the minimum radius ball which may be fit to the given subset of data. So, in our implementation, we may use improvement heuristics after the average point heuristic, MEB shrinking heuristic, and Shenmaier's approximation since these methods do not necessarily return an MEB.
+We now consider some improvement heuristics. The two heuristics described here are, strictly speaking, designed to improve an existing ball without considering outliers. Quick and effective methods exist for solving the MEB problem and so improvement heuristics have not been needed thus far, while methods which inexactly solve the MEBwO problem may return a solution which has considerable space for improvement. These improvement heuristics may be used after a method which attempts to solve the MEBwO problem where the initial solution is not an MEB, since if we do have an MEB, that ball is by definition the minimum radius ball which may be fit to the given subset of data. So, in our implementation, we may use improvement heuristics after the average point heuristic, MEB shrinking heuristic, and Shenmaier's approximation since these methods do not necessarily return an MEB.
 
 The two improvement heuristics work in a similar way, by considering an improving direction in which moving the centre of the MEB in that direction while keeping the same radius retains a feasible solution, then shrinking the radius to the furthest point from the new centre. The Direction-Constrained Single Step Heuristic (DCSSH) works by pure geometric reasoning to find a new centre, while the Direction-Constrained MEB (DCMEB) uses an optimization solver such as Gurobi to find an optimal step in the improving direction to minimise the radius of the new ball.
 
-The inspiration for these heuristics comes from Shenmaier's Approximation, which returns a ball with some centre $c\in\A$. Our assumption is that a better solution exists in a local neighbourhood around $c$, i.e. we find a new centre that does not have to lie on a point in $\A$. Both heuristics consider only a single step, but as they are quick to run, we may run each heuristic in succession to build a sequence of steps that lead to an improved solution. There are various stopping criteria one could consider in an implementation of these heuristics, such as setting an iteration limit or stopping once each iteration yields an improvement below some threshold. For ease of implementation, we will choose the iteration limit since each iteration is computationally cheap.
+The inspiration for these heuristics comes from Shenmaier's Approximation, which returns a ball with some centre $c\in\A$. Our assumption is that a better solution exists in a local neighbourhood around $c$, i.e. we find a new centre that does not have to lie on a point in $\A$. Both algorithms as written here consider only a single step, but as they are quick to run, we may run each algorithm in succession to build a sequence of steps that lead to an improved solution. There are various stopping criteria one could consider in an implementation of these heuristics, such as setting an iteration limit or stopping once each iteration yields an improvement below some threshold. For ease of implementation, we will choose the iteration limit since each iteration is computationally cheap.
 
 For an example of this refer to Figure \ref{fig:riterations} which shows the new radius after each iteration of each improvement heuristic on each data set for $n=1000$, $d=100$, and the standard parameters for each data type (see Section \ref{data}). These examples were run on one data set each rather than averaged over multiple data sets and so should not be used to draw any conclusions.
 
 \subsection{Direction-Constrained Single Step Heuristic}
 \subsubsection{Derivation}
-For a visual aid to this derivation, please refer to Figure \ref{vis aid derivation}. Consider $B(\hat{c}, r) = \MEB(\A)$. To find an improving direction we choose the furthest point from $c$, $\hat{a}=\arg\max_{a\in\A}\norm{c-a}$, then the (negative) improving direction is defined to be $\beta=\hat{c}-\hat{a}$. We choose the direction $\hat{a}\to\hat{c}$ as opposed to $\hat{c}\to\hat{a}$ in order to simplify later derivations.
+For a visual aid to this derivation, please refer to Figure \ref{vis aid derivation}. Consider $B(\hat{c}, r)$ which contains $\A$. To find an improving direction we choose the furthest point from $c$, $\hat{a}=\arg\max_{a\in\A}\norm{c-a}$, then the (negative) improving direction is defined to be $\beta=\hat{c}-\hat{a}$. We choose the direction $\hat{a}\to\hat{c}$ as opposed to $\hat{c}\to\hat{a}$ in order to simplify later derivations.
 
 Now that we have a direction $\beta$, we can move the initial ball in this direction by simply subtracting $\beta x$ from $\hat{c}$ where $x\in\mathbb{R}^{\geq0}$ is some scalar, i.e. our new centre is $c=\hat{c}-\beta x$. We would like to choose $x$ such that the new ball remains feasible by ensuring that $\norm{c-a^i}\leq r$ for $i=1,\ldots,n$, and we can do this by considering the distance from each $a^i$ in the direction of $\beta$ to the surface of the initial ball and choose $x$ such that each of these distances is greater than $\norm{\beta x}$.
 
 More formally, for each $a^i\in\A$ let $x_i$ be the scalar such that $a^i+\beta x_i$ lies on the surface of the initial ball, i.e. $\norm{(a^i+\beta x^i)-\hat{c}}=r$. Again, to simplify derivations, denote the direction $\hat{c}\to a^i$ by $\alpha_i=a^i-\hat{c}$. To calculate each $x_i$, we square this equation and set $\gamma=r^2$ to get
 \begin{align*}
-    \alpha_i^T\alpha_i + 2x\alpha_i^T\beta + x^2\beta^T\beta &= \gamma \\
-    \implies \beta^T\beta x^2 + 2\alpha_i^T\beta x + \alpha_i^T\alpha_i - \gamma &= 0.
+    \alpha_i^T\alpha_i + 2x_i\alpha_i^T\beta + x^2_i\beta^T\beta &= \gamma \\
+    \implies \beta^T\beta x^2_i + 2\alpha_i^T\beta x_i + \alpha_i^T\alpha_i - \gamma &= 0.
 \end{align*}
 Using the quadratic formula we then have
 \begin{align*}
-    x &= \frac{-2\alpha_i^T\beta \pm \sqrt{4\left(\alpha_i^T\beta\right)^2 - 4\beta^T \beta\left(\alpha_i^T\alpha_i-\gamma\right)}}{2\beta^T\beta} \\[4pt]
+    x_i &= \frac{-2\alpha_i^T\beta \pm \sqrt{4\left(\alpha_i^T\beta\right)^2 - 4\beta^T \beta\left(\alpha_i^T\alpha_i-\gamma\right)}}{2\beta^T\beta} \\[4pt]
     &= \frac{-\alpha_i^T\beta \pm \sqrt{\left(\alpha_i^T\beta\right)^2 - \beta^T \beta\left(\alpha_i^T\alpha_i-\gamma\right)}}{\beta^T\beta}.
 \end{align*}
-The two solutions to $x$ corresponding to the positive and negative discriminants represent the steps in the positive and negative $\beta$ directions respectively, then since from our derivations we are only interested in the positive $\beta$ direction we can disregard the negative solution for $x$, so we can define the function $Q:\mathbb{R}^d\times\mathbb{R}^d\times\mathbb{R}\to\mathbb{R}$ by
+The two solutions to $x_i$ corresponding to the positive and negative discriminants represent the steps in the positive and negative $\beta$ directions respectively, then since from our derivations we are only interested in the positive $\beta$ direction we can disregard the negative solution for $x$, so we can define the function $Q:\mathbb{R}^d\times\mathbb{R}^d\times\mathbb{R}\to\mathbb{R}$ by
 \begin{equation*}
     Q(\alpha_i,\beta,\gamma) = \frac{-\alpha_i^T\beta + \sqrt{\left(\alpha_i^T\beta\right)^2 - \beta^T \beta\left(\alpha_i^T\alpha_i-\gamma\right)}}{\beta^T\beta}.
 \end{equation*}
@@ -836,9 +841,9 @@ since $\norm{a^i-a^i_\beta}\geq0$. Hence $\norm{c-a^i}\leq r$ for $i=1,\ldots,n$
 The complexity of the DCSSH is easy to determine. Referring to Algorithm \ref{fig:dcssh}, on line 1 we have a loop over each data point which runs in $O(n)$ time. On lines 4 through 6 we have a \texttt{for} loop which runs $n$ many times, with the operations on lines 5 and 6 both being $O(d)$ as they are each single operations on $d$-dimensional vectors, so overall this loop runs in $O(nd)$ time. On lines 7 and 8 we find the minimum and maximum of two lists respectively, again $O(n)$. Finally, on line 8, a single operation on $d$-dimensional vectors runs in $O(d)$ time. Our dominating term is then $O(nd)$.
 \subsection{Direction-Constrained MEB Heuristic}
 \subsubsection{Derivation}
-For a visual aid to this derivation, please refer to Figure \ref{fig:dcmeb}. Consider $B(\hat{c},\hat{r})$. Similarly to the DCSSH, for an improving direction we choose the furthest point in $\A$ from $\hat{c}$, $\hat{a}=\arg\max_{a\in\A}\norm{\hat{c}-a}$, and let $\beta=\hat{a}-\hat{c}$ be this direction. Note that this is the negative of $\beta$ used in the derivation of the DCSSH, as we are now considering the direction $\hat{c}\to\hat{a}$. Now, instead of calculating distances between each point in data and the surface of the ball to find a feasible step length from $\hat{c}$ towards $\hat{a}$, we formulate an optimization model to find an optimal step length such that the new ball still contains all data, but has a smaller radius.
+For a visual aid to this derivation, please refer to Figure \ref{fig:dcmeb}. Consider $B(\hat{c},\hat{r})$ which contains $\A$. Similarly to the DCSSH, for an improving direction we choose the furthest point in $\A$ from $\hat{c}$, $\hat{a}=\arg\max_{a\in\A}\norm{\hat{c}-a}$, and let $\beta=\hat{a}-\hat{c}$ be this direction. Note that this is the negative of $\beta$ used in the derivation of the DCSSH, as we are now considering the direction $\hat{c}\to\hat{a}$. Now, instead of calculating distances between each point in data and the surface of the ball to find a feasible step length from $\hat{c}$ towards $\hat{a}$, we formulate an optimization model to find an optimal step length such that the new ball still contains all data, but has a smaller radius.
 
-We modify the optimization model for the MEB problem, adding the constraint that $c$ must lie on the direction $\beta$ from $\hat{c}$. It is possible to formulate this exactly using the constraint $c=x(\hat{c}+\beta)$, however a better formulation is to consider a variable $x\in\mathbb{R}^{\geq0}$, then write $c=\hat{c}+\beta x$. Obviously $\hat{c}$ is a constant vector, so this reduces the problem of finding the new $c$ to that of finding the optimal solution to one variable $x$, as opposed to $d$ many decision variables for each element of the vector $c$. The optimization model for the DCMEB problem is as follows:
+We modify the optimization model for the MEB problem, adding the constraint that $c$ must lie on the direction $\beta$ from $\hat{c}$. It is possible to formulate this exactly using the constraint $c=x(\hat{c}+\beta)$, however a better formulation is to consider a variable $x\in\mathbb{R}^{\geq0}$, then write $c=\hat{c}+\beta x$. Obviously, $\hat{c}$ is a constant vector, so this reduces the problem of finding a new $d$-dimensional vector $c$ to that of finding one variable $x$. The optimization model for the DCMEB problem is then as follows:
 \begin{center}
     \begin{tabular}{CCC}
         \displaystyle\min_{x,r} & r \\
@@ -860,7 +865,7 @@ This model has $n+1$ constraints and, most crucially, 2 decision variables. This
 \begin{equation*}
     C_i = \left\{(r,\beta x+\hat{c}-a^i) \in \mathbb{R}^{d+1}: \norm{\beta x +\hat{c}-a^i}\leq\gamma\right\}.
 \end{equation*}
-and as such, the DCMEB problem may be solved by interior-point methods \cite{socp_ipm}. The DCMEB heuristic is then to simply solve the DCMEB, given a data set $\A$ and initial ball $B(\hat{c},\hat{r}$, using the solutions of the solved DCMEB problem for the new ball.
+and as such, the DCMEB problem may be solved by interior-point methods \cite{socp_ipm}. The DCMEB heuristic is then to simply repeatedly solve the DCMEB problem given a data set $\A$ and initial ball $B(\hat{c},\hat{r})$, using the new ball of each solved DCMEB problem for the next iteration.
 
 \begin{algorithm}
     \KwIn{Data set $\A$, Ball $B(\hat{c},\hat{r}$)}
@@ -932,14 +937,14 @@ The operations in this heuristic are simply finding a maximally distant point wh
 \subsection{Software}\label{sec:software}
 We implement our algorithms and data generation using Python 3.8 \cite{python}. Python is a high-level procedural programming language which is commonly used in data science and mathematics for its low barrier to entry, wide-scale adoption, and rich package ecosystem. One drawback of using Python is that it is known to be slow compared to other languages.
 
-An implementation of our work in a faster programming language such as C \cite{kernighan2006c} will almost certainly result in faster run times --- in fact many Python packages such as scikit-learn \cite{scikit-learn} and NumPy \cite{numpy} utilize C to run the more time-consuming processes, and the Gurobi \cite{gurobi} solver is written in C while Python and other languages with Gurobi support are merely interfaces to this solver. A new up-and-coming programming language is Julia \cite{bezanson2017julia} which promises similar run times to C and has a mature library for interfacing with optimization solvers known as JuMP \cite{jump}. Due to the time constraints on this paper, we make use of the author's prior knowledge in Python for the implementation as previously mentioned, but again acknowledge that there are indeed potentially superior choices for this type of work.
+An implementation of our work in a faster programming language such as C \cite{kernighan2006c} will almost certainly result in faster run times---in fact many Python packages such as scikit-learn \cite{scikit-learn} and NumPy \cite{numpy} utilize C to run the more time-consuming processes, and the Gurobi \cite{gurobi} solver is written in C while Python and other languages with Gurobi support are merely interfaces to this solver. A new up-and-coming programming language is Julia \cite{bezanson2017julia} which promises similar run times to C and has a mature library for interfacing with optimization solvers known as JuMP \cite{jump}. Due to the time constraints on this paper, we make use of the author's prior knowledge in Python for the implementation as previously mentioned, but again acknowledge that there are indeed potentially superior choices for this type of work.
 
-Packages within Python we make use of in the implementation are NumPy \cite{numpy} for numerical computation and linear algebra, pandas \cite{pandasjeff_reback_2021_5060318}{pandasmckinney-proc-scipy-2010} for data manipulation, Matplotlib \cite{matplotlib} and Seaborn \cite{seaborn} for visualisation and plotting, and finally TensorFlow Datasets \cite{TFDS} to access the MNIST \cite{lecun2010mnist} data set.
+Packages within Python we make use of in the implementation are NumPy \cite{numpy} for numerical computation and linear algebra, pandas \cite{pandasjeff_reback_2021_5060318, pandasmckinney-proc-scipy-2010} for data manipulation, Matplotlib \cite{matplotlib} and Seaborn \cite{seaborn} for visualisation and plotting, and finally TensorFlow Datasets \cite{TFDS} to access the MNIST \cite{lecun2010mnist} data set.
 
 For modelling and solving our exact models for the MEBwO and DCMEB problems, we use the Gurobi optimization solver \cite{gurobi}. At the time of writing, Gurobi is one of the fastest and most powerful mathematical programming solvers available and in particular is able to formulate and solve the QCQP and MIQCQP problems we require, so Gurobi was an easy choice of solver. Gurobi also has an easy-to-use Python interface which we make use of in our implementation.
 
-\subsection{Implementation}
-Our implementation can be found on GitHub \footnote{\url{https://github.com/tomholmes19/Minimum-Enclosing-Balls-with-Outliers} \cite{Holmes_Minimum_Enclosing_Balls_2021}} within the \texttt{src} folder and overall consists of around 2000 lines of code. All scripts used to run benchmarks and create figures are contained within this folder, and we have also written three packages contained therein. The \texttt{meb} package contains an object-oriented framework for MEB objects, defining \texttt{Ball}, \texttt{MEB}, and \texttt{MEBwO} objects within \texttt{ball.py} with a simple class hierarchy as seen in Figure \ref{fig:hierarchy}. 
+\subsection{Implementation}\label{sec:impl_python}
+Our implementation can be found on GitHub\footnote{\url{https://github.com/tomholmes19/Minimum-Enclosing-Balls-with-Outliers} \cite{Holmes_Minimum_Enclosing_Balls_2021}} within the \texttt{src} folder and overall consists of around 2000 lines of code. All scripts used to run benchmarks and create figures are contained within this folder, and we have also written three packages contained therein. The \texttt{meb} package contains an object-oriented framework for MEB objects, defining \texttt{Ball}, \texttt{MEB}, and \texttt{MEBwO} objects within \texttt{ball.py} with a simple class hierarchy as seen in Figure \ref{fig:hierarchy}. 
 
 \begin{figure}
     \centering
@@ -956,9 +961,9 @@ Our implementation can be found on GitHub \footnote{\url{https://github.com/tomh
     \label{fig:hierarchy}
 \end{figure}
 
-These objects have attributes such as a centre and radius and allow us to define an MEB or MEBwO as a single variable as an instance of their corresponding object, which allows for more streamlined implementation, as opposed to tracking values such as the centre and radius within separate, unrelated variables. These objects also implement methods such as \texttt{.fit()} which, given a data input and a chosen method and relevant parameters, will solve the MEB or MEBwO problem on that data set. Other methods are implemented, and the reader may refer to the aforementioned \texttt{ball.py} module for a comprehensive guide. All other modules within this package are used by \texttt{ball.py} and are simply used to abstract methods out of this module so as to adhere to good programming principles. Our exact models are formulated and solved using Gurobi in \texttt{gurobi\_solvers.py}.
+These objects have attributes such as a centre and radius and allow us to define an MEB or MEBwO as a single variable as an instance of their corresponding object, which allows for more streamlined implementation, as opposed to tracking values such as the centre and radius within separate, unlinked variables. These objects also implement methods such as \texttt{.fit()} which, given a data input and a chosen method and relevant parameters, will solve the MEB or MEBwO problem on that data set. Other methods are implemented, and the reader may refer to the aforementioned \texttt{ball.py} module for a comprehensive guide. All other modules within this package are used by \texttt{ball.py} and are simply used to abstract methods out of this module so as to adhere to good programming principles. Our exact models are formulated and solved using Gurobi in \texttt{gurobi\_solvers.py}.
 
-The \texttt{data} package contains modules regarding the data used in this paper. The \texttt{generation.py} module contains functions which generate each type of data set described in Section \ref{data}, as well as some others which were used in the testing and development of our methods but are not mentioned further within this paper. \texttt{loading.py} contains a few utility functions regarding loading and saving data consistently for ease of implementation. \texttt{benchmarking\_data.py} can be run to generate the data used in our benchmarking, and must be run if the reader wishes to obtain our data as the data sets generated are cumulatively too large to reasonably be uploaded to GitHub.
+The \texttt{data} package contains modules regarding the data used in this paper. The \texttt{generation.py} module contains functions which generate each type of data set described in Section \ref{data}, as well as some others which were used in the testing and development of our methods but are not mentioned further within this paper. \texttt{loading.py} contains a few utility functions regarding loading and saving data consistently for ease of implementation. \texttt{benchmarking\_data.py} can be run to generate the data used in our benchmarking, and must be run if the reader wishes to obtain our data as the data sets generated are cumulatively too large to be uploaded to GitHub.
 
 The \texttt{benchmarking} package contains the \texttt{trials.py} module which contains functions used for benchmarking. The other module in this package, \texttt{utils.py}, simply abstracts various functions away from \texttt{trials.py}.
 
@@ -966,9 +971,9 @@ The \texttt{benchmarking} package contains the \texttt{trials.py} module which c
 In this section, we present and discuss the types of data we will use for bench-marking our algorithms for solving the MEBwO problem. Functions written and used for this paper can be found in the module \texttt{src/data/generation.py}.
 
 \subsubsection{On Random Number Generation}
-In order to generate our data, we must have some method of creating random numbers. To generate uniform random variates from the distribution $U(0,1)$, the method of linear congruential generators \cite{lcg1,lcg2} is well known within the literature, and provide us a computationally trivial way of generating pseudo-random uniform numbers.
+In order to generate our data, we must have some means of creating random numbers. To generate uniform random variates from the distribution $U(0,1)$, the method of linear congruential generators \cite{lcg1,lcg2} is well known within the literature, and provide us a computationally trivial way of generating pseudo-random uniform numbers.
 
-With a source of pseudo-random uniform numbers, it is then possible to create a wide variety of different random variates from various distributions. For example, to sample a random variate from the distribution $U(a,b)$ where $a>b$, one must simply generate a random variate $U$, from the distribution $U(0,1)$, then $U(b-a)+a$ follows the distribution $U(a,b)$. To generate standard normal random variates from uniform random variates, one can use methods such as the Box-Muller transform \cite{boxmuller}.
+With a source of pseudo-random uniform numbers, it is then possible to create a wide variety of different random variates from various distributions. For example, to sample a random variate from the distribution $U(a,b)$ where $a>b$, one must simply generate a random variate $U$, from the distribution $U(0,1)$, then the random variates $U(b-a)+a$ follows the distribution $U(a,b)$. To generate standard normal random variates from uniform random variates, one can use methods such as the Box-Muller transform \cite{boxmuller}.
 
 Using linear congruential generators and then applying transformations to obtain other random variates allows the user direct control over the randomness in their computations, allowing for very easy reproducibility. In our implementation, we instead use the \texttt{random} package from NumPy \cite{numpy}. This allows us to generate uniform random numbers using \texttt{np.random.uniform} and \texttt{np.random.normal} easily, and we may set a seed for the pseudo-random generator using \texttt{np.random.seed} for reproducibility.
 
@@ -1003,7 +1008,7 @@ A naive approach would then be to multiply the point on the surface of the hyper
     \label{alg:unitball}
 \end{algorithm}
 
-One benefit of using this data is that when we are bench-marking the Relaxation-Based Heuristic, we do not need to spend time calculating a lower bound for $M$. Since we know our data set is contained within a unit ball, our diameter can be at most 2. The true diameter of any given uniform ball data set will be some value marginally close to 2, but crucially, less than 2. This means an $M$ value of 2 will ensure that our big $M$ constraints work correctly, and the closeness of the true diameter to 2 means that the increase in solution time for the exact model is negligible.
+One benefit of using this data is that when we are bench-marking the Relaxation-Based Heuristic, we do not need to spend time calculating a lower bound for $M$. Since we know our data set is contained within a unit ball, our diameter can be at most 2. The true diameter of any given uniform ball data set will be some value marginally close to 2, but crucially, less than 2. This means an $M$ value of 2 will ensure that our big-$M$ constraints work correctly, and the closeness of the true diameter to 2 means that the increase in solution time for the exact model is negligible.
 
 \subsection{Hyperspherical Shell}
 Now we will discuss the data type we call the Hyperspherical Shell. This consists of points sampled uniformly between the surfaces of two concentric hyperspheres with the same centres, where one is strictly contained within the other. We may explicitly define this region as
@@ -1015,11 +1020,11 @@ In this paper we choose the zero vector as our centre, an inner radius of $1$, a
 
 \datafigure{hyperspherical_shell}{Example of a Hyperspherical Shell}{fig:hypshell}
 
-This data type is chosen as the optimal centre of the MEBwO on any sufficiently large data set is guaranteed to be ``far" away from any point in the data set. This poses issues for Shenmaier's approximation, which always returns a centre which is a point within the data set.
+This data type is chosen as the optimal centre of the MEBwO on any sufficiently large data set is guaranteed to be ``far" away from any point in the data set, specifically it will be near the zero vector. This poses issues for Shenmaier's approximation, which always returns a centre which is a point within the data set.
 
 To generate points within this set, we can make use of Algorithm \ref{alg:unitball} to generate points uniformly in a hypersphere whose radius is our chosen outer radius, then use an acceptance-rejection method to reject points whose distance from our chosen centre is less than our chosen inner radius. A common drawback of acceptance-rejection methods is that of efficiency, i.e. of the space in which we are generating points, what percentage of this space is our acceptance region. Depending on the amount of points desired, a low efficiency can result in very long computation times due to the number of points being rejected.
 
-Acceptance-rejection methods are usually unsuitable for generating high-dimensional data, as a result of the ``curse of dimensionality". For example, if we wanted to generate points within a unit ball using an acceptance-rejection method, the ratio of the volume of a hypersphere inscribed within a hypercube to the volume of that hypercube tends to $0$ as $d\to\infty$ \cite{curse}.
+Acceptance-rejection methods are usually unsuitable for generating high-dimensional data. For example, if we wanted to generate points within a unit ball using an acceptance-rejection method by first generating points uniformly inside a hypercube, the ratio of the volume of a hypersphere inscribed within a hypercube to the volume of that hypercube tends to $0$ as $d\to\infty$ \cite{curse}.
 
 Fortunately, in our case, the ratio of the acceptance region to the total volume of the hypersphere tends to $1$ as $d\to\infty$. To see this, note that the volume of a $d$-dimensional hypersphere with radius $r$ is
 \begin{equation*}
@@ -1104,7 +1109,7 @@ Our interest in benchmarking the exact solver is simply to demonstrate the impra
 
 Parameters chosen for $n$ were $n=300$ to $n=750$ in steps of 50 with $d=10$ and $\eta=0.9$ fixed. For $d$ we choose $d=2$ to $d=20$ in steps of 2 with $n=300$ and $\eta=0.9$ fixed, and for $\eta$ we choose $\eta=0.5$ to $\eta=1$ in steps of 0.05 with $n=300$ and $d=10$ fixed. Note that the $\eta=1$ case reduces to the standard MEB problem.
 
-In Section \ref{sec:M} we discussed the effects of the big $M$ parameter on the solution time of the solver, and so we also benchmark the solution time when this parameter is varied. To calculate a lower bound on $M$ which ensures that our constraints work as intended, we use the maximum pairwise distance as discussed in the aforementioned section. This is a suitable choice as the size of data sets which we use to benchmark the solver are relatively small and so calculating each pairwise distance does not take too much time. Then, we solve the model on the same data set while increasing $M$ in steps of $M/2$.
+In Section \ref{sec:M} we discussed the effects of the big-$M$ parameter on the solution time of the solver, and so we also benchmark the solution time when this parameter is varied. To calculate a lower bound on $M$ which ensures that our constraints work as intended, we use the maximum pairwise distance as discussed in the aforementioned section. This is a suitable choice as the size of data sets which we use to benchmark the solver are relatively small and so calculating each pairwise distance does not take too much time. Then, we solve the model on the same data set while increasing $M$ in steps of $M/2$.
 
 We generate a large data set ($1000\times100000$) of random normal variates, from which we may sample $n$ many $d$-dimensional vectors to use as a data set. For each choice of parameters, we solve 5 different models and record details such as the centre and radius, elapsed time from the solver, and more to a log file. While we choose 5 for our number of trials, more is always better in this context, but due to the time constraints of the project we deemed 5 to be a sufficient amount of trials. In presenting our results, we give the average elapsed time, though exact times for each solved instance may be found in the log files in the \texttt{benchmarks} folder in the GitHub repository.
 
@@ -1162,39 +1167,47 @@ In presenting our results, we again report average radii and runtimes while exac
 \subsection{Results}
 \subsubsection{By Data Type}
 %TODO: want to put figures close to the text that talks about them
+
+On normal data (Figure \ref{fig:constr_normal}), we observe that Shenmaier's approximation gives strictly worse solutions as both $n$ and $d$ vary. Shenmaier's approximation also has the longest run time for each $n$, while for $d$ it runs in less time than the relaxation-based heuristic for $d$ greater than 50. The average point heuristic tends to perform the best on normal data, while also sporting near-instant runtimes.
+
+On uniform ball data (Figure \ref{fig:constr_uniform_ball}), the relaxation-based heuristic and shrink heuristic give the same solutions as each parameter varies, but the shrink heuristic has strictly shorter runtimes for each parameter. The average point heuristic also gives the same solutions with insignificant runtimes. Shenmaier's approximation has shorter runtimes for $d$ greater than 70, but has significantly worse radii on these instances (around 40\% worse).
+
+
+On hyperspherical shell data (Figure \ref{fig:constr_hyperspherical_shell}), we observe a similar story to that of uniform ball data, with the relaxation-based heuristic, shrink heuristic, and average point heuristic again giving the same results, with the shrink heuristic running in less time than the relaxation-based heuristic for each parameter. Shenmaier's approximation again is the fastest method for $d$ greater than 70, but like before has strictly worse performance.
+
+
+On uniform ball with outliers data (Figure \ref{fig:constr_uniform_ball_with_outliers}), the relaxation-based heuristic is our best performing method, though we observe a larger than usual increase in runtime as the dimension increases, with a runtime of a little over an hour for each instance at $d=80$, so we were unable to solve instances for $d=90$ and $d=100$ within the time constraints. The shrink heuristic as usual gives short runtimes with only marginally worse radii, though also marginally worse radii than the average point heuristic for small $n$. Each of these methods have very similar solutions for large $n$ and all $d$. Recall that the optimal solution for our uniform ball with outliers data will be a radius of 1, which is indeed returned by the relaxation-based heuristic, while the shrink heuristic returns radii marginally above 1. Shenmaier's approximation gives far worse than expected solutions, on average around 55\% worse than optimal.
+
 \benchmarkfiguresix{normal}{Normal}
-On normal data we observe that Shenmaier's approximation gives strictly worse solutions as both $n$ and $d$ vary. For $n$ Shenmaier's approximation also has the longest run time for each $n$, while for $d$ it runs in less time than the relaxation-based heuristic for $d$ greater than 50. The average point heuristic tends to perform the best on normal data while also sporting near-instant runtimes.
-
 \benchmarkfiguresix{uniform_ball}{Uniform Ball}
-On uniform ball data, the relaxation-based heuristic and shrink heuristic give the same solutions as each parameter varies, but the shrink heuristic has strictly shorter runtimes for each parameter. The average point heuristic also gives the same solutions with insignificant runtimes. Shenmaier's approximation has shorter runtimes for $d$ greater than 70, but has significantly worse radii on these instances (around 40\% worse).
-
-
 \benchmarkfiguresix{hyperspherical_shell}{Hyperspherical Shell}
-On hyperspherical shell data we observe a similar story to that of uniform ball data, with the relaxation-based heuristic, shrink heuristic, and average point heuristic again giving the same results, with the shrink heuristic running in less time than the relaxation-based heuristic for each parameter. Shenmaier's approximation again is the fastest method for $d$ greater than 70, but like before has strictly worse performance.
-
-
 \benchmarkfiguresix{uniform_ball_with_outliers}{Uniform Ball with Outliers}
-On uniform ball with outliers data, the relaxation-based heuristic is our best performing method, though we observe a larger than usual increase in runtime as the dimension increases, with a runtime of a little over an hour for each instance at $d=80$, so we were unable to solve instances for $d=90$ and $d=100$ within the time constraints. The shrink heuristic as usual gives short runtimes with only marginally worse radii, though also marginally worse radii than the average point heuristic for small $n$. Each of these methods have very similar solutions for large $n$ and all $d$. Recall that the optimal solution for our uniform ball with outliers data will be a radius of 1, which is indeed returned by the relaxation-based heuristic, while the shrink heuristic returns radii marginally above 1. Shenmaier's approximation gives far worse than expected solutions, on average around 55\% worse than optimal.
 
-
+\newpage
 \subsubsection{By Algorithm}
-\benchmarkfigurebyfunc{relaxation_heuristic}{Runtimes for Relaxation-Based Heuristic on each Data Type}{fig:rbh_benchmarks}
-The complexity of the relaxation-based heuristic is hard to assess due to being solved by an optimization solver, so these plots are able to give us some insight. With respect to $n$, we can observe a trend somewhere between linear and polynomial. With respect to $d$, the trend appears to be polynomial, and with respect to $\eta$ there does not appear to be any strong trend.
 
+The complexity of the relaxation-based heuristic is hard to assess due to being solved by an optimization solver, so these plots (Figure \ref{fig:rbh_benchmarks}) are able to give us some insight. With respect to $n$, we can observe a trend somewhere between linear and polynomial. With respect to $d$, the trend appears to be polynomial, and with respect to $\eta$ there does not appear to be any strong trend.
+
+
+We know that the average time complexity of Shenmaier's approximation will be, $O(n^2d)$ which is fortunately exactly what we observe in Figure \ref{fig:shenmaier_benchmarks}. We would expect no significant difference in runtimes when comparing data types since Shenmaier's approximation works by iterating over each point, but we do see slight differences in runtime then varying the dimension of the data. This could be explained by the sorting of distances which takes place when finding the $k$ closest points, as this list will have a different distribution when sorted for each data type. The overall trend as dimension is increased is linear, but we observe a lesser increase in runtime than expected. This is likely because of optimizations made by NumPy, where the computations for arrays/vectors are written in C.
+
+
+
+Recall that the shrink heuristic's time complexity depends on the algorithm used to solve the initial MEB problem, which in our implementation is Algorithm \ref{core-set algorithm} from \cite{core-sets} with time complexity $O\left(\frac{nd}{\epsilon}+\frac{d^2}{\epsilon^{3/2}}\left(\frac{1}{\epsilon}+d\right)\log\frac{1}{\epsilon}\right)$. In Figure \ref{fig:shrink_benchmarks}, we indeed see a linear relationship between runtime and $n$ and a polynomial relationship between runtime and $d$. Interestingly, we have almost no relationship between runtime and $d$ for normal data, and the reason for this is unclear. There is no relationship observed between runtime and $\eta$ as expected, except for uniform ball with outliers data, which makes sense considering the structure of the data is dependent on $\eta$ which evidently has an effect on the runtime of this algorithm, which works by finding a core-set for the data which we would assume is easier to find when there are fewer points in the outer shell.
+
+
+\benchmarkfigurebyfunc{relaxation_heuristic}{Runtimes for the Relaxation-Based Heuristic on each Data Type}{fig:rbh_benchmarks}
 \benchmarkfigurebyfunc{shenmaier}{Runtimes for Shenmaier's Approximation on each Data Type}{fig:shenmaier_benchmarks}
-We know that the average time complexity of Shenmaier's approximation will be, $O(n^2d)$ which is fortunately exactly what we observe in these plots. We would expect no significant difference in runtimes when comparing data types since Shenmaier's approximation works by iterating over each point, but we do see slight differences in runtime then varying the dimension of the data. This could be explained by the sorting of distances which takes place when finding the $k$ closest points, as this list will have a different distribution when sorted for each data type. The overall trend as dimension is increased is linear, but we observe a lesser increase in runtime than expected. This is likely because of optimizations made by NumPy, where the computations for arrays/vectors are written in C.
+\benchmarkfigurebyfunc{shrink}{Runtimes for the Shrink Heuristic on each Data Type}{fig:shrink_benchmarks}
 
-
-\benchmarkfigurebyfunc{shrink}{Runtimes for Shrink Heuristic on each Data Type}{fig:shrink_benchmarks}
-Recall that the shrink heuristic's time complexity depends on the algorithm used to solve the initial MEB problem, which in our implementation is Algorithm \ref{core-set algorithm} from \cite{core-sets} with time complexity $O\left(\frac{nd}{\epsilon}+\frac{d^2}{\epsilon^{3/2}}\left(\frac{1}{\epsilon}+d\right)\log\frac{1}{\epsilon}\right)$. We indeed see a linear relationship between runtime and $n$ and a polynomial relationship between runtime and $d$. Interestingly, we have almost no relationship between runtime and $d$ for normal data, and the reason for this is unclear. There is no relationship observed between runtime and $\eta$ as expected, except for uniform ball with outliers data, which makes sense considering the structure of the data is dependent on $\eta$ which evidently has an effect on the runtime of this algorithm, which works by finding a core-set for the data which we would assume is easier to find when there are fewer points in the outer shell.
-
+\clearpage
 \section{Improvement Heuristics}
 \subsection{Methodology}
 Our interest in benchmarking our improvement heuristics is in how well these heuristics improve an existing solution. As discussed in Section \ref{sec:improvement_heuristics} we know that both heuristics will run very quickly, however we are interested in the differences in runtimes between the heuristics. The DCSSH will run in polynomial time while the DCMEB is expected to run in polynomial time, as is typical of interior point methods, so we will benchmark the runtimes of the solver for this model.
 
 These heuristics were designed to be used after gaining a solution from Shenmaier's approximation, so we first find this solution for the given data set and then run an improvement heuristic 100 times. As discussed in Section \ref{sec:improvement_heuristics} other stopping criteria could be implemented, but we opt for an iteration limit for ease of implementation and simplicity.
 
-As seen in the previous section, Shenmaier's algorithm is not a particularly fast method, so with regard to the time constraint of this project we choose to benchmark our improvement heuristics on separate, smaller data sets than those we used to benchmark our construction methods. We follow the same methodology in generating and saving each data set. For benchmarking $n$ we choose $n=500$ to $n=5000$ in steps of 500 and for $d$ we choose $d=10$ to $d=150$ in steps of 10. The improvement heuristics, while primarily useful for improving an existing MEBwO, ultimately only improves an MEB on a subset of data, so there is no $\eta$ parameter to vary.
+As seen in the previous section, Shenmaier's algorithm is not a particularly fast method, so with regard to the time constraint of this project we choose to benchmark our improvement heuristics on separate, smaller data sets than those we used to benchmark our construction methods. We follow the same methodology in generating and saving each data set. For benchmarking $n$ we choose $n=500$ to $n=5000$ in steps of 500 with $d=100$ fixed and for $d$ we choose $d=10$ to $d=150$ in steps of 10 with $n=1000$ fixed. The improvement heuristics only improve a ball on a given subset of data, so there is no $\eta$ parameter to vary.
 
 In each instance we solve, we record the initial radius returned by Shenmaier's approximation, and after running the improvement heuristic 100 times we record the new improved radius. For benchmarking the runtime of the solver for the DCMEB solver, we will record the runtime from the model instance after running Shenmaier's approximation.  In the results section we report average improvement for each heuristic, where if $r$ is the initial radius and $\hat{r}$ is the improved radius, the improvement percentage is calculated as $(1-\hat{r}/r)\cdot100$. Tabular results may be found in Appendix \ref{app:impr_tables}.
 
@@ -1220,9 +1233,15 @@ In each instance we solve, we record the initial radius returned by Shenmaier's 
     \label{fig:dcmeb_plot}
 \end{figure}
 
-From these plots we see what looks to be a polynomial relationship between runtime and $n$ as expected when using an interior point method, and no relationship between runtime and $d$. Although the longest that a single model took to solve was about 1.1 seconds, since this model is solved many times (100 in our case) this leads to non-insignificant runtimes when applying the heuristic, especially when compared to the DCSSH which runs in linear time.
+From Figure \ref{fig:dcmeb_plot} we see what appears to be a polynomial relationship between runtime and $n$ as expected when using an interior point method, and no relationship between runtime and $d$. Although the longest that a single model took to solve was about 1.1 seconds, since this model is solved many times (100 in our case) this leads to non-insignificant runtimes when applying the heuristic, especially when compared to the DCSSH which runs in linear time.
 
 \subsubsection{Performance}
+
+
+From the first three plots (Figures \ref{fig:improvement_normal}, \ref{fig:improvement_unifball}, \ref{fig:improvement_hypshell}), we see the same trends, where the average improvement decreases as $n$ increases and average improvement increases as $d$ increases. This is likely due to more free space between points near the surface of the ball and that surface as dimension increases, while increasing the number of points will mean there are more points which are near the surface, thus giving a lower minimal distance between each point and the surface of the ball in the opposite improving direction. Interestingly, we observe the exact opposite trend for the uniform ball with outliers data in Figure \ref{fig:improvement_unifballwoutliers}, and it is uncertain why this is, though it is likely due to the unique structure of this data type.
+
+Both heuristics give very similar performances, though the DCSSH appears to always be marginally better than the DCMEB. We can then conclude that, out of these two heuristics, one should always use the DCSSH over the DCMEB since the DCSSH runs in linear time as opposed to the polynomial time of the DCMEB, and for ease of implementation as the DCSSH does not require the use of an optimization solver which requires specific knowledge of how to use and in a commercial setting will in most cases require a payment of sorts.
+
 \imprfigure{normal}{Average Improvement Performance on Normal Data as a Function of $n$ and $d$}{fig:improvement_normal}
 
 \imprfigure{uniform_ball}{Average Improvement Performance on Uniform Ball Data as a Function of $n$ and $d$}{fig:improvement_unifball}
@@ -1230,10 +1249,6 @@ From these plots we see what looks to be a polynomial relationship between runti
 \imprfigure{hyperspherical_shell}{Average Improvement Performance on Hyperspherical Shell Data as a Function of $n$ and $d$}{fig:improvement_hypshell}
 
 \imprfigure{uniform_ball_with_outliers}{Average Improvement Performance on Uniform Ball with Outliers Data as a Function of $n$ and $d$}{fig:improvement_unifballwoutliers}
-
-From the first three plots, we see the same trends, where the average improvement decreases as $n$ decreases and average improvement increases as $d$ increases. This is likely due to more free space between points near the surface of the ball and that surface as dimension increases, while increasing the number of points will mean there are more points which are near the surface, thus giving a lower minimal distance between each point and the surface of the ball in the opposite improving direction. Interestingly, we observe the exact opposite trend for the uniform ball with outliers data, and it is uncertain why this is, though it is likely due to the unique structure of this data type.
-
-Both heuristics give very similar performances, though the DCSSH appears to always be marginally better than the DCMEB. We can then conclude that, out of these two heuristics, one should always use the DCSSH over the DCMEB since the DCSSH runs in linear time as opposed to the polynomial time of the DCMEB, and for ease of implementation as the DCSSH does not require the use of an optimization solver which requires specific knowledge of how to use and in a commercial setting will in most cases require a payment of sorts.
 
 \section{Outlier Recognition}\label{sec:outlier_recognition}
 \subsection{Methodology}
@@ -1251,7 +1266,7 @@ and $\text{TP}$, $\text{FP}$, and $\text{FN}$ are the number of true positives, 
 
 For each method and each parameter, we solve the MEBwO problem for each digit and then report the average $F_1$ score across each digit. Due to the random sampling in constructing each instance we would prefer to report average performance for each digit across multiple instances, but due to time constraints this was not possible, and we hope that averaging across each digit provides enough robustness to the issues associated with random sampling.
 
-The algorithm in \cite{huding} is compared against three outlier recognition methods, which are angle-based outlier detection (ABOD) \cite{abod}, one-class support vector machine (OCSVM) \cite{ocsvm}, and discriminative reconstructions in an auto-encoder (DRAE) \cite{drae}. See \cite{huding} for further details. We provide an extension to Table 2 of this paper, referring to their algorithm as HDMY. The total time reported is the total running time for each value of $\eta$ and we assume this is averaged over each of their 20 instances. It should be noted that the time for sampling is included in the runtimes in their paper, which we do not do, but in our experiments we find this takes at most a few seconds, so the effect on the results is negligible considering the total runtime for each algorithm is reported on the order of hours. Additionally, a different computer is used to compute these results, and this an unavoidable (short of buying the same machine) limiting factor on the comparisons we may draw.
+The algorithm in \cite{huding} is compared against three outlier recognition methods, which are angle-based outlier detection (ABOD) \cite{abod}, one-class support vector machine (OCSVM) \cite{ocsvm}, and discriminative reconstructions in an auto-encoder (DRAE) \cite{drae}. See \cite{huding} and each respective paper for further details. We provide an extension to Table 2 of \cite{huding}, referring to their algorithm as HDMY. The total time reported is the total running time for each value of $\eta$ and we assume this is averaged over each of their 20 instances. It should be noted that the time for sampling is included in the runtimes in their paper, which we do not do, but in our experiments we find this takes at most a few seconds, so the effect on the results is negligible considering the total runtime for each algorithm is reported on the order of hours. Additionally, a different computer is used to compute these results, and this an unavoidable (short of buying the same machine) limiting factor on the comparisons we may draw.
 
 We present our results in tabular form as in \cite{huding} but also provide the results as a plot for the reader's enjoyment. It should be noted that HDMY and each of our algorithms are all MEBwO models, and we are comparing the effectiveness and runtime of each algorithm used to create the MEBwO. Unfortunately, Gurobi was unable to solve the relaxed model required for the relaxation-based heuristic, reaching the memory limit on our machine (16 GB) before the model could be instantiated.
 
@@ -1301,7 +1316,7 @@ The average point heuristic also gives similar objective function value, and for
 
 Our improvement algorithms yielded almost exactly the same results, with the DCSSH giving marginally better results over the DCMEB heuristic, and as discussed in Section \ref{sec:impr_results} that one should always use the DCSSH due to the longer runtimes required to solve many DCMEB models and the requirement of an optimization solver.
 
-We compared three of our methods to the tree-based construction method (HDMY) in \cite{huding} in an application to outlier recognition, and found that the balls found by Shenmaier's approximation and the average point heuristic were able to provide similar performance to that of the HDMY method, though Shenmaier's approximation takes three times as long to run on this data and the average point heuristic takes very little time. Again, it should be noted that our algorithms were benchmarked on a different machine and were not run over multiple instances to reduce the impact of random sampling, so it would be unwise to draw concrete conclusions from these benchmarks.
+We compared three of our methods to the tree-based construction method (HDMY) in \cite{huding} in an application to outlier recognition, and found that the balls returned by Shenmaier's approximation and the average point heuristic were able to provide similar performance to that of the HDMY method, though Shenmaier's approximation takes three times as long to run on this data and the average point heuristic takes very little time. Again, it should be noted that our algorithms were benchmarked on a different machine and were not run over multiple instances to reduce the impact of random sampling, so it would be unwise to draw concrete conclusions from these benchmarks.
 
 There are many directions for further research, one of note which may continue the work done in this paper is whether approximation methods exist which may solve the relaxed optimization model for the minimum enclosing ball with outliers problem within some approximation guarantee. Currently, this is a large bottleneck in both the runtime and the capabilities of the relaxation-based heuristic, seeing as the model was unable to be instantiated for the high-dimensional MNIST data with the available memory on our machine. An algorithm to solve this specific model in a similar manner as that of the simple minimum enclosing ball problem in \cite{two-algorithms} could enable the relaxation-based heuristic to tackle larger problems in less time.
 
@@ -1550,7 +1565,7 @@ As we have seen, the minimum enclosing ball with outliers problem is not a simpl
     \clearpage
     
     \section{Improvement Heuristic Tables}\label{app:impr_tables}
-    Here, we present results for each instance of benchmarking the improvement heuristic. We ran 5 separate instances for each particular benchmark, and $r_i$ represents the initial radius of the $i$th instance returned by Shenmaier's approximation, while $\hat{r}_i$ represents the improved radius. The final column is the average improvement percentage, which is presented in the main text. Figures are rounded to two decimal places to fit within the page width, and the complete solutions may be found in the GitHub repository.
+    Here, we present results for each instance of benchmarking the improvement heuristic. We ran 5 separate instances for each particular benchmark, and $r_i$ represents the initial radius of the $i$th instance returned by Shenmaier's approximation, while $\hat{r}_i$ represents the improved radius. The final column is the average improvement percentage, which is presented in the main text. Figures are rounded to two decimal places to fit within the page width, and the complete solutions may be found in the GitHub repository\footnote{\url{https://github.com/tomholmes19/Minimum-Enclosing-Balls-with-Outliers} \cite{Holmes_Minimum_Enclosing_Balls_2021}}.
     
     \subsection{Normal}
     \begin{table}[ht]
