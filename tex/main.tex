@@ -240,7 +240,7 @@ The minimum enclosing ball with outliers problem is that of finding the ball wit
 \vspace*{20mm}
 
 %TODO
-My biggest thanks to my supervisor, Dr. E. Alper Yıldırım for his invaluable guidance during this dissertation. Without him, this paper would look very different. I would also like to thank Toby Yıldırım.
+My biggest thanks to my supervisor, Dr. E. Alper Yıldırım for his invaluable guidance during this dissertation. Without him, this process would not have gone so smoothly and the work inside would look very different. I would also like to thank Toby Yıldırım.
 
 Thank you to my family and all of my friends, both in Edinburgh and elsewhere, for their support over this very strange, challenging, but ultimately rewarding year. Thank you, Kevin and Benjamin, may our EP go platinum.
 
@@ -252,7 +252,7 @@ Thank you to my family and all of my friends, both in Edinburgh and elsewhere, f
 \end{center}
 \vspace*{20mm}
 
-\noindent I declare that this thesis was composed by myself and that the work contained therein is my own, except where explicitly stated otherwise in the text.
+\noindent I declare that this dissertation was composed by myself and that the work contained therein is my own, except where explicitly stated otherwise in the text.
 
 \vspace*{10mm}
 
@@ -374,7 +374,7 @@ We would now like to make some formal definitions.
 \begin{definition}
     Let $c\in\mathbb{R}^n$ and $r\in\mathbb{R}$. Then the \textit{ball} with centre $c$ and radius $r$ is the set
     \begin{equation*}
-        B(c;r) = \left\{x\in\mathbb{R}^n : \norm{x-c} \leq r\right\}
+        B(c,r) = \left\{x\in\mathbb{R}^n : \norm{x-c} \leq r\right\}
     \end{equation*}
     where $\norm{\cdot}:L\to\mathbb{R}$ denotes the standard Euclidean norm on a vector space $L$ (in this paper, $L=\mathbb{R}^n$).
 \end{definition}
@@ -408,7 +408,7 @@ These two propositions tell us that when we add data to a set, the resulting MEB
 
 In the interest of contextualizing Algorithm \ref{core-set algorithm}, we define the $(1+\epsilon)$-approximation to an MEB and core-sets.
 \begin{definition}[{{\cite[page 2]{core-sets}}}]
-    Let $\epsilon>0$. Let $r^*$ be the radius of $\MEB(\A)$. A ball $B(c;(1+\epsilon)r)$ is a \textit{$(1+\epsilon)$-approximation} of $\MEB(\A)$ if $r\leq r^*$ and $\mathcal{A}\subseteq B(c,(1+\epsilon)r)$.
+    Let $\epsilon>0$. Let $r^*$ be the radius of $\MEB(\A)$. A ball $B(c,(1+\epsilon)r)$ is a \textit{$(1+\epsilon)$-approximation} of $\MEB(\A)$ if $r\leq r^*$ and $\mathcal{A}\subseteq B(c,(1+\epsilon)r)$.
 \end{definition}
 
 \begin{definition}[{{\cite[page 2]{core-sets}}}]
@@ -416,7 +416,7 @@ In the interest of contextualizing Algorithm \ref{core-set algorithm}, we define
 \end{definition}
 Finally, the following two definitions allow us to formally define the MEBwO.
 \begin{definition}
-    For a set $\A$, the set of $k$-subsets of $\A$ is the set $\mathfrak{K}=\left\{\K\in\mathscr{P}(\A): |\K|=k\right\}$ where $\mathscr(\A)$ is the usual power-set of $\A$.
+    For a set $\A$, the set of $k$-subsets of $\A$ is the set $\mathfrak{K}=\left\{\K\in\mathscr{P}(\A): |\K|=k\right\}$ where $\mathscr{P}(\A)$ is the usual power set of $\A$.
 \end{definition}
 
 \begin{definition}
@@ -459,7 +459,7 @@ For a simple example, consider the data set $\A=\left\{(-2,-1),(2,-1),(2,1),(-2,
     \begin{center}
         \begin{tabular}{CCC}
             \displaystyle\min_{c,r} & r \\
-            \text{s.t.} & \norm{c-a^i} \leq r & i=1,\ldots,n
+            \text{s.t.} & \norm{c-a^i} \leq r, & i=1,\ldots,n.
         \end{tabular}
     \end{center}
     where $c\in\mathbb{R}^d$ and $r\in\mathbb{R}$ are the decision variables corresponding to the centre and radius of the ball respectively.
@@ -474,7 +474,7 @@ For a simple example, consider the data set $\A=\left\{(-2,-1),(2,-1),(2,1),(-2,
     \begin{center}
         \begin{tabular}{CLC}
             \displaystyle\min_{c,\gamma} & \gamma \\
-            \text{s.t.} & \left(a^i\right)^Ta^i - 2\left(a^i\right)^Tc + c^Tc \leq \gamma & i=1,\ldots,n
+            \text{s.t.} & \left(a^i\right)^Ta^i - 2\left(a^i\right)^Tc + c^Tc \leq \gamma, & i=1,\ldots,n.
         \end{tabular}
     \end{center}
 \end{definition}
@@ -535,9 +535,9 @@ Algorithm \ref{core-set algorithm} runs in $O\left(\frac{nd}{\epsilon}+\frac{d^2
     \begin{center}
         \begin{tabular}{CLC}
             \displaystyle\min_{c,\gamma, \xi} & \gamma \\
-            \text{s.t.} & \left(a^i\right)^Ta^i - 2\left(a^i\right)^Tc + c^Tc \leq \gamma + M\xi_i & i=1,\ldots,n \\
-            & \displaystyle\sum_{i=1}^n\xi_i \leq k \\
-            & \xi_i \in \binary & i=1,\ldots,n
+            \text{s.t.} & \left(a^i\right)^Ta^i - 2\left(a^i\right)^Tc + c^Tc \leq \gamma + M\xi_i, & i=1,\ldots,n, \\
+            & \displaystyle\sum_{i=1}^n\xi_i \leq k, \\
+            & \xi_i \in \binary, & i=1,\ldots,n.
         \end{tabular}
     \end{center}
 \end{definition}
@@ -587,7 +587,7 @@ One concern with our choice of $M$ is the effect on the solution time of the sol
 \subsubsection{Quality of $\xi_i$ Solutions in the QCQP Relaxation}
 Another concern regarding the value of $M$ for the exact model is the effect on the optimal solutions for the relaxed $\xi_i$ variables in the QCQP relaxation. This is important as good quality relaxed solutions are essential to Algorithm \ref{relaxation heuristic}, which uses high-valued $\xi_i$ as a proxy for how far a data point lies from the optimal centre, and so for how much of an outlier that point is.
 
-We can evaluate the quality and diversity of relaxed solutions by solving the relaxed model on the same data set with different values of $M$. We generate random data sets (see Section \ref{data}) with $n=1000$, $d=10$, and the standard parameters described in Section \ref{data}, then calculate a lower bound for $M^*$ using Algorithm \ref{alg:diameter approx} for each data set, then solve the model for a sequence of multiples of $M^*$ and record the variance of the list of relaxed solutions. We choose to test 50 different values of $M$ in the sequence $\langle M^*(1+k/2)\rangle _{k=1,\ldots,50}$. The implementation can be found in \texttt{src/xi\_analysis.py} (see Section \ref{sec:impl_python}) and a plot of the variances can be seen in Figure \ref{fig:xi analysis}.
+We can evaluate the quality and diversity of relaxed solutions by solving the relaxed model on the same data set with different values of $M$. We generate random data sets (see Section \ref{data}) with $n=1000$, $d=10$, and the standard parameters described in Section \ref{data}, then calculate a lower bound for $M^*$ using Algorithm \ref{alg:diameter approx} for each data set, then solve the model for a sequence of multiples of $M^*$ and record the variance of the list of relaxed solutions. We choose to test 50 different values of $M$ in the sequence $\langle M^*(1+k/2)\rangle _{k=0,\ldots,49}$. The implementation can be found in \texttt{src/xi\_analysis.py} (see Section \ref{sec:impl_python}) and a plot of the variances can be seen in Figure \ref{fig:xi analysis}.
 
 \begin{figure}
     \centering
@@ -635,9 +635,9 @@ The Average Point Heuristic (APH) works by finding the average point, i.e. $c=\f
     \KwOut{Ball $B(c,r)$}
     $k:=\floor{n(1-\eta)}$\;
     $c:=\frac{1}{n}\sum_{i=1}^na^i$\;
-    $D:=\left\{\norm{c-x}: x\in\A\right\}$\;
+    $D:=\left\{\norm{c-a}: a\in\A\right\}$\;
     Let $D'$ be $D$ sorted in ascending order\;
-    Let $\delta=D[k-1]$ be the $(k-1)$th element of $D'$ (indexing from 0)\;
+    Let $\delta=D'[k-1]$ be the $(k-1)$th element of $D'$ (indexing from 0)\;
     $\A' = \left\{a^i\in\A: D[i] \leq \delta, i=1,\ldots,n\right\}$\;
     $r = \max_{a\in\A'}\norm{c-a}$\;
     \KwRet{$B(c,r)$}
@@ -658,9 +658,9 @@ The MEB Shrinking Heuristic works by computing $\MEB(\A) = B(c,r)$, then simply 
     \KwOut{Ball $B(c,r)$}
     $k:=\floor{n(1-\eta)}$\;
     Let $c$ be the centre of the MEB returned by a heuristic for $\MEB(\A)$\;
-    $D:=\left\{\norm{c-x}: x\in\A\right\}$\;
+    $D:=\left\{\norm{c-a}: a\in\A\right\}$\;
     Let $D'$ be $D$ sorted in ascending order\;
-    Let $\delta$ be the $(k-1)$th element of $D'$ (indexing from 0)\;
+    Let $\delta=D'[k-1]$ be the $(k-1)$th element of $D'$ (indexing from 0)\;
     $\A' = \left\{a^i\in\A: D[i] \leq \delta, i=1,\ldots,n\right\}$\;
     $r = \max_{a\in\A'}\norm{c-a}$\;
     \KwRet $B(c,r)$\;
@@ -847,8 +847,8 @@ We modify the optimization model for the MEB problem, adding the constraint that
 \begin{center}
     \begin{tabular}{CCC}
         \displaystyle\min_{x,r} & r \\
-        \text{s.t.} & \norm{\hat{c}+\beta x - a^i} \leq r & i=1,\ldots,n \\
-        & x\geq0
+        \text{s.t.} & \norm{\hat{c}+\beta x - a^i} \leq r, & i=1,\ldots,n, \\
+        & x\geq0.
     \end{tabular}
 \end{center}
 
@@ -856,8 +856,8 @@ By setting $\gamma=r^2$, $\alpha^i=\hat{c}-a^i$ for $i=1,\ldots,n$, and squaring
 \begin{center}
     \begin{tabular}{CCC}
         \displaystyle\min_{x,\gamma} & \gamma \\
-        \text{s.t.} & \beta^T\beta x^2 + 2\alpha_i^T\beta x + \alpha_i^T\alpha_i \leq \gamma & i=1,\ldots,n \\
-        & x\geq0
+        \text{s.t.} & \beta^T\beta x^2 + 2\alpha_i^T\beta x + \alpha_i^T\alpha_i \leq \gamma, & i=1,\ldots,n, \\
+        & x\geq0.
     \end{tabular}
 \end{center}
 
@@ -957,7 +957,7 @@ Our implementation can be found on GitHub\footnote{\url{https://github.com/tomho
             ]
         ]
     \end{tikzpicture}
-    \caption{Class Hierarchy}
+    \caption{Class Hierarchy of Ball Objects}
     \label{fig:hierarchy}
 \end{figure}
 
@@ -1303,7 +1303,7 @@ Each of our algorithms is able to outperform the ABOD model, and all but the shr
 % Chapter 6
 % =============================================================================
 \chapter{Conclusion}\label{conclusion}
-
+\section{Discussion}
 In this paper, we have explored the minimum enclosing ball with outliers problem and discussed the difficulties when trying to solve this problem optimally by way of an optimization solver. We were interested in the viability of alternative methods which may produce a feasible solution in a reasonable time. We have benchmarked these methods on various data and have recorded the runtimes and solutions when each parameter is varied. From this, we are able to draw conclusions about the effectiveness and viability of each method.
 
 In our results, we consistently observe Shenmaier's approximation giving worse results than the other three algorithms, while often having longer runtimes. This is particularly true for large values of $n$, though Shenmaier's approximation scales linearly with $d$ so for very high dimensional data relative to the number of data points this method may be preferable. The comparatively poor objective function value may be improved by applying an improvement heuristic in these cases.
@@ -1318,6 +1318,7 @@ Our improvement algorithms yielded almost exactly the same results, with the DCS
 
 We compared three of our methods to the tree-based construction method (HDMY) in \cite{huding} in an application to outlier recognition, and found that the balls returned by Shenmaier's approximation and the average point heuristic were able to provide similar performance to that of the HDMY method, though Shenmaier's approximation takes three times as long to run on this data and the average point heuristic takes very little time. Again, it should be noted that our algorithms were benchmarked on a different machine and were not run over multiple instances to reduce the impact of random sampling, so it would be unwise to draw concrete conclusions from these benchmarks.
 
+\section{Future Work}
 There are many directions for further research, one of note which may continue the work done in this paper is whether approximation methods exist which may solve the relaxed optimization model for the minimum enclosing ball with outliers problem within some approximation guarantee. Currently, this is a large bottleneck in both the runtime and the capabilities of the relaxation-based heuristic, seeing as the model was unable to be instantiated for the high-dimensional MNIST data with the available memory on our machine. An algorithm to solve this specific model in a similar manner as that of the simple minimum enclosing ball problem in \cite{two-algorithms} could enable the relaxation-based heuristic to tackle larger problems in less time.
 
 Another interesting direction of research is in the development of improvement heuristics which are able to choose which points to include and exclude from the initial ball. This could work in multiple ways, for example by first finding a ball which excludes ``obvious" outliers first, giving a ball that covers more than $\eta\%$ of the data, and then choosing points to remove which reduce the percentage of points covered until that percentage equals $\eta\%$. Another way would be to find an initial ball which does cover $\eta\%$ of the data, and then ``swap" points which are considered by the model to be inliers and outliers in such a way that after each step the exact number of points inside the ball remains the same but the objective function value is reduced.
